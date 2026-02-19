@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Glass · applied to Zoho enterprise UI</title>
+    <style>
+        /* === identical CSS from the Apple Liquid Glass study — preserved 1:1 === */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+        :root {
+            --accent-blue: #0071e3;
+            --accent-indigo: #5e5ce6;
+            --accent-teal: #30d158;
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --bg-light: #f5f5f7;
+            --bg-white: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-light); color: var(--text-primary); line-height: 1.7; font-size: 16px; }
+
+        .hero { position: relative; min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 80px 32px 72px; overflow: hidden; background: linear-gradient(135deg, #0a0015 0%, #0d0033 40%, #001858 80%, #002266 100%); }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; }
+        .orb-1 { width: 520px; height: 520px; background: radial-gradient(circle, #5e5ce6, transparent 70%); top: -160px; left: -120px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #0071e3, transparent 70%); bottom: -100px; right: -80px; }
+        .orb-3 { width: 320px; height: 320px; background: radial-gradient(circle, #30d158, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 6px 18px; color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 500; letter-spacing: 0.04em; margin-bottom: 28px; text-transform: uppercase; }
+        .dot { width: 6px; height: 6px; background: #30d158; border-radius: 50%; display: inline-block; }
+        h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(40px, 7vw, 78px); font-weight: 900; line-height: 1.05; color: #fff; letter-spacing: -0.02em; margin-bottom: 20px; }
+        .grad { background: linear-gradient(90deg, #a8c8ff, #d4b8ff, #8affc1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-sub { font-size: clamp(15px, 2.2vw, 19px); color: rgba(255,255,255,0.65); max-width: 640px; margin: 0 auto 40px; }
+        .hero-meta { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+        .meta-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.5); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+        .meta-item strong { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600; text-transform: none; letter-spacing: 0; }
+
+        .toc-section { background: var(--bg-white); border-bottom: 1px solid #e5e5ea; padding: 32px 0; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .toc-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-light); text-decoration: none; transition: all 0.2s; border: 1px solid transparent; }
+        .toc-item:hover { color: var(--accent-blue); background: #e8f2ff; border-color: #c7deff; }
+        .toc-num { font-weight: 700; color: var(--accent-blue); min-width: 20px; font-size: 11px; }
+        .toc-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+        .section { padding: 68px 0; border-bottom: 1px solid #e5e5ea; }
+        .section-alt { background: var(--bg-white); }
+        .section-dark { background: linear-gradient(160deg, #0a0015, #001038); color: white; }
+        .section-dark .sl { color: #a8c8ff; }
+        .section-dark h2 { color: white; }
+        .section-dark p, .section-dark li { color: rgba(255,255,255,0.75); }
+        .section-dark p strong { color: white; }
+        .section-dark h3 { color: rgba(255,255,255,0.95); }
+        .section-dark .callout { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .section-dark .callout p { color: rgba(255,255,255,0.85); }
+
+        .sl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent-blue); margin-bottom: 10px; }
+        h2 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(26px, 4vw, 40px); font-weight: 700; line-height: 1.15; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 20px; }
+        h3 { font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 30px 0 12px; letter-spacing: -0.01em; }
+        p { margin-bottom: 16px; color: var(--text-secondary); }
+        p strong { color: var(--text-primary); font-weight: 600; }
+        ul.prose { padding-left: 20px; margin-bottom: 16px; }
+        ul.prose li { color: var(--text-secondary); margin-bottom: 6px; font-size: 15px; line-height: 1.6; }
+
+        .callout { background: #f0f6ff; border-left: 3px solid var(--accent-blue); border-radius: 0 12px 12px 0; padding: 20px 24px; margin: 28px 0; }
+        .callout p { margin: 0; font-style: italic; color: #374151; font-size: 15px; line-height: 1.65; }
+        .cl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-blue); margin-bottom: 8px; }
+
+        .fg { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin: 28px 0; }
+        .fc { background: var(--bg-white); border: 1px solid #e5e5ea; border-radius: 16px; padding: 22px; transition: box-shadow 0.2s, transform 0.2s; }
+        .fc:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .fi { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+        .fc h4 { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 7px; }
+        .fc p { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+        .ib { background: #e8f2ff; } .ii { background: #f0eeff; } .it { background: #e8fff0; } .ia { background: #fffbe8; } .ir { background: #fff0f3; } .ig { background: #f2f2f7; }
+
+        .glass-demo { position: relative; border-radius: 24px; overflow: hidden; margin: 36px 0; min-height: 240px; background: linear-gradient(135deg, #4158d0, #c850c0 50%, #ffcc70); display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 28px; }
+        .gp { background: rgba(255,255,255,0.15); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid rgba(255,255,255,0.35); border-radius: 100px; padding: 11px 26px; color: white; font-weight: 600; font-size: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3); }
+        .gc { background: rgba(255,255,255,0.14); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); border: 1px solid rgba(255,255,255,0.28); border-radius: 18px; padding: 20px 24px; color: white; min-width: 160px; box-shadow: 0 8px 32px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25); }
+        .gc .lbl { font-size: 10px; opacity: 0.65; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+        .gc .val { font-size: 24px; font-weight: 700; line-height: 1; }
+        .demo-cap { text-align: center; font-size: 12px; color: var(--text-secondary); margin-top: -20px; margin-bottom: 28px; font-style: italic; }
+
+        .ct { width: 100%; border-collapse: collapse; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.07); margin: 32px 0; font-size: 13.5px; }
+        .ct thead tr { background: linear-gradient(90deg, #0071e3, #5e5ce6); color: white; }
+        .ct thead th { padding: 15px 18px; text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+        .ct tbody tr { background: white; border-bottom: 1px solid #f2f2f7; }
+        .ct tbody tr:nth-child(even) { background: #fafafa; }
+        .ct td { padding: 13px 18px; color: var(--text-secondary); vertical-align: top; line-height: 1.5; }
+        .ct td:first-child { font-weight: 600; color: var(--text-primary); width: 22%; }
+        .ct td:nth-child(2) { border-right: 1px solid #e5e5ea; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .ta { background: #e8f2ff; color: #0071e3; }
+        .tz { background: #fff0e8; color: #d4521e; }
+
+        .tr { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 24px 0; }
+        .tc-card { border-radius: 14px; padding: 18px; }
+        .tc-card .tic { font-size: 26px; margin-bottom: 8px; }
+        .tc-card .tn { font-size: 14px; font-weight: 700; color: white; margin-bottom: 6px; }
+        .tc-card .td { font-size: 12.5px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+        .ts { background: linear-gradient(135deg, #1c1c3e, #2d2d6b); }
+        .tm { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .tak { background: linear-gradient(135deg, #0f2027, #203a43); }
+        .tsi { background: linear-gradient(135deg, #200122, #6f0000); }
+
+        .vg { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0; }
+        @media (max-width: 600px) { .vg { grid-template-columns: 1fr; } }
+        .vc { border-radius: 14px; padding: 22px; }
+        .vs { background: linear-gradient(135deg, #e8fff0, #d1fadf); border: 1px solid #a7f3c0; }
+        .vw { background: linear-gradient(135deg, #fff0f3, #ffe4e8); border: 1px solid #fca5a5; }
+        .vc h4 { font-size: 14px; font-weight: 700; margin-bottom: 11px; display: flex; align-items: center; gap: 8px; }
+        .vs h4 { color: #065f46; } .vw h4 { color: #9f1239; }
+        .vc ul { padding-left: 16px; }
+        .vc li { font-size: 13.5px; margin-bottom: 6px; line-height: 1.5; }
+        .vs li { color: #064e3b; } .vw li { color: #881337; }
+
+        .sr { display: flex; flex-direction: column; gap: 13px; margin: 24px 0; }
+        .si { display: flex; align-items: center; gap: 14px; }
+        .slb { font-size: 13.5px; font-weight: 600; color: var(--text-primary); min-width: 200px; }
+        .sbb { flex: 1; height: 9px; background: #e5e5ea; border-radius: 100px; overflow: hidden; }
+        .sbf { height: 100%; border-radius: 100px; }
+        .sn { font-size: 12px; font-weight: 700; color: var(--text-secondary); min-width: 30px; text-align: right; }
+
+        .pq { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(18px, 2.8vw, 26px); line-height: 1.45; font-weight: 700; color: rgba(255,255,255,0.9); border-left: 4px solid #a8c8ff; padding: 14px 26px; margin: 32px 0; }
+        .pq cite { display: block; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; font-style: normal; color: rgba(255,255,255,0.5); margin-top: 8px; }
+
+        .is { display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0; justify-content: center; }
+        .ib2 { width: 68px; height: 68px; border-radius: 17px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 18px rgba(0,0,0,0.12); position: relative; overflow: hidden; }
+        .ib2::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, transparent 50%); pointer-events: none; }
+
+        .divider { border: none; border-top: 1px solid #e5e5ea; margin: 32px 0; }
+        code { background: #f2f2f7; border-radius: 5px; padding: 2px 7px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12.5px; color: var(--accent-indigo); }
+        .section-dark code { background: rgba(255,255,255,0.12); color: #c8b8ff; }
+
+        .doc-footer { background: var(--bg-white); border-top: 1px solid #e5e5ea; padding: 32px 0; text-align: center; font-size: 12.5px; color: var(--text-secondary); }
+        .doc-footer strong { color: var(--text-primary); }
+
+        @media (max-width: 640px) {
+            .fg { grid-template-columns: 1fr; }
+            .tr { grid-template-columns: 1fr 1fr; }
+            .ct { font-size: 12px; }
+            .ct td, .ct th { padding: 10px 12px; }
+            .section { padding: 44px 0; }
+            .slb { min-width: 150px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO — adapted to Zoho + Liquid Glass fusion -->
+    <section class="hero">
+        <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+        <div class="hero-badge"><span class="dot"></span>Liquid Glass · Enterprise Context</div>
+        <h1>How Zoho can <span class="grad">borrow & refine</span><br>Apple’s Liquid Glass</h1>
+        <p class="hero-sub">A conceptual adaptation of Apple’s most sophisticated material design for Zoho’s 55+ product suite — balancing transparency, spatial depth, and enterprise‑grade legibility.</p>
+        <div class="hero-meta">
+            <div class="meta-item"><strong>Zoho CRM · Books · Desk · Analytics</strong>Target apps</div>
+            <div class="meta-item"><strong>Selective translucency · 8‑pt grid · WCAG 2.2+</strong>Core constraints</div>
+            <div class="meta-item"><strong>2026 concept</strong>Design fusion</div>
+        </div>
+    </section>
+
+    <!-- TOC unchanged structure but items updated -->
+    <div class="toc-section">
+        <div class="container">
+            <div class="toc-title">Adaptation framework</div>
+            <div class="toc-grid">
+                <a href="#principles" class="toc-item"><span class="toc-num">01</span>Core principles</a>
+                <a href="#glass-zoho" class="toc-item"><span class="toc-num">02</span>Glass for enterprise</a>
+                <a href="#spatial" class="toc-item"><span class="toc-num">03</span>Spatial hierarchy</a>
+                <a href="#performance" class="toc-item"><span class="toc-num">04</span>Performance trade‑offs</a>
+                <a href="#adaptation" class="toc-item"><span class="toc-num">05</span>Zoho product mockups</a>
+                <a href="#accessibility" class="toc-item"><span class="toc-num">06</span>Accessibility first</a>
+                <a href="#comparison" class="toc-item"><span class="toc-num">07</span>Apple vs. Zoho logic</a>
+                <a href="#verdict" class="toc-item"><span class="toc-num">08</span>Feasibility verdict</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 01 — PRINCIPLES: how liquid glass works & what Zoho can extract -->
+    <section class="section section-alt" id="principles">
+        <div class="container">
+            <div class="sl">01 — material logic</div>
+            <h2>What is Liquid Glass — and what makes it transferable?</h2>
+            <p>Liquid Glass, introduced by Apple in 2025, replaces static Gaussian blur with <strong>real‑time lensing</strong> that directionally bends light, creating curved‑glass optics. For Zoho, the key insight isn’t the visual flamboyance — it’s the <strong>intentional use of depth to separate controls from content</strong>. Enterprise interfaces can adopt a restrained version: glass surfaces only for toolbars, side panels, and modals, using the same underlying physics to signal “this layer is interactive”.</p>
+            <div class="glass-demo">
+                <div class="gc"><div class="lbl">Deal score (Zia)</div><div class="val">86<span style="font-size:13px;opacity:0.7;">/100</span></div></div>
+                <div style="display:flex;flex-direction:column;gap:11px;align-items:center;">
+                    <div class="gp">📊 Forecast panel</div>
+                    <div class="gp">📝 Quick note</div>
+                </div>
+                <div class="gc"><div class="lbl">Active filters</div><div class="val">3</div></div>
+            </div>
+            <p class="demo-cap">Conceptual Zoho glass: high‑contrast text, translucency only around interactive chrome.</p>
+            <p>The technical core — Metal shaders doing directional light bending — is overkill for Zoho’s web‑first stack. But the <strong>user‑perceptible result</strong> can be approximated with CSS <code>backdrop-filter: blur()</code> combined with luminosity and contrast adjustments, plus careful edge highlighting to simulate specular response. What matters is the <strong>design intention</strong>: glass signals elevation without obscuring data.</p>
+        </div>
+    </section>
+
+    <!-- 02 — Glass adapted for enterprise density -->
+    <section class="section" id="glass-zoho">
+        <div class="container">
+            <div class="sl">02 — enterprise‑grade translucency</div>
+            <h2>Selective translucency, not total transparency</h2>
+            <p>Zoho’s CRM and Analytics dashboards are densely packed. Applying Liquid Glass wholesale would destroy legibility. Instead, a <strong>tiered glass system</strong>:</p>
+            <div class="fg">
+                <div class="fc"><div class="fi ib">🔮</div><h4>Command bars / global nav</h4><p>Light glass with 85% opacity, strong backdrop blur, always with a solid‑color fallback for contrast. Never place text directly on busy backgrounds.</p></div>
+                <div class="fc"><div class="fi ii">📋</div><h4>Side panels (Zia insights)</h4><p>Medium glass with frosted effect, but text blocks sit on an additional 90% opaque sub‑layer — clarity preserved.</p></div>
+                <div class="fc"><div class="fi it">📊</div><h4>Data cards / KPIs</h4><p>No glass on numbers — they remain fully opaque. Only container edges get subtle glass to indicate grouping.</p></div>
+                <div class="fc"><div class="fi ia">💬</div><h4>Floating action buttons / Zia chat</h4><p>Prominent glass with specular‑like gradient overlay, signalling “always‑on‑top” affordance.</p></div>
+            </div>
+            <p>This constrained palette borrows Apple’s <strong>material hierarchy</strong> without adopting its full‑screen transparency. The result is a Zoho interface that feels modern, spacious, and yet retains the information density power users demand.</p>
+        </div>
+    </section>
+
+    <!-- 03 — spatial hierarchy: three‑layer model for Zoho -->
+    <section class="section section-alt" id="spatial">
+        <div class="container">
+            <div class="sl">03 — spatial depth cues</div>
+            <h2>Background · content · control — adapted for SaaS</h2>
+            <p>Apple’s three‑layer model (wallpaper, scrollable content, floating controls) maps neatly to Zoho’s structure if we reinterpret “wallpaper” as a <strong>neutral workspace tint</strong> rather than a photograph. Zoho could introduce a subtle gradient or low‑contrast pattern as the deepest layer, then opaque content cards float above, and finally glass‑textured toolbars/sidebars occupy the top layer.</p>
+            <div class="callout">
+                <div class="cl">Zoho CRM reimagined</div>
+                <p>The list view (accounts) remains solid white on a soft‑grey background; the left navigation rail adopts a light glass with a 1px highlight; the global search bar becomes a prominent glass element. Users perceive the hierarchy instantly without needing to decode color alone.</p>
+            </div>
+            <p>This spatial approach reduces cognitive load — exactly what enterprise UX needs — because depth becomes an additional channel of information.</p>
+        </div>
+    </section>
+
+    <!-- 04 — performance considerations -->
+    <section class="section" id="performance">
+        <div class="container">
+            <div class="sl">04 — web‑first constraints</div>
+            <h2>Metal vs. CSS — graceful degradation</h2>
+            <p>Apple’s Liquid Glass runs on GPU via Metal, dedicated to each display. Zoho’s web apps run on heterogeneous hardware. But modern <code>backdrop-filter</code> is widely supported (Edge, Chrome, Safari, Firefox). Zoho could offer <strong>progressive enhancement</strong>: browsers that support it get subtle glass; older browsers see solid backgrounds with same layout. The performance cost of a few blurred layers is negligible on today’s machines.</p>
+            <div class="tr">
+                <div class="tc-card ts"><div class="tic">⚡</div><div class="tn">backdrop-filter: blur(12px)</div><div class="td">Combined with luminosity blend modes to emulate Apple’s adaptive tinting. Use sparingly.</div></div>
+                <div class="tc-card tm"><div class="tic">🔩</div><div class="tn">will-change: transform</div><div class="td">Hint for compositor‑layer isolation to keep scrolling smooth when glass panels are sticky.</div></div>
+                <div class="tc-card tak"><div class="tic">📐</div><div class="tn">8‑pt grid + glass</div><div class="td">Spacing unchanged — glass only affects surface treatment, not layout rhythm.</div></div>
+                <div class="tc-card tsi"><div class="tic">🧠</div><div class="tn">prefers-reduced-transparency</div><div class="td">Respect OS setting; fallback to solid panels automatically.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 05 — mockups: Zoho products with glass -->
+    <section class="section section-alt" id="adaptation">
+        <div class="container">
+            <div class="sl">05 — application mockups</div>
+            <h2>Zoho CRM, Analytics, Desk with restrained glass</h2>
+            <div class="fg">
+                <div class="fc"><div class="fi ir">📇</div><h4>CRM deal view</h4><p>Left rail: light glass. Top action bar: glass. Main deal cards: opaque white. Zia insight panel (right): semi‑glass with solid text container. Spatial separation clear.</p></div>
+                <div class="fc"><div class="fi ig">📉</div><h4>Analytics dashboard</h4><p>Chart area fully opaque; filter bar and date picker use glass to indicate “adjustable” layer. KPIs in glass cards with 0.9 opacity background.</p></div>
+                <div class="fc"><div class="fi it">🎫</div><h4>Desk ticket view</h4><p>Conversation thread opaque; reply box and side panel (suggested solutions) use glass. The glass signals “you can interact here” while thread remains read‑focused.</p></div>
+                <div class="fc"><div class="fi ia">📝</div><h4>Writer editor</h4><p>Canvas white; toolbars and comments panel glass — exactly the Apple Pages model, now applied to Zoho Writer.</p></div>
+            </div>
+            <p>Each mockup keeps critical data on opaque surfaces. Glass is reserved for navigation, filtering, and secondary panels — exactly the <strong>functional restraint</strong> that makes Liquid Glass suitable for enterprise.</p>
+        </div>
+    </section>
+
+    <!-- 06 — accessibility first (WCAG 2.2 AA) -->
+    <section class="section" id="accessibility">
+        <div class="container">
+            <div class="sl">06 — non‑negotiable contrast</div>
+            <h2>How Zoho would out‑accessibility Apple</h2>
+            <p>Apple’s Liquid Glass received criticism for contrast risks. Zoho, serving business users with visual demands, cannot compromise. The solution: <strong>never place text directly on a live glass surface</strong>. Any text‑bearing glass element must have an inner “solid insert” or a 90%+ opaque layer behind the text. Icons and controls can sit on pure glass, but always with high‑contrast borders (a technique Apple also uses in its HIG but doesn’t enforce).</p>
+            <div class="callout">
+                <div class="cl">proactive accessibility</div>
+                <p>Zoho’s design system already enforces 4.5:1 contrast. Glass would inherit those rules: when a glass panel contains a label, the label’s background layer is programmatically opaque. The glass effect is visible <em>around</em> the text, not behind it.</p>
+            </div>
+            <p>Three system‑level toggles (mirroring Apple’s) would be present: <strong>Reduce Transparency</strong> (fully opaque panels), <strong>Increase Contrast</strong> (adds a 1px border to all glass), and <strong>Reduce Motion</strong> (disables any elastic transitions). These would propagate to every Zoho product using the design tokens.</p>
+        </div>
+    </section>
+
+    <!-- 07 — comparison: Apple’s glass vs. Zoho’s adaptation -->
+    <section class="section section-dark" id="comparison">
+        <div class="container">
+            <div class="sl">07 — side‑by‑side logic</div>
+            <h2>Apple consumer delight ↔ Zoho productivity precision</h2>
+            <table class="ct">
+                <thead><tr><th>Dimension</th><th><span class="tag ta">Apple Liquid Glass</span></th><th><span class="tag tz">Zoho adapted glass</span></th></tr></thead>
+                <tbody>
+                    <tr><td>Primary goal</td><td>Delight, immersion, platform identity</td><td>Spatial hierarchy, reduced cognitive load, modernised aesthetic</td></tr>
+                    <tr><td>Text placement</td><td>Sometimes directly on glass (risk)</td><td>Never — always opaque backing behind text</td></tr>
+                    <tr><td>Glass density</td><td>Can cover large areas (sidebars, menus)</td><td>Confined to navigation bars, toolbars, secondary panels</td></tr>
+                    <tr><td>Motion physics</td><td>Elastic, fluid, materialising</td><td>Subtle fade‑in, no elastic — stays professional</td></tr>
+                    <tr><td>Background</td><td>Dynamic wallpaper, photography</td><td>Static low‑contrast gradient / neutral tint</td></tr>
+                    <tr><td>Accessibility baseline</td><td>Material modifiers, optional</td><td>WCAG 2.2 AA mandatory for all glass placements</td></tr>
+                </tbody>
+            </table>
+            <p>The adaptation retains the <em>perceptual benefits</em> of glass — depth, layering, material affordance — while discarding elements that conflict with data density and universal legibility.</p>
+        </div>
+    </section>
+
+    <!-- 08 — final verdict: feasibility for Zoho -->
+    <section class="section section-alt" id="verdict">
+        <div class="container">
+            <div class="sl">08 — executive summary</div>
+            <h2>Can Zoho implement its own Liquid Glass?</h2>
+            <p><strong>Yes — with design leadership.</strong> The technical barriers are low (CSS filters, will‑change, progressive enhancement). The real work is in the <strong>design system</strong>: defining exactly which components get glass, at what opacity, with what backing, and baking those decisions into tokens consumed by all 55+ products.</p>
+
+            <div class="vg">
+                <div class="vc vs">
+                    <h4>✅ Advantages for Zoho</h4>
+                    <ul>
+                        <li>Modern visual language without sacrificing density</li>
+                        <li>Stronger spatial cues for navigation vs. content</li>
+                        <li>Competitive differentiation from other SaaS suites</li>
+                        <li>Can be rolled out progressively, product by product</li>
+                        <li>Leverages existing browser capabilities</li>
+                    </ul>
+                </div>
+                <div class="vc vw">
+                    <h4>⚠️ Challenges to manage</h4>
+                    <ul>
+                        <li>Consistency across 55+ legacy products</li>
+                        <li>Training product teams to apply glass correctly</li>
+                        <li>Ensuring accessibility always overrides aesthetics</li>
+                        <li>Performance on very old devices (graceful fallback)</li>
+                        <li>User education: why some panels look different</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="sr">
+                <div class="si"><div class="slb">Feasibility (technical)</div><div class="sbb"><div class="sbf" style="width:92%;background:linear-gradient(90deg,#5e5ce6,#a78bfa);"></div></div><div class="sn">92</div></div>
+                <div class="si"><div class="slb">Alignment with Zoho brand</div><div class="sbb"><div class="sbf" style="width:87%;background:linear-gradient(90deg,#0071e3,#5ac8fa);"></div></div><div class="sn">87</div></div>
+                <div class="si"><div class="slb">Accessibility compatibility</div><div class="sbb"><div class="sbf" style="width:94%;background:linear-gradient(90deg,#30d158,#34c759);"></div></div><div class="sn">94</div></div>
+                <div class="si"><div class="slb">Cross‑product rollout complexity</div><div class="sbb"><div class="sbf" style="width:63%;background:linear-gradient(90deg,#ff9500,#ffd60a);"></div></div><div class="sn">63</div></div>
+            </div>
+
+            <p>The largest unknown is <strong>design governance</strong> — Zoho’s current cross‑product consistency is moderate; glass would demand stricter oversight. However, if executed with the same rigour as Apple’s HIG, the result could be the most sophisticated enterprise UI on the market — one that finally brings the clarity of spatial design to business software.</p>
+
+            <div class="pq" style="color:var(--text-primary); border-left-color: var(--accent-blue);">
+                “The goal isn’t to copy Apple. It’s to understand why glass works as a signal — and then apply that signal where it matters: toolbars, sidebars, and floating actions. Everything else stays solid. That’s the Zoho way.”
+                <cite>— adaptation principle, 2026</cite>
+            </div>
+        </div>
+    </section>
+
+    <div class="doc-footer">
+        <div class="container">
+            <p><strong>Liquid Glass · Zoho Enterprise Concept</strong> | February 2026</p>
+            <p style="margin-top:8px;">Analysis based on Apple’s iOS 26 design language, WWDC sessions, and Zoho’s existing UI patterns. All product names are trademarks of their respective owners.</p>
+        </div>
+    </div>
+</body>
+</html>

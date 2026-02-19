@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Systems Engineer Case Study — Architecture at Scale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f4f0e8;
+    --cream: #ede8dc;
+    --rust: #c8461e;
+    --rust-dim: #9a351700;
+    --rust-border: #c8461e55;
+    --steel: #2b3a52;
+    --steel-light: #4a6080;
+    --gold: #b89248;
+    --gold-light: #d4af6a;
+    --muted: #7a7060;
+    --rule: #d0c9bb;
+    --code-bg: #1a1a1a;
+    --code-text: #d4c8a8;
+    --highlight-bg: #f0eade;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 1px solid var(--ink);
+    padding: 0 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    top: 0;
+    z-index: 100;
+    background: var(--paper);
+    height: 52px;
+  }
+
+  .masthead-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .masthead-center {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .masthead-right {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 6rem 4rem 4rem;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 4rem;
+    align-items: end;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: var(--rust);
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-top: 1.5rem;
+    line-height: 1.65;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    padding: 2rem;
+    border: 1px solid var(--rule);
+    background: var(--cream);
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .hero-meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hero-meta-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .hero-divider {
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ── PULLQUOTE BAND ── */
+  .pullquote-band {
+    background: var(--steel);
+    color: white;
+    padding: 3.5rem 4rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .pullquote-band::before {
+    content: '"';
+    position: absolute;
+    font-family: 'DM Serif Display', serif;
+    font-size: 22rem;
+    line-height: 1;
+    top: -4rem;
+    left: 2rem;
+    color: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+
+  .pullquote-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .pullquote-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pullquote-text em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .pullquote-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-cell {
+    background: var(--steel);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.4;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .body-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 4rem;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 5rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 2rem;
+    align-items: baseline;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    letter-spacing: 0.1em;
+    padding-top: 0.25rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .section-intro {
+    grid-column: 2;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 680px;
+    line-height: 1.7;
+    margin-top: 0.5rem;
+  }
+
+  /* ── TWO COLUMN ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  /* ── BODY TEXT ── */
+  .body-text {
+    font-size: 15px;
+    line-height: 1.78;
+    color: var(--ink);
+    max-width: 680px;
+  }
+
+  .body-text + .body-text { margin-top: 1.2em; }
+
+  .body-text strong { font-weight: 600; }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-card {
+    border: 1px solid var(--rule);
+    background: var(--cream);
+    padding: 2rem 2.5rem;
+    position: relative;
+  }
+
+  .challenge-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 3.5rem;
+    color: var(--rule);
+    line-height: 1;
+  }
+
+  .challenge-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 0.8rem;
+  }
+
+  .challenge-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: var(--ink);
+  }
+
+  .challenge-body {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* ── ARCHITECTURE DIAGRAM ── */
+  .arch-diagram {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 2.5rem;
+    overflow-x: auto;
+    border-left: 3px solid var(--rust);
+    position: relative;
+  }
+
+  .arch-diagram::before {
+    content: 'ARCHITECTURE';
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .arch-diagram .comment { color: #5a6e5a; }
+  .arch-diagram .highlight { color: #d4af6a; }
+  .arch-diagram .accent { color: #e8836a; }
+  .arch-diagram .dim { color: #4a5568; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 0;
+    padding: 2rem 2.5rem;
+    overflow-x: auto;
+    position: relative;
+    border-top: 1px solid #2a2a2a;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .code-block-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 1rem;
+  }
+
+  .code-block code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--code-text);
+    white-space: pre;
+    display: block;
+  }
+
+  .kw { color: #8bb0d9; }
+  .str { color: #98c379; }
+  .num { color: #d19a66; }
+  .cmt { color: #4a5568; }
+  .fn-name { color: #61afef; }
+  .cls { color: #e5c07b; }
+  .prop { color: #e06c75; }
+
+  /* ── DECISION TABLE ── */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .decision-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.8rem 1.2rem;
+    text-align: left;
+    border-bottom: 2px solid var(--ink);
+    background: var(--cream);
+  }
+
+  .decision-table td {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .decision-table tr:last-child td { border-bottom: none; }
+
+  .decision-table tr:hover td { background: var(--highlight-bg); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    background: var(--steel);
+    color: white;
+    margin-right: 0.3rem;
+  }
+
+  .badge-rust { background: var(--rust); }
+  .badge-gold { background: var(--gold); }
+  .badge-muted { background: var(--muted); }
+
+  /* ── INSIGHT BLOCK ── */
+  .insight {
+    border-left: 3px solid var(--gold);
+    padding: 1.5rem 2rem;
+    background: var(--cream);
+    margin: 2.5rem 0;
+  }
+
+  .insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .insight-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  /* ── SKILL MATRIX ── */
+  .skill-matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  .skill-cell {
+    background: var(--paper);
+    padding: 1.5rem;
+    transition: background 0.15s;
+  }
+
+  .skill-cell:hover { background: var(--cream); }
+
+  .skill-domain {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 0.6rem;
+  }
+
+  .skill-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-bar-wrap {
+    height: 2px;
+    background: var(--rule);
+    margin-top: 0.8rem;
+  }
+
+  .skill-bar {
+    height: 100%;
+    background: var(--steel);
+    transition: width 1s ease;
+  }
+
+  .skill-bar.expert { background: var(--rust); }
+  .skill-bar.advanced { background: var(--steel); }
+  .skill-bar.intermediate { background: var(--gold); }
+
+  .skill-level {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  /* ── FLOW ── */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 2.5rem 0;
+    overflow-x: auto;
+  }
+
+  .flow-step {
+    flex: 1;
+    min-width: 160px;
+    padding: 1.5rem;
+    border: 1px solid var(--rule);
+    border-right: none;
+    position: relative;
+    background: var(--paper);
+  }
+
+  .flow-step:last-child { border-right: 1px solid var(--rule); }
+
+  .flow-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--paper);
+    padding: 2px 0;
+    z-index: 2;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .flow-step:last-child::after { display: none; }
+
+  .flow-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--rust);
+    margin-bottom: 0.5rem;
+  }
+
+  .flow-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .flow-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* ── OUTCOME METRICS ── */
+  .outcome-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin: 2.5rem 0;
+  }
+
+  .outcome-cell {
+    background: var(--paper);
+    padding: 2.5rem 2rem;
+  }
+
+  .outcome-delta {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3rem;
+    color: var(--rust);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .outcome-metric {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+
+  .outcome-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── ANNOTATION ── */
+  .annotation {
+    display: flex;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    font-size: 13px;
+    margin-bottom: 1px;
+  }
+
+  .annotation-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--steel);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .annotation-icon.warn { background: var(--rust); }
+  .annotation-icon.ok { background: #3a7a4a; }
+
+  .annotation-content {
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .annotation-content strong { font-weight: 600; }
+
+  /* ── COLOPHON ── */
+  .colophon {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4rem;
+    margin-top: 0;
+  }
+
+  .colophon-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 2rem;
+  }
+
+  .colophon h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 1rem;
+  }
+
+  .colophon ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .colophon li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .colophon li::before {
+    content: '·';
+    color: var(--rust);
+  }
+
+  .colophon-foot {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .colophon-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+  }
+
+  .colophon-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── HORIZONTAL RULE ── */
+  .ruled {
+    height: 1px;
+    background: var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  /* ── LAYER STACK ── */
+  .layer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+
+  .layer-row {
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    gap: 2rem;
+    transition: background 0.1s;
+  }
+
+  .layer-row:last-child { border-bottom: none; }
+  .layer-row:hover { background: var(--cream); }
+
+  .layer-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+  }
+
+  .layer-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .layer-tech {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--steel-light);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .layer-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rust);
+    flex-shrink: 0;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-grid { animation: fadeUp 0.7s ease both; }
+  .pullquote-inner { animation: fadeUp 0.7s ease 0.1s both; }
+
+  /* ── MARGINAL NOTE ── */
+  .wide-layout {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .marginal {
+    padding-top: 0.3rem;
+  }
+
+  .marginal p {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--muted);
+    border-left: 2px solid var(--rule);
+    padding-left: 1rem;
+  }
+
+  .marginal p + p { margin-top: 0.8rem; }
+
+  /* ── SIDENOTE SECTION ── */
+  .sidenote-wrap {
+    padding: 2rem 2.5rem;
+    background: var(--cream);
+    border-top: 2px solid var(--ink);
+  }
+
+  .sidenote-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+
+  .sidenote-text {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { padding: 4rem 2rem 3rem; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .body-wrapper { padding: 0 2rem; }
+    .masthead { padding: 0 2rem; }
+    .pullquote-inner { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr 1fr; }
+    .skill-matrix { grid-template-columns: 1fr 1fr; }
+    .outcome-grid { grid-template-columns: 1fr 1fr; }
+    .colophon { padding: 3rem 2rem; }
+    .colophon-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .wide-layout { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <span class="masthead-label">Case Study · Systems Engineering</span>
+  <span class="masthead-center">Full-Stack Distributed Platform</span>
+  <span class="masthead-right">Vol. I — 2024</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow">Senior Systems Engineer · Case Study</div>
+      <h1 class="hero-title">
+        Building at<br>
+        <em>Scale,</em><br>
+        End to End
+      </h1>
+      <p class="hero-subtitle">
+        An in-depth study of cross-domain systems thinking — how a senior engineer 
+        navigates cloud architecture, embedded systems, AI/ML integration, 
+        and full-stack development within a single production platform.
+      </p>
+    </div>
+    <aside class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Role</span>
+        <span class="hero-meta-value">Senior / Staff Systems Engineer</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Domain Coverage</span>
+        <span class="hero-meta-value">Cloud · Embedded · AI/ML · FinTech · IoT</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Stack Depth</span>
+        <span class="hero-meta-value">Full vertical — silicon to SaaS</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Duration</span>
+        <span class="hero-meta-value">18-month platform build</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Team Size</span>
+        <span class="hero-meta-value">6 engineers across 3 time zones</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- PULL QUOTE BAND -->
+<div class="pullquote-band">
+  <div class="pullquote-inner">
+    <p class="pullquote-text">
+      The modern systems engineer is not a specialist — they are a 
+      <em>translator</em> who can speak fluently between silicon, 
+      cloud, and product.
+    </p>
+    <div class="pullquote-stats">
+      <div class="stat-cell">
+        <span class="stat-num">500+</span>
+        <span class="stat-label">Skills catalogued across domains</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">8</span>
+        <span class="stat-label">Cloud platforms integrated</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">12</span>
+        <span class="stat-label">Industrial protocols implemented</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num">3</span>
+        <span class="stat-label">Production AI models in deployment</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN BODY -->
+<div class="body-wrapper">
+
+  <!-- SECTION 1: PROBLEM STATEMENT -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 01</span>
+      <div>
+        <h2 class="section-title">The Problem Space</h2>
+        <p class="section-intro">
+          A mid-market industrial firm needed to unify OT and IT infrastructure — 
+          connecting factory floor equipment to a cloud-native analytics platform 
+          while maintaining sub-100ms control loop latency.
+        </p>
+      </div>
+    </div>
+
+    <div class="wide-layout">
+      <div>
+        <p class="body-text">
+          The organization operated legacy SCADA systems across three manufacturing 
+          plants, each using different PLC vendors — Siemens S7-1500, Rockwell 
+          CompactLogix, and Schneider Modicon — communicating over isolated 
+          PROFINET and Modbus TCP networks with no cross-plant visibility.
+        </p>
+        <p class="body-text" style="margin-top:1.2em">
+          Leadership required a unified operational dashboard, predictive 
+          maintenance capabilities, and the ability to retrain ML models 
+          on live production data without disrupting control systems.
+          The constraints were severe: <strong>zero tolerance for downtime</strong>, 
+          OT/IT network segregation requirements, and a team with limited 
+          cloud-native experience.
+        </p>
+
+        <div class="insight">
+          <div class="insight-label">Core Tension</div>
+          <p class="insight-text">
+            "Make the factory smarter" and "do not touch what works" 
+            are fundamentally contradictory mandates — and both are non-negotiable.
+          </p>
+        </div>
+
+        <p class="body-text">
+          This case study documents how cross-domain systems thinking — spanning 
+          IEC 61131-3 PLC programming, edge computing, Kubernetes orchestration, 
+          and production ML — was applied to resolve this tension without 
+          compromise on either constraint.
+        </p>
+      </div>
+      <div class="marginal">
+        <p>All PLC code changes required dual sign-off from OT and IT leads, adding a coordination layer that slowed iteration velocity by ~40% initially.</p>
+        <p style="margin-top:1rem">Network topology mapping took 3 weeks before a single line of integration code was written.</p>
+      </div>
+    </div>
+
+    <div class="ruled"></div>
+
+    <div class="three-col" style="margin-top:2rem">
+      <div class="challenge-card" data-num="1">
+        <div class="challenge-tag">Challenge</div>
+        <div class="challenge-title">Protocol Heterogeneity</div>
+        <p class="challenge-body">Three PLC vendors, four fieldbus protocols (PROFINET, Modbus TCP, EtherCAT, OPC UA), and zero shared data model across plants.</p>
+      </div>
+      <div class="challenge-card" data-num="2">
+        <div class="challenge-tag">Challenge</div>
+        <div class="challenge-title">Latency vs. Analytics</div>
+        <p class="challenge-body">Control loops demand sub-100ms determinism. Cloud analytics pipelines introduce unpredictable jitter. These cannot share the same network path.</p>
+      </div>
+      <div class="challenge-card" data-num="3">
+        <div class="challenge-tag">Challenge</div>
+        <div class="challenge-title">ML in Safety Context</div>
+        <p class="challenge-body">Deploying predictive maintenance models near safety-rated machinery requires IEC 62443 compliance and strict separation of inference from control.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: ARCHITECTURE DECISIONS -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 02</span>
+      <div>
+        <h2 class="section-title">Architecture Decisions</h2>
+        <p class="section-intro">
+          Every architectural choice was a deliberate trade-off between 
+          operational safety, developer velocity, and long-term maintainability.
+        </p>
+      </div>
+    </div>
+
+    <!-- SVG Architecture Diagram -->
+    <div style="background:#1a1a1a; padding:2.5rem; border-left:3px solid var(--rust); position:relative; overflow-x:auto;">
+      <div style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.2em; color:rgba(255,255,255,0.2); margin-bottom:1.5rem; text-transform:uppercase;">Architecture · Unified IIoT + Cloud Stack</div>
+      <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px; display:block; font-family:'DM Mono',monospace;">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#c8461e"/>
+          </marker>
+          <marker id="arrow-up" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4a6080"/>
+          </marker>
+          <marker id="arrow-gold" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#b89248"/>
+          </marker>
+        </defs>
+
+        <!-- ── LEVEL 0: FIELD ── -->
+        <rect x="10" y="10" width="880" height="110" rx="2" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+        <text x="22" y="30" fill="#c8461e" font-size="9" letter-spacing="3">LEVEL 0</text>
+        <text x="72" y="30" fill="#555" font-size="9" letter-spacing="2">· FIELD DEVICES</text>
+
+        <!-- PLC boxes -->
+        <rect x="50" y="42" width="200" height="60" rx="2" fill="#1e2a1e" stroke="#3a6a3a" stroke-width="1"/>
+        <text x="150" y="62" fill="#7ab87a" font-size="10" font-weight="500" text-anchor="middle">Siemens S7-1500</text>
+        <text x="150" y="78" fill="#4a7a4a" font-size="9" text-anchor="middle">PROFINET / IRT</text>
+        <text x="150" y="93" fill="#3a5a3a" font-size="8" text-anchor="middle">Hard real-time · IRT class</text>
+
+        <rect x="340" y="42" width="200" height="60" rx="2" fill="#1e2a1e" stroke="#3a6a3a" stroke-width="1"/>
+        <text x="440" y="62" fill="#7ab87a" font-size="10" font-weight="500" text-anchor="middle">Rockwell CL5380</text>
+        <text x="440" y="78" fill="#4a7a4a" font-size="9" text-anchor="middle">EtherNet/IP</text>
+        <text x="440" y="93" fill="#3a5a3a" font-size="8" text-anchor="middle">CIP safety · 1ms scan</text>
+
+        <rect x="630" y="42" width="200" height="60" rx="2" fill="#1e2a1e" stroke="#3a6a3a" stroke-width="1"/>
+        <text x="730" y="62" fill="#7ab87a" font-size="10" font-weight="500" text-anchor="middle">Schneider M241</text>
+        <text x="730" y="78" fill="#4a7a4a" font-size="9" text-anchor="middle">Modbus TCP</text>
+        <text x="730" y="93" fill="#3a5a3a" font-size="8" text-anchor="middle">Port 502 · Function 03/04</text>
+
+        <!-- down arrows from level 0 -->
+        <line x1="150" y1="102" x2="150" y2="148" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="440" y1="102" x2="440" y2="148" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="730" y1="102" x2="730" y2="148" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <!-- converge lines -->
+        <line x1="150" y1="140" x2="440" y2="140" stroke="#c8461e" stroke-width="1" stroke-dasharray="4 3"/>
+        <line x1="730" y1="140" x2="440" y2="140" stroke="#c8461e" stroke-width="1" stroke-dasharray="4 3"/>
+
+        <!-- ── LEVEL 1: EDGE ── -->
+        <rect x="10" y="160" width="880" height="120" rx="2" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+        <text x="22" y="180" fill="#c8461e" font-size="9" letter-spacing="3">LEVEL 1</text>
+        <text x="72" y="180" fill="#555" font-size="9" letter-spacing="2">· EDGE GATEWAY  (K3s · 3 nodes/plant · Jetson AGX Orin)</text>
+
+        <rect x="40" y="190" width="220" height="72" rx="2" fill="#1a1e2a" stroke="#3a4a6a" stroke-width="1"/>
+        <text x="150" y="212" fill="#8ab4d4" font-size="10" font-weight="500" text-anchor="middle">OPC UA Aggregator</text>
+        <text x="150" y="228" fill="#4a6888" font-size="9" text-anchor="middle">opcua-asyncio · Python</text>
+        <text x="150" y="243" fill="#354860" font-size="8" text-anchor="middle">mTLS · X.509 certs · 100ms sub</text>
+
+        <rect x="330" y="190" width="220" height="72" rx="2" fill="#1a1e2a" stroke="#3a4a6a" stroke-width="1"/>
+        <text x="440" y="212" fill="#8ab4d4" font-size="10" font-weight="500" text-anchor="middle">EdgeX Foundry</text>
+        <text x="440" y="228" fill="#4a6888" font-size="9" text-anchor="middle">Normalised data model</text>
+        <text x="440" y="243" fill="#354860" font-size="8" text-anchor="middle">Device services · Core services</text>
+
+        <rect x="620" y="190" width="240" height="72" rx="2" fill="#1a1e2a" stroke="#3a4a6a" stroke-width="1"/>
+        <text x="740" y="212" fill="#8ab4d4" font-size="10" font-weight="500" text-anchor="middle">MQTT Broker / EMQX</text>
+        <text x="740" y="228" fill="#4a6888" font-size="9" text-anchor="middle">MQTT v5.0 · QoS 1</text>
+        <text x="740" y="243" fill="#354860" font-size="8" text-anchor="middle">50k msg/sec · TLS 1.3</text>
+
+        <!-- arrows in level 1 -->
+        <line x1="260" y1="226" x2="328" y2="226" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+        <line x1="550" y1="226" x2="618" y2="226" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+
+        <!-- boundary label -->
+        <line x1="10" y1="292" x2="890" y2="292" stroke="#c8461e" stroke-width="1" stroke-dasharray="6 4"/>
+        <rect x="330" y="284" width="240" height="16" rx="2" fill="#1a1a1a"/>
+        <text x="450" y="295" fill="#c8461e" font-size="8" text-anchor="middle" letter-spacing="2">AIR-GAPPED BOUNDARY · DMZ</text>
+
+        <!-- down arrow to level 2 -->
+        <line x1="450" y1="280" x2="450" y2="310" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- ── LEVEL 2: DMZ ── -->
+        <rect x="10" y="312" width="880" height="90" rx="2" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+        <text x="22" y="332" fill="#c8461e" font-size="9" letter-spacing="3">LEVEL 2</text>
+        <text x="72" y="332" fill="#555" font-size="9" letter-spacing="2">· DMZ  (Protocol relay · no business logic)</text>
+
+        <rect x="80" y="342" width="200" height="48" rx="2" fill="#221a1a" stroke="#5a3a2a" stroke-width="1"/>
+        <text x="180" y="362" fill="#d4946a" font-size="10" font-weight="500" text-anchor="middle">Kafka Connect</text>
+        <text x="180" y="377" fill="#7a5040" font-size="9" text-anchor="middle">Source connectors · MQTT</text>
+
+        <rect x="340" y="342" width="200" height="48" rx="2" fill="#221a1a" stroke="#5a3a2a" stroke-width="1"/>
+        <text x="440" y="362" fill="#d4946a" font-size="10" font-weight="500" text-anchor="middle">Schema Registry</text>
+        <text x="440" y="377" fill="#7a5040" font-size="9" text-anchor="middle">Avro · Confluent compatible</text>
+
+        <rect x="600" y="342" width="220" height="48" rx="2" fill="#221a1a" stroke="#5a3a2a" stroke-width="1"/>
+        <text x="710" y="362" fill="#d4946a" font-size="10" font-weight="500" text-anchor="middle">Debezium CDC</text>
+        <text x="710" y="377" fill="#7a5040" font-size="9" text-anchor="middle">Change data capture · WAL</text>
+
+        <line x1="280" y1="366" x2="338" y2="366" stroke="#b89248" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+        <line x1="540" y1="366" x2="598" y2="366" stroke="#b89248" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+
+        <!-- encrypted tunnel label + arrow -->
+        <line x1="450" y1="392" x2="450" y2="420" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <rect x="360" y="396" width="180" height="14" rx="2" fill="#1a1a1a"/>
+        <text x="450" y="406" fill="#555" font-size="8" text-anchor="middle" letter-spacing="1.5">ENCRYPTED TUNNEL · TLS</text>
+
+        <!-- ── LEVEL 3: CLOUD ── -->
+        <rect x="10" y="425" width="880" height="120" rx="2" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+        <text x="22" y="445" fill="#c8461e" font-size="9" letter-spacing="3">LEVEL 3</text>
+        <text x="72" y="445" fill="#555" font-size="9" letter-spacing="2">· CLOUD  (AWS multi-region · us-east-1 primary)</text>
+
+        <rect x="30" y="455" width="175" height="72" rx="2" fill="#1a1a22" stroke="#3a3a6a" stroke-width="1"/>
+        <text x="117" y="476" fill="#a0a0e0" font-size="10" font-weight="500" text-anchor="middle">MSK / Kafka</text>
+        <text x="117" y="492" fill="#5a5a90" font-size="9" text-anchor="middle">3 brokers · MSK Serverless</text>
+        <text x="117" y="507" fill="#3a3a60" font-size="8" text-anchor="middle">50k events/sec peak</text>
+
+        <rect x="225" y="455" width="175" height="72" rx="2" fill="#1a1a22" stroke="#3a3a6a" stroke-width="1"/>
+        <text x="312" y="476" fill="#a0a0e0" font-size="10" font-weight="500" text-anchor="middle">Flink Streaming</text>
+        <text x="312" y="492" fill="#5a5a90" font-size="9" text-anchor="middle">Feature extraction · windows</text>
+        <text x="312" y="507" fill="#3a3a60" font-size="8" text-anchor="middle">500ms tumbling · p99 &lt;200ms</text>
+
+        <rect x="420" y="455" width="175" height="72" rx="2" fill="#1a1a22" stroke="#3a3a6a" stroke-width="1"/>
+        <text x="507" y="476" fill="#a0a0e0" font-size="10" font-weight="500" text-anchor="middle">S3 Data Lake</text>
+        <text x="507" y="492" fill="#5a5a90" font-size="9" text-anchor="middle">Parquet · Glue catalog</text>
+        <text x="507" y="507" fill="#3a3a60" font-size="8" text-anchor="middle">18-month training corpus</text>
+
+        <rect x="615" y="455" width="155" height="72" rx="2" fill="#1a1a22" stroke="#3a3a6a" stroke-width="1"/>
+        <text x="692" y="476" fill="#a0a0e0" font-size="10" font-weight="500" text-anchor="middle">SageMaker</text>
+        <text x="692" y="492" fill="#5a5a90" font-size="9" text-anchor="middle">LightGBM · ONNX export</text>
+        <text x="692" y="507" fill="#3a3a60" font-size="8" text-anchor="middle">92% precision · MLflow</text>
+
+        <rect x="780" y="455" width="105" height="72" rx="2" fill="#1a1a22" stroke="#3a3a6a" stroke-width="1"/>
+        <text x="832" y="476" fill="#a0a0e0" font-size="10" font-weight="500" text-anchor="middle">Grafana</text>
+        <text x="832" y="492" fill="#5a5a90" font-size="9" text-anchor="middle">Dashboards</text>
+        <text x="832" y="507" fill="#3a3a60" font-size="8" text-anchor="middle">4 golden signals</text>
+
+        <line x1="205" y1="491" x2="223" y2="491" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+        <line x1="400" y1="491" x2="418" y2="491" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+        <line x1="595" y1="491" x2="613" y2="491" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+        <line x1="770" y1="491" x2="778" y2="491" stroke="#4a6080" stroke-width="1.5" marker-end="url(#arrow-up)"/>
+
+        <!-- down arrow to level 4 -->
+        <line x1="250" y1="528" x2="250" y2="556" stroke="#c8461e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- ── LEVEL 4: PRODUCT ── -->
+        <rect x="10" y="558" width="880" height="52" rx="2" fill="#111" stroke="#2a2a2a" stroke-width="1"/>
+        <text x="22" y="578" fill="#c8461e" font-size="9" letter-spacing="3">LEVEL 4</text>
+        <text x="72" y="578" fill="#555" font-size="9" letter-spacing="2">· PRODUCT</text>
+
+        <rect x="120" y="568" width="180" height="34" rx="2" fill="#1e1e1a" stroke="#5a5a2a" stroke-width="1"/>
+        <text x="210" y="583" fill="#d4d47a" font-size="10" font-weight="500" text-anchor="middle">Next.js Dashboard</text>
+        <text x="210" y="596" fill="#6a6a3a" font-size="8" text-anchor="middle">RSC · SSE · TanStack Query</text>
+
+        <rect x="360" y="568" width="180" height="34" rx="2" fill="#1e1e1a" stroke="#5a5a2a" stroke-width="1"/>
+        <text x="450" y="583" fill="#d4d47a" font-size="10" font-weight="500" text-anchor="middle">FastAPI Gateway</text>
+        <text x="450" y="596" fill="#6a6a3a" font-size="8" text-anchor="middle">Streaming · Pydantic v2 · Auth</text>
+
+        <rect x="600" y="568" width="180" height="34" rx="2" fill="#1e1e1a" stroke="#5a5a2a" stroke-width="1"/>
+        <text x="690" y="583" fill="#d4d47a" font-size="10" font-weight="500" text-anchor="middle">GraphQL Mesh</text>
+        <text x="690" y="596" fill="#6a6a3a" font-size="8" text-anchor="middle">Federation · DataLoader</text>
+
+        <!-- arrows in level 4 (right to left = upstream data) -->
+        <line x1="598" y1="585" x2="542" y2="585" stroke="#b89248" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+        <line x1="358" y1="585" x2="302" y2="585" stroke="#b89248" stroke-width="1.5" marker-end="url(#arrow-gold)"/>
+      </svg>
+    </div>
+
+    <div class="ruled"></div>
+
+    <h3 style="font-family:'DM Serif Display',serif; font-size:1.5rem; margin-bottom:1.5rem">Decision Log</h3>
+
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th>Decision</th>
+          <th>Alternatives Considered</th>
+          <th>Rationale</th>
+          <th>Consequence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>K3s over K8s at edge</strong></td>
+          <td>MicroK8s, Docker Swarm, bare systemd</td>
+          <td>&lt;512MB RAM footprint, SQLite-backed etcd, single-binary deploy critical for resource-constrained edge hardware. ARM64 native.</td>
+          <td><span class="badge badge-rust">Accepted</span> Lost some ecosystem tooling; gained operational simplicity on 24 nodes.</td>
+        </tr>
+        <tr>
+          <td><strong>OPC UA as normalisation layer</strong></td>
+          <td>Custom adapter per vendor, MQTT direct from PLC</td>
+          <td>OPC UA's information model (address space, type system) provides vendor-neutral semantic layer. Security (X.509 certs, audit trail) maps to IEC 62443 requirements.</td>
+          <td><span class="badge badge-gold">Trade-off</span> Added 8ms latency vs direct Modbus. Well within budget for analytics tier.</td>
+        </tr>
+        <tr>
+          <td><strong>Separate OT / IT networks</strong></td>
+          <td>Flat network with ACLs only</td>
+          <td>Regulatory requirement (IEC 62443 Zone/Conduit model). Also reduces blast radius if cloud-side compromise occurs.</td>
+          <td><span class="badge badge-rust">Accepted</span> Added DMZ complexity but satisfied compliance auditor first pass.</td>
+        </tr>
+        <tr>
+          <td><strong>Apache Flink over Spark</strong></td>
+          <td>Spark Streaming, Kafka Streams, Apache Beam</td>
+          <td>True stream processing (not micro-batch). Event time semantics native. Lower latency for anomaly alerting pipeline (&lt;200ms p99).</td>
+          <td><span class="badge badge-gold">Trade-off</span> Smaller talent pool. Invested in upskilling two engineers over 6 weeks.</td>
+        </tr>
+        <tr>
+          <td><strong>FastAPI (Python) for ML gateway</strong></td>
+          <td>Django, Go/Gin, Node/NestJS</td>
+          <td>Pydantic v2 validation, native async, direct integration with numpy/pandas inference code. Team fluency highest in Python for ML workloads.</td>
+          <td><span class="badge badge-muted">Neutral</span> Served 18k req/s with 8 workers. Switched to Uvicorn + Gunicorn for prod.</td>
+        </tr>
+        <tr>
+          <td><strong>TimescaleDB over InfluxDB</strong></td>
+          <td>InfluxDB, Prometheus long-term, VictoriaMetrics</td>
+          <td>PostgreSQL extension → existing team SQL skills applicable. Continuous aggregates for time-bucketed analytics. Joins against relational metadata tables.</td>
+          <td><span class="badge badge-rust">Accepted</span> Query complexity on 2TB dataset manageable with chunk compression and proper indexes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SECTION 3: IMPLEMENTATION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 03</span>
+      <div>
+        <h2 class="section-title">Implementation Deep Dive</h2>
+        <p class="section-intro">
+          Three representative subsystems, each illustrating a different 
+          domain of cross-stack systems engineering.
+        </p>
+      </div>
+    </div>
+
+    <!-- 3A: Edge OPC UA -->
+    <div style="margin-bottom:3.5rem">
+      <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1.2rem">
+        <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--rust); letter-spacing:0.15em">3A ·</span>
+        <h3 style="font-family:'DM Serif Display',serif; font-size:1.4rem">Edge OPC UA Aggregator</h3>
+      </div>
+
+      <p class="body-text" style="margin-bottom:1.5rem">
+        Each plant runs a Python-based OPC UA aggregator on dedicated edge nodes 
+        (NVIDIA Jetson AGX Orin, 32GB). The aggregator subscribes to monitored items 
+        across all three PLC vendors, normalises tag names to a unified namespace, 
+        and publishes to EMQX via MQTT v5.0 with QoS 1. Subscription cycle: 100ms 
+        for control-adjacent sensors, 1s for environmental data.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-label">Edge Aggregator — core subscription loop (Python / opcua-asyncio)</div>
+        <code><span class="kw">import</span> asyncio
+<span class="kw">from</span> asyncua <span class="kw">import</span> Client, ua
+<span class="kw">from</span> asyncua.common.subscription <span class="kw">import</span> SubHandler
+<span class="kw">import</span> aiomqtt, orjson, time
+
+<span class="kw">class</span> <span class="cls">PlantSubHandler</span>(SubHandler):
+    <span class="kw">def</span> <span class="fn-name">__init__</span>(self, mqtt_client, plant_id: str):
+        self.mqtt = mqtt_client
+        self.plant_id = plant_id
+
+    <span class="kw">async def</span> <span class="fn-name">datachange_notification</span>(self, node, val, data):
+        <span class="cmt"># Normalise to unified schema before publish</span>
+        tag = <span class="kw">await</span> node.read_browse_name()
+        payload = {
+            <span class="str">"ts"</span>: time.time_ns() // <span class="num">1_000_000</span>,  <span class="cmt"># ms epoch</span>
+            <span class="str">"plant"</span>: self.plant_id,
+            <span class="str">"tag"</span>: tag.Name,
+            <span class="str">"val"</span>: val,
+            <span class="str">"quality"</span>: data.monitored_item.Value.StatusCode.is_good(),
+        }
+        topic = <span class="str">f"plant/{self.plant_id}/telemetry/{tag.Name}"</span>
+        <span class="kw">await</span> self.mqtt.publish(topic, orjson.dumps(payload), qos=<span class="num">1</span>)
+
+<span class="kw">async def</span> <span class="fn-name">run_aggregator</span>(opc_url: str, mqtt_url: str, plant_id: str):
+    <span class="kw">async with</span> aiomqtt.Client(mqtt_url) <span class="kw">as</span> mqtt:
+        <span class="kw">async with</span> Client(url=opc_url) <span class="kw">as</span> opc:
+            <span class="kw">await</span> opc.load_client_certificate(<span class="str">"certs/edge.pem"</span>)
+            <span class="kw">await</span> opc.load_private_key(<span class="str">"certs/edge.key"</span>)
+            handler = <span class="cls">PlantSubHandler</span>(mqtt, plant_id)
+            sub = <span class="kw">await</span> opc.create_subscription(<span class="num">100</span>, handler)  <span class="cmt"># 100ms</span>
+            nodes = <span class="kw">await</span> opc.nodes.root.get_children()
+            <span class="kw">await</span> sub.subscribe_data_change(nodes)
+            <span class="kw">await</span> asyncio.Event().wait()  <span class="cmt"># run forever</span></code>
+      </div>
+
+      <div class="annotation" style="margin-top:1rem">
+        <div class="annotation-icon warn">!</div>
+        <div class="annotation-content"><strong>Security note:</strong> OPC UA client certificates are rotated every 90 days via a custom EdgeX device service that polls AWS Secrets Manager. Rotation is zero-downtime using connection draining on the subscription pool.</div>
+      </div>
+      <div class="annotation">
+        <div class="annotation-icon ok">✓</div>
+        <div class="annotation-content"><strong>Observed latency:</strong> OPC UA subscription → MQTT publish measured at 6–14ms p99 on Jetson hardware. Budget was 25ms. Headroom used by downstream Kafka Connect consumer.</div>
+      </div>
+    </div>
+
+    <!-- 3B: Predictive Maintenance -->
+    <div style="margin-bottom:3.5rem">
+      <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1.2rem">
+        <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--rust); letter-spacing:0.15em">3B ·</span>
+        <h3 style="font-family:'DM Serif Display',serif; font-size:1.4rem">Predictive Maintenance ML Pipeline</h3>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <p class="body-text">
+            Vibration data from 214 accelerometers is streamed through Apache Flink, 
+            where a windowed feature extractor computes RMS, kurtosis, and spectral 
+            entropy over 500ms tumbling windows. Features are materialised into a 
+            Feast feature store backed by TimescaleDB (online) and S3 Parquet (offline).
+          </p>
+          <p class="body-text" style="margin-top:1.2em">
+            A LightGBM classifier trained on 18 months of historical fault/non-fault 
+            pairs predicts bearing failure with 92% precision at the chosen 
+            operating threshold. Model is served via TorchServe (ONNX-exported) 
+            behind a FastAPI proxy that enforces a 50ms SLO per inference call.
+          </p>
+          <div class="insight" style="margin-top:1.5rem">
+            <div class="insight-label">MLOps Detail</div>
+            <p class="insight-text">
+              Retraining is triggered automatically when production data drift 
+              (measured via Evidently AI) exceeds 0.15 PSI on the top 5 features. 
+              New models shadow-deploy for 48h before promotion.
+            </p>
+          </div>
+        </div>
+        <div>
+          <div class="layer-stack">
+            <div class="layer-row">
+              <span class="layer-name">Data Ingestion</span>
+              <span class="layer-desc">Flink streaming, 500ms tumbling windows, feature extraction</span>
+              <span class="layer-tech">Flink 1.18</span>
+            </div>
+            <div class="layer-row">
+              <span class="layer-name">Feature Store</span>
+              <span class="layer-desc">Online (TimescaleDB) + offline (S3 Parquet) via Feast</span>
+              <span class="layer-tech">Feast 0.36</span>
+            </div>
+            <div class="layer-row">
+              <span class="layer-name">Training</span>
+              <span class="layer-desc">LightGBM on 18-month labelled dataset, ONNX export</span>
+              <span class="layer-tech">LightGBM 4.x</span>
+            </div>
+            <div class="layer-row">
+              <span class="layer-name">Experiment Track</span>
+              <span class="layer-desc">MLflow on ECS Fargate, model registry with approval gates</span>
+              <span class="layer-tech">MLflow 2.x</span>
+            </div>
+            <div class="layer-row">
+              <span class="layer-name">Inference Serving</span>
+              <span class="layer-desc">TorchServe + FastAPI proxy, 50ms p99 SLO</span>
+              <span class="layer-tech">TorchServe 0.9</span>
+            </div>
+            <div class="layer-row">
+              <span class="layer-name">Drift Monitoring</span>
+              <span class="layer-desc">Evidently AI on PSI threshold, auto-retrain trigger</span>
+              <span class="layer-tech">Evidently 0.4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3C: Full-stack dashboard -->
+    <div>
+      <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1.2rem">
+        <span style="font-family:'DM Mono',monospace; font-size:10px; color:var(--rust); letter-spacing:0.15em">3C ·</span>
+        <h3 style="font-family:'DM Serif Display',serif; font-size:1.4rem">Operator Dashboard — Full-Stack Integration</h3>
+      </div>
+
+      <p class="body-text" style="margin-bottom:1.5rem">
+        The plant operator dashboard is a Next.js 14 App Router application 
+        that subscribes to live Kafka topics via Server-Sent Events (SSE) 
+        through a FastAPI streaming endpoint. React Server Components render 
+        the static plant topology; client components handle live sensor tiles 
+        using TanStack Query with 1-second stale time.
+      </p>
+
+      <div class="code-block">
+        <div class="code-block-label">Live sensor SSE — FastAPI streaming endpoint (Python)</div>
+        <code><span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter
+<span class="kw">from</span> fastapi.responses <span class="kw">import</span> StreamingResponse
+<span class="kw">from</span> aiokafka <span class="kw">import</span> AIOKafkaConsumer
+<span class="kw">import</span> orjson, asyncio
+
+router = APIRouter()
+
+<span class="kw">async def</span> <span class="fn-name">_stream_plant</span>(plant_id: str):
+    consumer = AIOKafkaConsumer(
+        <span class="str">f"plant.{plant_id}.telemetry"</span>,
+        bootstrap_servers=<span class="str">"kafka:9092"</span>,
+        group_id=<span class="str">f"dashboard-{plant_id}"</span>,
+        auto_offset_reset=<span class="str">"latest"</span>,
+    )
+    <span class="kw">await</span> consumer.start()
+    <span class="kw">try</span>:
+        <span class="kw">async for</span> msg <span class="kw">in</span> consumer:
+            data = orjson.loads(msg.value)
+            <span class="kmt"># SSE format</span>
+            <span class="kw">yield</span> <span class="str">f"data: {orjson.dumps(data).decode()}\n\n"</span>
+            <span class="kw">await</span> asyncio.sleep(<span class="num">0</span>)  <span class="cmt"># yield control</span>
+    <span class="kw">finally</span>:
+        <span class="kw">await</span> consumer.stop()
+
+<span class="prop">@router.get</span>(<span class="str">"/stream/{plant_id}"</span>)
+<span class="kw">async def</span> <span class="fn-name">plant_stream</span>(plant_id: str):
+    <span class="kw">return</span> StreamingResponse(
+        _stream_plant(plant_id),
+        media_type=<span class="str">"text/event-stream"</span>,
+        headers={<span class="str">"X-Accel-Buffering"</span>: <span class="str">"no"</span>},
+    )</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DEPLOYMENT PIPELINE -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 04</span>
+      <div>
+        <h2 class="section-title">Deployment & DevOps</h2>
+        <p class="section-intro">
+          A multi-environment CI/CD system with distinct pipelines for 
+          cloud services and edge firmware — each with different 
+          rollout constraints and safety gates.
+        </p>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">01</div>
+        <div class="flow-title">PR Merge</div>
+        <div class="flow-desc">Branch protection, 2 reviewers, PHPStan / Ruff / ESLint green</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">02</div>
+        <div class="flow-title">CI Build</div>
+        <div class="flow-desc">GitHub Actions. Docker multi-stage. Trivy image scan. SBOM gen.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">03</div>
+        <div class="flow-title">Staging Deploy</div>
+        <div class="flow-desc">EKS dev cluster. Integration tests. OpenTelemetry trace validation.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">04</div>
+        <div class="flow-title">Canary 5%</div>
+        <div class="flow-desc">Production canary via Argo Rollouts. Prometheus error-rate gate.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">05</div>
+        <div class="flow-title">Full Rollout</div>
+        <div class="flow-desc">Progressive 5→20→50→100%. Auto-rollback on p99 latency SLO breach.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">06</div>
+        <div class="flow-title">Edge OTA</div>
+        <div class="flow-desc">K3s airgap bundle. Staged per-plant. Requires OT sign-off before promote.</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:2rem">
+      <div>
+        <h4 style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem">Observability Stack</h4>
+        <div class="layer-stack">
+          <div class="layer-row">
+            <span class="layer-name">Tracing</span>
+            <span class="layer-desc">OpenTelemetry SDK in all services, Jaeger backend</span>
+            <span class="layer-tech">OTel 1.x</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Metrics</span>
+            <span class="layer-desc">Prometheus + Grafana. Four Golden Signals dashboards.</span>
+            <span class="layer-tech">Prom 2.48</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Logging</span>
+            <span class="layer-desc">Structured JSON → Fluentd → OpenSearch. 14-day hot retention.</span>
+            <span class="layer-tech">Fluentd 1.16</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Alerting</span>
+            <span class="layer-desc">Alertmanager → PagerDuty. SLO burn-rate alerts (4x, 14.4x)</span>
+            <span class="layer-tech">Alertmanager</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Edge Metrics</span>
+            <span class="layer-desc">Node Exporter on K3s nodes. Remote-write to central Prometheus.</span>
+            <span class="layer-tech">Node Exp 1.7</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-family:'DM Mono',monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem">Security Controls</h4>
+        <div class="layer-stack">
+          <div class="layer-row">
+            <span class="layer-name">Secrets</span>
+            <span class="layer-desc">HashiCorp Vault + External Secrets Operator for K8s injection</span>
+            <span class="layer-tech">Vault 1.15</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">mTLS</span>
+            <span class="layer-desc">Istio service mesh. All east-west traffic encrypted in transit.</span>
+            <span class="layer-tech">Istio 1.20</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Image Trust</span>
+            <span class="layer-desc">Cosign image signing. Connaisseur admission controller enforces.</span>
+            <span class="layer-tech">Cosign 2.x</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Runtime</span>
+            <span class="layer-desc">Falco for runtime threat detection. Alerts to Security Hub.</span>
+            <span class="layer-tech">Falco 0.37</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-name">Compliance</span>
+            <span class="layer-desc">SOC 2 Type II. IEC 62443 Level 2 for OT zone.</span>
+            <span class="layer-tech">ISO 27001</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: SKILL MAP -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 05</span>
+      <div>
+        <h2 class="section-title">Skills Applied</h2>
+        <p class="section-intro">
+          A cross-domain competency map — each skill was exercised 
+          directly in production, not in isolation.
+        </p>
+      </div>
+    </div>
+
+    <div class="skill-matrix">
+      <div class="skill-cell">
+        <div class="skill-domain">Backend</div>
+        <div class="skill-name">Python / FastAPI</div>
+        <div class="skill-bar-wrap"><div class="skill-bar expert" style="width:95%"></div></div>
+        <div class="skill-level">Expert — ML inference gateway, streaming endpoints</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Frontend</div>
+        <div class="skill-name">Next.js / TypeScript</div>
+        <div class="skill-bar-wrap"><div class="skill-bar expert" style="width:90%"></div></div>
+        <div class="skill-level">Expert — Operator dashboard, RSC + client components</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Embedded</div>
+        <div class="skill-name">C++ / FreeRTOS</div>
+        <div class="skill-bar-wrap"><div class="skill-bar advanced" style="width:75%"></div></div>
+        <div class="skill-level">Advanced — Edge firmware, RTOS task scheduling</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">AI/ML</div>
+        <div class="skill-name">LightGBM / ONNX</div>
+        <div class="skill-bar-wrap"><div class="skill-bar advanced" style="width:80%"></div></div>
+        <div class="skill-level">Advanced — Predictive maintenance models in prod</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Cloud</div>
+        <div class="skill-name">AWS (EKS, MSK, S3)</div>
+        <div class="skill-bar-wrap"><div class="skill-bar expert" style="width:92%"></div></div>
+        <div class="skill-level">Expert — Multi-service production deployment</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Industrial</div>
+        <div class="skill-name">OPC UA / Modbus</div>
+        <div class="skill-bar-wrap"><div class="skill-bar advanced" style="width:82%"></div></div>
+        <div class="skill-level">Advanced — Multi-vendor PLC integration</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">DevOps</div>
+        <div class="skill-name">Kubernetes / Terraform</div>
+        <div class="skill-bar-wrap"><div class="skill-bar expert" style="width:88%"></div></div>
+        <div class="skill-level">Expert — 3-cluster topology, IaC with Terragrunt</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Security</div>
+        <div class="skill-name">Zero Trust / mTLS</div>
+        <div class="skill-bar-wrap"><div class="skill-bar intermediate" style="width:70%"></div></div>
+        <div class="skill-level">Intermediate — Istio, Vault, IEC 62443 compliance</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Streaming</div>
+        <div class="skill-name">Kafka / Flink</div>
+        <div class="skill-bar-wrap"><div class="skill-bar advanced" style="width:78%"></div></div>
+        <div class="skill-level">Advanced — 50k events/sec production throughput</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Observability</div>
+        <div class="skill-name">OpenTelemetry</div>
+        <div class="skill-bar-wrap"><div class="skill-bar advanced" style="width:80%"></div></div>
+        <div class="skill-level">Advanced — Distributed tracing across 12 services</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">MLOps</div>
+        <div class="skill-name">MLflow / Feast</div>
+        <div class="skill-bar-wrap"><div class="skill-bar intermediate" style="width:68%"></div></div>
+        <div class="skill-level">Intermediate — End-to-end ML platform ownership</div>
+      </div>
+      <div class="skill-cell">
+        <div class="skill-domain">Database</div>
+        <div class="skill-name">TimescaleDB / DynamoDB</div>
+        <div class="skill-bar-wrap"><div class="skill-bar expert" style="width:85%"></div></div>
+        <div class="skill-level">Expert — Schema design, chunk compression, TTL</div>
+      </div>
+    </div>
+
+    <div class="sidenote-wrap" style="margin-top:2rem">
+      <div class="sidenote-label">Why breadth matters here</div>
+      <p class="sidenote-text">
+        Each of these skills was exercised within a <strong>single project</strong>. The OPC UA aggregator 
+        required embedded-level thinking about deterministic timing; the Flink pipeline required 
+        deep knowledge of streaming semantics; the MLOps platform required DevOps and data engineering 
+        in equal measure. A specialist would have handed off at each boundary — this project had no such luxury.
+      </p>
+    </div>
+  </section>
+
+  <!-- SECTION 6: OUTCOMES -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">§ 06</span>
+      <div>
+        <h2 class="section-title">Outcomes & Lessons</h2>
+        <p class="section-intro">
+          Measured results across reliability, operational efficiency, 
+          and engineering velocity — 12 months post-launch.
+        </p>
+      </div>
+    </div>
+
+    <div class="outcome-grid">
+      <div class="outcome-cell">
+        <div class="outcome-delta">92%</div>
+        <div class="outcome-metric">Bearing failure prediction precision</div>
+        <div class="outcome-desc">Operating threshold calibrated to minimise false positives. Maintenance team dispatched proactively on 47 alerts in first quarter — all validated.</div>
+      </div>
+      <div class="outcome-cell">
+        <div class="outcome-delta">−67%</div>
+        <div class="outcome-metric">Unplanned downtime</div>
+        <div class="outcome-desc">From baseline average of 18 hours/month/plant to 6 hours/month/plant across all three facilities, verified over 6-month window.</div>
+      </div>
+      <div class="outcome-cell">
+        <div class="outcome-delta">8ms</div>
+        <div class="outcome-metric">OPC UA → MQTT p99 latency</div>
+        <div class="outcome-desc">Budget was 25ms. Consistent across 30-day production load test at 50k events/sec peak throughput with no dropped messages.</div>
+      </div>
+      <div class="outcome-cell">
+        <div class="outcome-delta">99.97%</div>
+        <div class="outcome-metric">Dashboard API uptime (SLO: 99.9%)</div>
+        <div class="outcome-desc">Three-region active-active setup. 12 months post-launch. One incident: a Kafka broker restart during peak shift caused 4-minute degradation.</div>
+      </div>
+      <div class="outcome-cell">
+        <div class="outcome-delta">3 wks</div>
+        <div class="outcome-metric">Time to onboard new plant</div>
+        <div class="outcome-desc">After templating the K3s deployment, EdgeX configuration, and OPC UA address space mappings. First plant took 14 weeks. Template investment pays forward.</div>
+      </div>
+      <div class="outcome-cell">
+        <div class="outcome-delta">0</div>
+        <div class="outcome-metric">Control loop violations</div>
+        <div class="outcome-desc">Zero instances of analytics traffic crossing the OT/IT boundary and affecting PLC control cycle. Network segregation held for the full 18-month build and 12-month operation.</div>
+      </div>
+    </div>
+
+    <div class="ruled"></div>
+
+    <h3 style="font-family:'DM Serif Display',serif; font-size:1.5rem; margin-bottom:1.5rem; margin-top:2rem">What We'd Do Differently</h3>
+
+    <div class="two-col">
+      <div>
+        <div class="annotation">
+          <div class="annotation-icon warn">1</div>
+          <div class="annotation-content"><strong>Start with data modelling, not integration.</strong> Three weeks mapping the OPC UA address space and agreeing on a canonical tag schema before writing any code paid dividends. We should have spent five. Retrofitting a schema onto a running system is far more expensive.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-icon warn">2</div>
+          <div class="annotation-content"><strong>Edge hardware procurement is a long-lead item.</strong> Jetson AGX Orin units had 16-week lead time. We blocked on hardware for a full sprint. Build hardware into the critical path, not an afterthought.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-icon warn">3</div>
+          <div class="annotation-content"><strong>OT team buy-in requires demos, not docs.</strong> Written architecture proposals were ignored until we built a read-only live dashboard showing their own plant data. The visualisation unlocked stakeholder alignment in a single meeting that months of documentation could not.</div>
+        </div>
+      </div>
+      <div>
+        <div class="annotation">
+          <div class="annotation-icon ok">✓</div>
+          <div class="annotation-content"><strong>The strangler fig pattern worked.</strong> Adding read-only OPC UA subscriptions alongside existing SCADA (not replacing it) proved to OT stakeholders that we could not disrupt their systems. Trust was earned incrementally. This was the right sequencing.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-icon ok">✓</div>
+          <div class="annotation-content"><strong>Shadow deployment for ML models is non-negotiable.</strong> Two models failed shadow validation before promotion — one due to concept drift in the training data, one due to a feature engineering bug. Neither reached production operators.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-icon ok">✓</div>
+          <div class="annotation-content"><strong>Investing in K3s templating paid off on plant 2 and 3.</strong> The 14-week first deployment felt painful. But the 3-week replication across subsequent plants validated every hour spent on Helm charts, Ansible playbooks, and GitOps manifests.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div> <!-- end body-wrapper -->
+
+<!-- COLOPHON -->
+<footer class="colophon">
+  <div class="colophon-inner">
+    <div>
+      <h4>Technologies Referenced</h4>
+      <ul>
+        <li>K3s · KubeEdge · Istio</li>
+        <li>Apache Kafka · Flink · Avro</li>
+        <li>OPC UA · MQTT v5 · Modbus TCP</li>
+        <li>EdgeX Foundry · EMQX</li>
+        <li>FreeRTOS · ESP-IDF · PlatformIO</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Platforms</h4>
+      <ul>
+        <li>AWS EKS · MSK · S3 · SageMaker</li>
+        <li>NVIDIA Jetson AGX Orin</li>
+        <li>Siemens TIA Portal (S7-1500)</li>
+        <li>Rockwell Studio 5000</li>
+        <li>HashiCorp Vault · Terraform</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Standards & Compliance</h4>
+      <ul>
+        <li>IEC 62443 Zone/Conduit model</li>
+        <li>IEC 61131-3 (PLC languages)</li>
+        <li>OPC UA Part 2 (Security)</li>
+        <li>SOC 2 Type II</li>
+        <li>NIST Cybersecurity Framework</li>
+      </ul>
+    </div>
+  </div>
+  <div class="colophon-foot">
+    <span class="colophon-title">Systems Engineering Case Study</span>
+    <span class="colophon-copy">Comprehensive · Cross-Domain · Production-Verified · 2024</span>
+  </div>
+</footer>
+
+<script>
+  // Animate skill bars on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-bar').forEach(bar => {
+          const target = bar.style.width;
+          bar.style.width = '0';
+          setTimeout(() => { bar.style.width = target; }, 100);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  const skillMatrix = document.querySelector('.skill-matrix');
+  if (skillMatrix) observer.observe(skillMatrix);
+</script>
+
+</body>
+</html>

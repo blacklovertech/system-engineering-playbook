@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tesla Battery Algorithm — Case Study 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --black:#06080A;
+  --panel:#0D1117;
+  --surface:#111820;
+  --surface2:#161E28;
+  --border:#1C2733;
+  --border2:#243040;
+  --red:#E31937;
+  --red-dim:rgba(227,25,55,0.12);
+  --red-glow:rgba(227,25,55,0.35);
+  --cyan:#00C8FF;
+  --cyan-dim:rgba(0,200,255,0.1);
+  --green:#00E676;
+  --green-dim:rgba(0,230,118,0.08);
+  --amber:#FFB300;
+  --amber-dim:rgba(255,179,0,0.1);
+  --purple:#9B6DFF;
+  --purple-dim:rgba(155,109,255,0.1);
+  --text:#B8C8D8;
+  --text-dim:#4A6275;
+  --text-bright:#E0EAF5;
+  --mono:'IBM Plex Mono',monospace;
+  --serif:'Crimson Pro',Georgia,serif;
+  --display:'Bebas Neue',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:var(--serif);line-height:1.7;overflow-x:hidden;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--red);}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);pointer-events:none;z-index:9000;}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:8000;background:rgba(6,8,10,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 56px;height:50px;display:flex;align-items:center;justify-content:space-between;transform:translateY(-100%);transition:transform .3s;}
+.nav.show{transform:translateY(0);}
+.nav-id{font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--red);text-transform:uppercase;}
+.nav-links{display:flex;gap:28px;}
+.nav-link{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color .15s;}
+.nav-link:hover{color:var(--cyan);}
+
+/* ── HERO ── */
+.hero{min-height:100vh;background:var(--black);position:relative;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(28,39,51,0.35) 1px,transparent 1px),linear-gradient(90deg,rgba(28,39,51,0.35) 1px,transparent 1px);background-size:48px 48px;}
+.hero-glow1{position:absolute;top:-250px;right:-150px;width:800px;height:800px;background:radial-gradient(circle,rgba(227,25,55,0.07) 0%,transparent 65%);pointer-events:none;}
+.hero-glow2{position:absolute;bottom:-200px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,200,255,0.04) 0%,transparent 65%);pointer-events:none;}
+.hero-hdr{position:relative;z-index:1;padding:18px 56px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.hero-hdr-l{font-family:var(--mono);font-size:9px;letter-spacing:.28em;color:var(--text-dim);text-transform:uppercase;}
+.live-badge{display:flex;align-items:center;gap:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.live-txt{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;}
+.hero-body{position:relative;z-index:1;padding:72px 56px;display:flex;flex-direction:column;justify-content:center;}
+.eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.35em;color:var(--red);text-transform:uppercase;margin-bottom:22px;display:flex;align-items:center;gap:10px;}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--red);}
+.hero-title{font-family:var(--display);font-size:clamp(80px,13vw,210px);line-height:.86;letter-spacing:.02em;color:var(--text-bright);margin-bottom:10px;}
+.hero-title .r{color:var(--red);}
+.hero-title .d{color:var(--text-dim);}
+.hero-subtitle{font-family:var(--mono);font-size:13px;color:var(--text-dim);letter-spacing:.07em;margin-top:18px;max-width:580px;line-height:1.8;}
+.hero-subtitle em{color:var(--cyan);font-style:normal;}
+.hero-bar{position:relative;z-index:1;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);}
+.hstat{padding:26px 56px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:5px;}
+.hstat:last-child{border-right:none;}
+.hstat-val{font-family:var(--display);font-size:48px;line-height:1;}
+.hv-red{color:var(--red);}
+.hv-cyan{color:var(--cyan);}
+.hv-green{color:var(--green);}
+.hv-amber{color:var(--amber);}
+.hstat-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase;}
+.hstat-note{font-family:var(--mono);font-size:8px;color:var(--text-dim);opacity:.55;margin-top:1px;}
+
+/* ── LAYOUT ── */
+.section{border-top:1px solid var(--border);padding:80px 0;}
+.section.dark{background:var(--panel);}
+.wrap{max-width:1200px;margin:0 auto;padding:0 56px;}
+.sec-hdr{margin-bottom:48px;}
+.sec-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sec-eyebrow .n{color:var(--red);}
+.sec-eyebrow::after{content:'';flex:1;height:1px;background:var(--border);}
+.sec-title{font-family:var(--display);font-size:clamp(52px,7vw,100px);line-height:.88;letter-spacing:.03em;color:var(--text-bright);}
+.sec-title .r{color:var(--red);}
+.sec-title .c{color:var(--cyan);}
+.sec-title .g{color:var(--green);}
+.sec-title .a{color:var(--amber);}
+
+/* callout */
+.callout{border-left:3px solid var(--red);background:var(--red-dim);padding:18px 22px;margin:28px 0;font-family:var(--mono);font-size:12px;line-height:1.75;color:var(--text);}
+.callout.cyan{border-color:var(--cyan);background:var(--cyan-dim);}
+.callout.green{border-color:var(--green);background:var(--green-dim);}
+.callout.amber{border-color:var(--amber);background:var(--amber-dim);}
+.callout.purple{border-color:var(--purple);background:var(--purple-dim);}
+.callout cite{display:block;margin-top:8px;font-size:8px;letter-spacing:.2em;color:var(--text-dim);font-style:normal;text-transform:uppercase;}
+
+/* ── CELL VISUALIZER ── */
+.cell-section{background:var(--panel);padding:80px 0;border-top:1px solid var(--border);}
+.cell-stage{display:flex;align-items:flex-end;justify-content:center;gap:48px;margin:56px 0;flex-wrap:wrap;}
+.cell-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.cell-lbl-top{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;text-align:center;}
+.cell-body{position:relative;display:flex;align-items:center;justify-content:center;}
+.cell-svg{}
+.cell-name{font-family:var(--display);font-size:28px;letter-spacing:.05em;text-align:center;}
+.cell-dim-tag{font-family:var(--mono);font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:.1em;}
+.cell-specs{display:flex;flex-direction:column;gap:6px;min-width:160px;}
+.cell-spec-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;}
+.csr-l{color:var(--text-dim);}
+.csr-v{color:var(--text-bright);font-weight:500;}
+.csr-v.best{color:var(--green);}
+.connector-arrow{font-family:var(--display);font-size:28px;color:var(--text-dim);margin-bottom:60px;}
+
+/* ── COST TIMELINE ── */
+.cost-chart-section{padding:80px 0;border-top:1px solid var(--border);}
+.chart-container{margin-top:48px;background:var(--surface);border:1px solid var(--border);padding:40px;position:relative;}
+.chart-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;}
+.chart-title{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;}
+.chart-legend{display:flex;gap:20px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--text-dim);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+/* The cost curve chart */
+.cost-chart{position:relative;height:260px;margin-bottom:24px;}
+.cost-chart svg{width:100%;height:100%;}
+/* Year labels */
+.cost-year-labels{display:grid;grid-template-columns:repeat(8,1fr);padding:0 0;margin-top:8px;}
+.cyl{font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-align:center;}
+
+/* ── MANUFACTURING BREAKDOWN ── */
+.mfg-section{background:var(--panel);padding:80px 0;border-top:1px solid var(--border);}
+.mfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:48px;}
+.mfg-card{background:var(--surface);border:1px solid var(--border);padding:36px 32px;position:relative;overflow:hidden;}
+.mfg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.mfg-card.t::before{background:var(--red);}
+.mfg-card.c::before{background:var(--cyan);}
+.mfg-card.g::before{background:var(--green);}
+.mfg-card.a::before{background:var(--amber);}
+.mfg-card-icon{font-size:22px;margin-bottom:14px;}
+.mfg-card-title{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-bright);margin-bottom:10px;}
+.mfg-card-body{font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px;}
+.mfg-metric{background:var(--panel);border:1px solid var(--border);padding:8px 14px;font-family:var(--mono);font-size:10px;display:inline-flex;gap:6px;align-items:center;}
+.mfg-metric .val{font-weight:600;}
+.val-red{color:var(--red);}
+.val-cyan{color:var(--cyan);}
+.val-green{color:var(--green);}
+.val-amber{color:var(--amber);}
+
+/* ── COST BREAKDOWN DONUT ── */
+.cost-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:48px;}
+.donut-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+.donut-center{position:absolute;text-align:center;}
+.donut-val{font-family:var(--display);font-size:40px;color:var(--red);line-height:1;}
+.donut-sub{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--text-dim);text-transform:uppercase;}
+.cost-legend{display:flex;flex-direction:column;gap:10px;}
+.cl-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.cl-row:last-child{border-bottom:none;}
+.cl-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.cl-label{font-family:var(--mono);font-size:10px;color:var(--text-dim);flex:1;letter-spacing:.05em;}
+.cl-pct{font-family:var(--display);font-size:22px;color:var(--text-bright);}
+.cl-note{font-family:var(--mono);font-size:9px;color:var(--text-dim);}
+
+/* ── IMPORT / SUPPLY CHAIN ── */
+.supply-section{padding:80px 0;border-top:1px solid var(--border);}
+.supply-flow{margin-top:48px;position:relative;}
+.flow-stages{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;}
+.flow-stage{background:var(--surface);border:1px solid var(--border);padding:24px 20px;position:relative;text-align:center;}
+.flow-stage::after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:16px;color:var(--text-dim);z-index:1;}
+.flow-stage:last-child::after{display:none;}
+.flow-icon{font-size:24px;margin-bottom:10px;}
+.flow-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-bright);margin-bottom:8px;}
+.flow-body{font-family:var(--mono);font-size:9px;color:var(--text-dim);line-height:1.5;}
+.flow-cost{margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--red);}
+
+.supply-table{width:100%;border-collapse:collapse;margin-top:48px;font-family:var(--mono);font-size:11px;}
+.supply-table th{padding:12px 16px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;font-size:9px;text-align:left;}
+.supply-table td{padding:13px 16px;border:1px solid var(--border);vertical-align:middle;}
+.supply-table tr:nth-child(even) td{background:rgba(255,255,255,0.01);}
+.td-country{color:var(--text);}
+.td-material{color:var(--cyan);}
+.td-pct{font-family:var(--display);font-size:20px;color:var(--text-bright);}
+.td-risk{padding:3px 8px;font-size:9px;letter-spacing:.1em;border-radius:1px;}
+.risk-high{background:rgba(227,25,55,0.15);color:var(--red);border:1px solid rgba(227,25,55,0.3);}
+.risk-med{background:rgba(255,179,0,0.12);color:var(--amber);border:1px solid rgba(255,179,0,0.3);}
+.risk-low{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.25);}
+.td-tesla{color:var(--green);font-size:10px;}
+
+/* ── BMS DETAIL ── */
+.bms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:48px;}
+.bms-card{background:var(--surface);border:1px solid var(--border);padding:30px 26px;transition:border-color .2s,background .2s;position:relative;overflow:hidden;}
+.bms-card:hover{border-color:var(--cyan);background:rgba(0,200,255,0.02);}
+.bms-card-num{position:absolute;top:20px;right:20px;font-family:var(--display);font-size:56px;color:var(--red);opacity:.15;line-height:1;}
+.bms-icon{font-size:22px;margin-bottom:12px;}
+.bms-title{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-bright);margin-bottom:8px;}
+.bms-tech{font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:.1em;margin-bottom:10px;}
+.bms-body{font-family:var(--serif);font-size:13px;color:var(--text);line-height:1.65;}
+.bms-stat{margin-top:14px;background:var(--panel);border:1px solid var(--border);padding:8px 12px;font-family:var(--mono);font-size:9px;}
+.bms-stat .v{font-weight:600;}
+
+/* ── PRICE PROJECTION ── */
+.proj-section{background:var(--panel);padding:80px 0;border-top:1px solid var(--border);}
+.proj-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:48px;}
+.proj-card{background:var(--surface);border:1px solid var(--border);padding:32px 24px;}
+.proj-year{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;}
+.proj-price{font-family:var(--display);font-size:56px;line-height:1;margin-bottom:4px;}
+.proj-unit{font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;margin-bottom:12px;}
+.proj-note{font-family:var(--serif);font-size:13px;color:var(--text);line-height:1.6;}
+.proj-source{font-family:var(--mono);font-size:8px;letter-spacing:.15em;color:var(--text-dim);margin-top:12px;text-transform:uppercase;}
+.proj-bar{height:3px;margin-bottom:16px;border-radius:1px;}
+
+/* ── SOC PIPELINE ── */
+.soc-pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:40px;}
+.soc-step{background:var(--surface);border:1px solid var(--border);padding:22px 18px;position:relative;}
+.soc-step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:14px;color:var(--text-dim);z-index:1;}
+.soc-step:last-child::after{display:none;}
+.soc-n{font-family:var(--display);font-size:40px;color:var(--red);opacity:.4;line-height:1;margin-bottom:4px;}
+.soc-name{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-bright);margin-bottom:8px;}
+.soc-body{font-family:var(--mono);font-size:9px;color:var(--text-dim);line-height:1.5;}
+
+/* ── TECH TABLE ── */
+.tech-table{width:100%;border-collapse:collapse;margin:40px 0;font-family:var(--mono);font-size:11px;}
+.tech-table th{padding:11px 15px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase;font-size:9px;text-align:left;}
+.tech-table td{padding:13px 15px;border:1px solid var(--border);vertical-align:top;}
+.tech-table tr:nth-child(even) td{background:rgba(255,255,255,0.01);}
+.td-l{color:var(--text-dim);}
+.td-t{color:var(--green);}
+.td-i{color:var(--text-dim);}
+.td-x{color:var(--cyan);}
+
+/* ── COMPARISON CARDS ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:40px 0;}
+.cc{background:var(--surface);border:1px solid var(--border);padding:36px;position:relative;}
+.cc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.cc.tesla::before{background:var(--red);}
+.cc.rival::before{background:var(--text-dim);}
+.cc-badge{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.badge-dot{width:7px;height:7px;border-radius:50%;}
+.bd-r{background:var(--red);box-shadow:0 0 8px var(--red-glow);}
+.bd-g{background:var(--text-dim);}
+.cc-big{font-family:var(--display);font-size:88px;line-height:1;margin-bottom:4px;}
+.cc-big.red{color:var(--red);}
+.cc-big.grey{color:var(--text-dim);}
+.cc-unit{font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--text-dim);}
+.cc-range{font-family:var(--display);font-size:32px;margin:8px 0 14px;}
+.cc-range.w{color:var(--green);}
+.cc-range.l{color:var(--text-dim);}
+.cc-body{font-family:var(--serif);font-size:14px;color:var(--text);line-height:1.7;}
+.cc-rows{margin-top:18px;display:flex;flex-direction:column;}
+.cc-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;}
+.cc-row:last-child{border-bottom:none;}
+.cc-rl{color:var(--text-dim);}
+.cc-rv{color:var(--text-bright);}
+.cc-rv.b{color:var(--green);}
+.cc-rv.w{color:var(--text-dim);}
+
+/* ── PHYSICS ── */
+.phys-grid{display:grid;grid-template-columns:1fr 2fr;gap:48px;align-items:start;margin-top:48px;}
+.weight-card{background:var(--surface);border:1px solid var(--border);padding:32px;}
+.wc-title{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;}
+.w-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.w-lbl{font-family:var(--mono);font-size:9px;color:var(--text-dim);width:76px;flex-shrink:0;letter-spacing:.05em;}
+.w-bar{flex:1;height:28px;background:var(--panel);border:1px solid var(--border);position:relative;overflow:hidden;}
+.w-fill{height:100%;display:flex;align-items:center;padding:0 10px;font-family:var(--mono);font-size:9px;font-weight:600;}
+.w-fill.t{background:var(--red-dim);border-right:2px solid var(--red);color:var(--red);}
+.w-fill.r{background:rgba(74,98,117,0.15);border-right:2px solid var(--text-dim);color:var(--text-dim);}
+.phys-rules{display:flex;flex-direction:column;gap:16px;}
+.phys-rule{background:var(--surface);border:1px solid var(--border);padding:24px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;}
+.pr-num{font-family:var(--display);font-size:48px;color:var(--cyan);opacity:.5;line-height:1;}
+.pr-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-bright);margin-bottom:6px;}
+.pr-body{font-family:var(--serif);font-size:13px;color:var(--text);line-height:1.65;}
+.pr-calc{margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--green);background:var(--panel);border:1px solid var(--border);padding:6px 12px;display:inline-block;}
+
+/* ── CHARGING CARDS ── */
+.charge-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:48px 0;}
+.chg{background:var(--surface);border:1px solid var(--border);padding:32px;}
+.chg-badge{font-family:var(--mono);font-size:9px;letter-spacing:.2em;padding:4px 10px;border-radius:1px;display:inline-block;margin-bottom:14px;}
+.badge-nmc{background:rgba(0,200,255,0.12);color:var(--cyan);border:1px solid rgba(0,200,255,0.25);}
+.badge-lfp{background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.22);}
+.chg-title{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text-bright);letter-spacing:.05em;margin-bottom:12px;}
+.chg-body{font-family:var(--serif);font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px;}
+.chg-svg-wrap{height:110px;background:var(--panel);border:1px solid var(--border);margin:14px 0;}
+.chg-rule{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;}
+.chg-rule:last-child{border-bottom:none;}
+.cr-ico{font-size:13px;flex-shrink:0;margin-top:1px;}
+.cr-txt{color:var(--text);line-height:1.5;}
+.cr-txt strong{color:var(--text-bright);}
+
+/* ── VERDICT ── */
+.verdict-section{background:var(--panel);padding:80px 0;border-top:1px solid var(--border);}
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+.vc{background:var(--surface);border:1px solid var(--border);padding:44px;}
+.vc-big{font-family:var(--display);font-size:52px;line-height:1;margin-bottom:10px;color:var(--text-bright);}
+.vc-sub{font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--text-dim);text-transform:uppercase;margin-bottom:22px;}
+.vc-body{font-family:var(--serif);font-size:15px;line-height:1.82;color:var(--text);}
+.vc-body strong{color:var(--text-bright);}
+.pillars{display:flex;flex-direction:column;gap:0;}
+.pillar{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);}
+.pillar:last-child{border-bottom:none;}
+.pillar-n{font-family:var(--display);font-size:32px;line-height:1;flex-shrink:0;opacity:.5;}
+.pillar-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-bright);margin-bottom:4px;}
+.pillar-body{font-family:var(--serif);font-size:13px;color:var(--text-dim);line-height:1.5;}
+
+/* ── REFS ── */
+.refs-section{border-top:1px solid var(--border);padding:60px 0;}
+.refs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:36px;}
+.ref{background:var(--surface);border:1px solid var(--border);padding:22px;text-decoration:none;display:block;transition:border-color .15s,background .15s;}
+.ref:hover{border-color:var(--red);background:var(--red-dim);}
+.ref-src{font-family:var(--mono);font-size:8px;letter-spacing:.22em;color:var(--red);text-transform:uppercase;margin-bottom:5px;}
+.ref-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:5px;}
+.ref-detail{font-family:var(--mono);font-size:8px;color:var(--text-dim);line-height:1.4;}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+.ft-l{font-family:var(--mono);font-size:8px;letter-spacing:.2em;color:var(--text-dim);}
+.ft-r{font-family:var(--mono);font-size:8px;letter-spacing:.15em;color:var(--text-dim);opacity:.35;}
+
+/* ── ANIMATIONS ── */
+.fade{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s ease;}
+.fade.in{opacity:1;transform:translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .wrap{padding:0 24px;}
+  .hero-hdr,.hero-body,.hstat{padding-left:24px;padding-right:24px;}
+  .hero-bar,.mfg-grid,.compare-grid,.verdict-grid,.charge-grid,.refs-grid,.proj-cards{grid-template-columns:1fr;}
+  .bms-grid,.soc-pipe,.flow-stages,.phys-grid,.cost-breakdown{grid-template-columns:1fr;}
+  .cell-stage{gap:24px;}
+  .flow-stage::after,.soc-step::after{display:none;}
+  .nav{padding:0 24px;}.nav-links{display:none;}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:20px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <span class="nav-id">TESLA · BATTERY ALGORITHM · 2026</span>
+  <div class="nav-links">
+    <a href="#cells" class="nav-link">Cells</a>
+    <a href="#cost" class="nav-link">Cost History</a>
+    <a href="#manufacturing" class="nav-link">Manufacturing</a>
+    <a href="#supply" class="nav-link">Supply Chain</a>
+    <a href="#bms" class="nav-link">BMS</a>
+    <a href="#verdict" class="nav-link">Verdict</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow1"></div><div class="hero-glow2"></div>
+  <div class="hero-hdr">
+    <span class="hero-hdr-l">Case Study · Tesla Battery Systems · Vol. XIV — 2026</span>
+    <div class="live-badge"><div class="live-dot"></div><span class="live-txt">BMS Active · Monitoring</span></div>
+  </div>
+  <div class="hero-body">
+    <p class="eyebrow">Senior Systems Engineer · Janarthanan · BlackLoverTech</p>
+    <h1 class="hero-title">
+      <span class="d">78.4</span><br/>
+      <span class="r">BEATS</span><br/>
+      <span>100</span>
+    </h1>
+    <p class="hero-subtitle">How Tesla's <em>software-defined battery</em> extracts more range from a smaller pack — neural network SOC, precision balancing, manufacturing cost leadership, and systems-level mass optimization rivals still haven't replicated.</p>
+  </div>
+  <div class="hero-bar">
+    <div class="hstat"><span class="hstat-val hv-red">78.4</span><span class="hstat-lbl">kWh · Model Y LR NMC</span><span class="hstat-note">Beats rivals with 100 kWh+ packs</span></div>
+    <div class="hstat"><span class="hstat-val hv-cyan">$68</span><span class="hstat-lbl">Target $/kWh · 4680 Cell</span><span class="hstat-note">Down from $1,200/kWh in 2010</span></div>
+    <div class="hstat"><span class="hstat-val hv-green">&lt;1%</span><span class="hstat-lbl">SOC Prediction Error</span><span class="hstat-note">vs. 3–5% industry standard</span></div>
+    <div class="hstat"><span class="hstat-val hv-amber">Cd 0.22</span><span class="hstat-lbl">Drag Coefficient · Juniper</span><span class="hstat-note">Industry lowest in class</span></div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1: CELL EVOLUTION VISUALIZER
+═══════════════════════════════════════════════ -->
+<section class="cell-section" id="cells">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">01</span> Cell Architecture Evolution</div>
+      <h2 class="sec-title">THREE<br/><span class="c">GENERATIONS</span><br/>OF CELLS</h2>
+    </div>
+    <p style="font-family:var(--serif);font-size:16px;max-width:700px;line-height:1.8;margin-bottom:8px;" class="fade">
+      Tesla's journey from the original Roadster to the Cybertruck spans three distinct cylindrical cell formats — each larger, cheaper, and more capable than its predecessor. The naming convention is simple: diameter × height in mm.
+    </p>
+
+    <!-- CELL VISUAL COMPARISON -->
+    <div class="cell-stage fade">
+
+      <!-- 18650 -->
+      <div class="cell-wrap">
+        <span class="cell-lbl-top">First Gen · 2008–2020<br/>Model S / X / early Roadster</span>
+        <div class="cell-body">
+          <svg class="cell-svg" width="70" height="140" viewBox="0 0 70 140">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#1a2a3a"/>
+                <stop offset="40%" stop-color="#4a6275"/>
+                <stop offset="100%" stop-color="#1a2a3a"/>
+              </linearGradient>
+            </defs>
+            <!-- body -->
+            <rect x="18" y="8" width="34" height="120" rx="17" fill="url(#g1)" stroke="#1C2733" stroke-width="1.5"/>
+            <!-- top cap -->
+            <ellipse cx="35" cy="8" rx="17" ry="5" fill="#2a3d50"/>
+            <ellipse cx="35" cy="8" rx="8" ry="2.5" fill="#3a5060"/>
+            <!-- label band -->
+            <rect x="18" y="24" width="34" height="88" fill="rgba(74,98,117,0.18)"/>
+            <!-- text -->
+            <text x="35" y="60" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">18</text>
+            <text x="35" y="72" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">×</text>
+            <text x="35" y="84" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">65</text>
+            <!-- bottom -->
+            <ellipse cx="35" cy="128" rx="17" ry="5" fill="#1a2a3a"/>
+          </svg>
+        </div>
+        <span class="cell-name" style="color:var(--text-dim);">18650</span>
+        <span class="cell-dim-tag">18mm × 65mm</span>
+        <div class="cell-specs">
+          <div class="cell-spec-row"><span class="csr-l">Capacity</span><span class="csr-v">~3.5 Ah</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Energy / cell</span><span class="csr-v">~15 Wh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cells in Model S</span><span class="csr-v">~7,104</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cost era (pack)</span><span class="csr-v">~$300/kWh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Tab design</span><span class="csr-v">Tabbed</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Structural pack</span><span class="csr-v">No</span></div>
+        </div>
+      </div>
+
+      <div class="connector-arrow">→</div>
+
+      <!-- 2170 -->
+      <div class="cell-wrap">
+        <span class="cell-lbl-top">Second Gen · 2017–present<br/>Model 3 / Y LR / Roadster 2</span>
+        <div class="cell-body">
+          <svg class="cell-svg" width="90" height="175" viewBox="0 0 90 175">
+            <defs>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#1a2535"/>
+                <stop offset="40%" stop-color="#3a5570"/>
+                <stop offset="100%" stop-color="#1a2535"/>
+              </linearGradient>
+            </defs>
+            <rect x="20" y="8" width="50" height="152" rx="25" fill="url(#g2)" stroke="#1C2733" stroke-width="1.5"/>
+            <ellipse cx="45" cy="8" rx="25" ry="7" fill="#2a4055"/>
+            <ellipse cx="45" cy="8" rx="12" ry="3.5" fill="#3a5570"/>
+            <rect x="20" y="26" width="50" height="112" fill="rgba(58,85,112,0.18)"/>
+            <text x="45" y="72" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">21</text>
+            <text x="45" y="86" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">×</text>
+            <text x="45" y="100" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">70</text>
+            <ellipse cx="45" cy="160" rx="25" ry="7" fill="#1a2535"/>
+          </svg>
+        </div>
+        <span class="cell-name" style="color:var(--cyan);">2170</span>
+        <span class="cell-dim-tag">21mm × 70mm</span>
+        <div class="cell-specs">
+          <div class="cell-spec-row"><span class="csr-l">Capacity</span><span class="csr-v">~4.8 Ah</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Energy / cell</span><span class="csr-v">~18.5 Wh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cells in Model Y</span><span class="csr-v">~4,416</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cost era (pack)</span><span class="csr-v">~$130/kWh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Tab design</span><span class="csr-v">Tabbed</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Structural pack</span><span class="csr-v">No</span></div>
+        </div>
+      </div>
+
+      <div class="connector-arrow">→</div>
+
+      <!-- 4680 -->
+      <div class="cell-wrap">
+        <span class="cell-lbl-top">Third Gen · 2022–present<br/>Cybertruck / future Model Y</span>
+        <div class="cell-body">
+          <svg class="cell-svg" width="130" height="220" viewBox="0 0 130 220">
+            <defs>
+              <linearGradient id="g3" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#1f0a0d"/>
+                <stop offset="30%" stop-color="#6b1020"/>
+                <stop offset="50%" stop-color="#E31937"/>
+                <stop offset="70%" stop-color="#6b1020"/>
+                <stop offset="100%" stop-color="#1f0a0d"/>
+              </linearGradient>
+              <linearGradient id="g3top" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#c01530"/>
+                <stop offset="100%" stop-color="#6b1020"/>
+              </linearGradient>
+            </defs>
+            <!-- body -->
+            <rect x="14" y="10" width="102" height="194" rx="51" fill="url(#g3)" stroke="#E31937" stroke-width="1"/>
+            <!-- top cap -->
+            <ellipse cx="65" cy="10" rx="51" ry="14" fill="url(#g3top)"/>
+            <ellipse cx="65" cy="10" rx="24" ry="6.5" fill="#c01530"/>
+            <!-- inner glow -->
+            <rect x="14" y="28" width="102" height="155" fill="rgba(227,25,55,0.06)"/>
+            <!-- label -->
+            <text x="65" y="92" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="'Bebas Neue'" font-size="18" letter-spacing="3">4680</text>
+            <text x="65" y="112" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">TABLESS</text>
+            <text x="65" y="126" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">STRUCTURAL</text>
+            <!-- glow rings -->
+            <circle cx="65" cy="10" r="38" fill="none" stroke="rgba(227,25,55,0.2)" stroke-width="1"/>
+            <!-- bottom -->
+            <ellipse cx="65" cy="204" rx="51" ry="14" fill="#1f0a0d"/>
+            <!-- Tesla T mark -->
+            <text x="65" y="160" text-anchor="middle" fill="rgba(227,25,55,0.3)" font-family="'Bebas Neue'" font-size="28">T</text>
+          </svg>
+        </div>
+        <span class="cell-name" style="color:var(--red);">4680</span>
+        <span class="cell-dim-tag">46mm × 80mm · Cybercell Gen 2</span>
+        <div class="cell-specs">
+          <div class="cell-spec-row"><span class="csr-l">Capacity</span><span class="csr-v best">~26 Ah</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Energy / cell</span><span class="csr-v best">~100 Wh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cells in pack</span><span class="csr-v best">~960</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Cost (target)</span><span class="csr-v best">~$68/kWh</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Tab design</span><span class="csr-v best">Tabless ✓</span></div>
+          <div class="cell-spec-row"><span class="csr-l">Structural pack</span><span class="csr-v best">Yes — CTC ✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout green fade">
+      <strong style="color:var(--green);">The 4680 Milestone · End of 2024:</strong> Tesla's Giga Texas 4680 cell manufacturing team became the <strong>lowest cost per kWh cell producer for Tesla</strong> — beating outside suppliers like Panasonic and LG Energy Solution. Director of Cell Manufacturing Michael Guilfoy: "Our Cell Manufacturing team in Texas reached a huge milestone at the end of 2024." The 4680 Cybercell (Gen 2) also delivers 5× the energy and 6× the power of the 2170 — and now costs less per kWh to produce than any previous Tesla cell.
+      <cite>Source · Tesla / Teslarati · April 2025</cite>
+    </div>
+
+    <!-- Tabless design explanation -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:48px;" class="fade">
+      <div>
+        <p style="font-family:var(--mono);font-size:9px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px;">Why Tabless Changes Everything</p>
+        <!-- tabbed vs tabless SVG -->
+        <div style="background:var(--surface);border:1px solid var(--border);padding:24px;">
+          <svg width="100%" height="200" viewBox="0 0 480 200">
+            <!-- TABBED (left) -->
+            <text x="110" y="18" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="2">TABBED (2170)</text>
+            <!-- cell body -->
+            <rect x="30" y="24" width="160" height="140" rx="4" fill="#111820" stroke="#1C2733" stroke-width="1"/>
+            <!-- jelly roll layers -->
+            <g opacity="0.6">
+              <rect x="40" y="32" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="40" y="44" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="40" y="56" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="40" y="68" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="40" y="80" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="40" y="92" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="40" y="104" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="40" y="116" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="40" y="128" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="40" y="140" width="140" height="8" rx="1" fill="#102030"/>
+            </g>
+            <!-- single tab - bottleneck -->
+            <rect x="98" y="24" width="24" height="18" fill="#E31937" opacity=".7"/>
+            <line x1="110" y1="14" x2="110" y2="42" stroke="#E31937" stroke-width="2" stroke-dasharray="3,2"/>
+            <text x="110" y="175" text-anchor="middle" fill="#E31937" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">BOTTLENECK</text>
+            <text x="110" y="187" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="7">current must travel full</text>
+            <text x="110" y="197" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="7">length of electrode</text>
+
+            <!-- ARROW -->
+            <text x="240" y="105" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="20">→</text>
+
+            <!-- TABLESS (right) -->
+            <text x="370" y="18" text-anchor="middle" fill="#00E676" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="2">TABLESS (4680)</text>
+            <rect x="290" y="24" width="160" height="140" rx="4" fill="#111820" stroke="#00E676" stroke-width="1" opacity=".5"/>
+            <g opacity="0.6">
+              <rect x="300" y="32" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="300" y="44" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="300" y="56" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="300" y="68" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="300" y="80" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="300" y="92" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="300" y="104" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="300" y="116" width="140" height="8" rx="1" fill="#102030"/>
+              <rect x="300" y="128" width="140" height="8" rx="1" fill="#1C3A50"/>
+              <rect x="300" y="140" width="140" height="8" rx="1" fill="#102030"/>
+            </g>
+            <!-- full-width current path -->
+            <rect x="290" y="24" width="160" height="10" fill="#00E676" opacity=".3"/>
+            <rect x="290" y="154" width="160" height="10" fill="#00E676" opacity=".3"/>
+            <!-- arrows showing distributed current -->
+            <line x1="320" y1="29" x2="320" y2="39" stroke="#00E676" stroke-width="1.5" opacity=".7"/>
+            <line x1="350" y1="29" x2="350" y2="39" stroke="#00E676" stroke-width="1.5" opacity=".7"/>
+            <line x1="380" y1="29" x2="380" y2="39" stroke="#00E676" stroke-width="1.5" opacity=".7"/>
+            <line x1="410" y1="29" x2="410" y2="39" stroke="#00E676" stroke-width="1.5" opacity=".7"/>
+            <line x1="440" y1="29" x2="440" y2="39" stroke="#00E676" stroke-width="1.5" opacity=".7"/>
+            <text x="370" y="175" text-anchor="middle" fill="#00E676" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">DISTRIBUTED PATH</text>
+            <text x="370" y="187" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="7">current exits entire top/</text>
+            <text x="370" y="197" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="7">bottom face simultaneously</text>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:var(--mono);font-size:9px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:16px;">4680 Tabless Benefits vs. 2170</p>
+        <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;">
+          <thead>
+            <tr>
+              <th style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:9px;letter-spacing:.15em;text-align:left;text-transform:uppercase;">Metric</th>
+              <th style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);color:var(--red);font-size:9px;letter-spacing:.15em;text-align:left;text-transform:uppercase;">4680 vs 2170</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Energy per cell</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">5× more (~100 Wh vs ~18.5 Wh)</td></tr>
+            <tr style="background:rgba(255,255,255,0.01);"><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Power output</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">6× more power (tabless lowers resistance)</td></tr>
+            <tr><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Cells in same space</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">960 vs 4,416 (fewer = cheaper to assemble)</td></tr>
+            <tr style="background:rgba(255,255,255,0.01);"><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Range increase</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">+16% expected at pack level</td></tr>
+            <tr><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Internal resistance</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">Dramatically lower → less heat</td></tr>
+            <tr style="background:rgba(255,255,255,0.01);"><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Structural pack (CTC)</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">Yes — saves 370 parts</td></tr>
+            <tr><td style="padding:11px 14px;border:1px solid var(--border);color:var(--text-dim);">Cost per kWh</td><td style="padding:11px 14px;border:1px solid var(--border);color:var(--green);">50% target reduction (at volume)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2: BATTERY COST HISTORY CHART
+═══════════════════════════════════════════════ -->
+<section class="cost-chart-section" id="cost">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">02</span> Battery Price History</div>
+      <h2 class="sec-title">FROM<br/><span class="a">$1,200</span><br/>TO $68</h2>
+    </div>
+    <p style="font-family:var(--serif);font-size:16px;max-width:700px;line-height:1.8;" class="fade">
+      The single most important chart in EV economics: the cost of a lithium-ion battery pack has fallen <strong style="color:var(--text-bright);">94% in 15 years</strong>. Tesla has consistently tracked 15–20% below the industry average through vertical integration, scale, and cell innovation. The 4680 is the next step-change.
+    </p>
+
+    <div class="chart-container fade">
+      <div class="chart-title-row">
+        <span class="chart-title">Battery Pack Cost ($/kWh) · Industry vs. Tesla Estimate · 2010–2030</span>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--text-dim);"></div>Industry Avg (BNEF)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div>Tesla Estimate</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--cyan);opacity:.5;"></div>Projection</div>
+        </div>
+      </div>
+      <div class="cost-chart">
+        <svg viewBox="0 0 900 260" preserveAspectRatio="none" width="100%" height="100%">
+          <!-- Grid lines -->
+          <line x1="60" y1="10" x2="60" y2="220" stroke="#1C2733" stroke-width="1"/>
+          <line x1="60" y1="220" x2="880" y2="220" stroke="#1C2733" stroke-width="1"/>
+          <!-- Horizontal grid + labels -->
+          <line x1="60" y1="30" x2="880" y2="30" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="34" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$1200</text>
+          <line x1="60" y1="70" x2="880" y2="70" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="74" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$800</text>
+          <line x1="60" y1="110" x2="880" y2="110" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="114" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$500</text>
+          <line x1="60" y1="150" x2="880" y2="150" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="154" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$200</text>
+          <line x1="60" y1="185" x2="880" y2="185" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="189" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$100</text>
+          <line x1="60" y1="205" x2="880" y2="205" stroke="#1C2733" stroke-width=".5" stroke-dasharray="4,4"/>
+          <text x="52" y="209" text-anchor="end" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">$68</text>
+
+          <!-- X-axis year marks: 2010 2012 2014 2016 2018 2020 2022 2024 2026 2030 -->
+          <!-- Points mapped: y = 220 - ((val/1200)*210) approx, x spread 60 to 880 across 10 years -->
+          <!-- Industry curve: 1200, 900, 600, 384, 280, 137, 128, 115, 100, 80 -->
+          <polyline 
+            points="60,30 158,48 256,73 354,113 452,143 550,170 648,172 746,175 810,185 880,195"
+            fill="none" stroke="#4A6275" stroke-width="2" stroke-linejoin="round"/>
+          <!-- fill under industry -->
+          <polygon
+            points="60,30 158,48 256,73 354,113 452,143 550,170 648,172 746,175 810,185 880,195 880,220 60,220"
+            fill="rgba(74,98,117,0.06)"/>
+
+          <!-- Tesla curve: always 15-20% below industry, ending at 68 target -->
+          <!-- Values: 1200(same), 780, 500, 320, 230, 112, 105, 100, 80, 68 -->
+          <polyline 
+            points="60,30 158,58 256,88 354,123 452,153 550,177 648,179 746,182 810,190 880,205"
+            fill="none" stroke="#E31937" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- fill under Tesla -->
+          <polygon
+            points="60,30 158,58 256,88 354,123 452,153 550,177 648,179 746,182 810,190 880,205 880,220 60,220"
+            fill="rgba(227,25,55,0.06)"/>
+
+          <!-- Projection dashed (after 2024) -->
+          <line x1="746" y1="0" x2="746" y2="220" stroke="#1C2733" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="750" y="16" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">2024 ← ACTUAL  PROJECTED →</text>
+
+          <!-- Key annotations -->
+          <!-- 2010 start -->
+          <circle cx="60" cy="30" r="4" fill="#4A6275"/>
+          <text x="65" y="26" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8">$1,200</text>
+
+          <!-- 2015 -->
+          <circle cx="354" cy="113" r="4" fill="#4A6275"/>
+          <text x="358" y="109" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8">$384</text>
+
+          <!-- 2021 industry -->
+          <circle cx="648" cy="172" r="4" fill="#4A6275"/>
+          <text x="652" y="168" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8">$132</text>
+
+          <!-- 2024 Tesla -->
+          <circle cx="746" cy="182" r="5" fill="#E31937"/>
+          <text x="750" y="178" fill="#E31937" font-family="'IBM Plex Mono'" font-size="8">~$100</text>
+
+          <!-- 2024 BNEF industry -->
+          <circle cx="746" cy="175" r="4" fill="#4A6275"/>
+          <text x="706" y="167" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8">$115</text>
+
+          <!-- 4680 target -->
+          <circle cx="810" cy="190" r="5" fill="var(--cyan)" opacity=".6"/>
+          <text x="814" y="186" fill="var(--cyan)" font-family="'IBM Plex Mono'" font-size="8" opacity=".8">4680 Target</text>
+
+          <!-- $100 parity line -->
+          <line x1="60" y1="185" x2="880" y2="185" stroke="rgba(0,230,118,0.2)" stroke-width="1" stroke-dasharray="6,3"/>
+          <text x="65" y="181" fill="rgba(0,230,118,0.5)" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">$100 ICE PARITY LINE</text>
+
+          <!-- 2030 target -->
+          <circle cx="880" cy="195" r="4" fill="#4A6275" opacity=".5"/>
+          <text x="850" y="192" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8" opacity=".7">$80</text>
+
+          <!-- Goldman $68 label -->
+          <line x1="810" y1="205" x2="880" y2="205" stroke="rgba(0,200,255,0.3)" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <circle cx="880" cy="205" r="4" fill="var(--cyan)" opacity=".5"/>
+          <text x="820" y="215" fill="var(--cyan)" font-family="'IBM Plex Mono'" font-size="8" opacity=".7">$68 Tesla 4680 goal</text>
+
+          <!-- Year labels -->
+          <text x="60" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2010</text>
+          <text x="158" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2012</text>
+          <text x="256" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2014</text>
+          <text x="354" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2016</text>
+          <text x="452" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2018</text>
+          <text x="550" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2020</text>
+          <text x="648" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2022</text>
+          <text x="746" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2024</text>
+          <text x="810" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2026</text>
+          <text x="880" y="235" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="9">2030</text>
+        </svg>
+      </div>
+      <p style="font-family:var(--mono);font-size:8px;letter-spacing:.15em;color:var(--text-dim);text-transform:uppercase;">Source · BloombergNEF Annual Battery Price Survey · Goldman Sachs Research 2024 · Tesla Battery Day Data</p>
+    </div>
+
+    <!-- PRICE PROJECTION CARDS -->
+    <div class="proj-cards fade">
+      <div class="proj-card">
+        <div class="proj-year">2010 · Baseline</div>
+        <div class="proj-bar" style="background:var(--red);width:100%;"></div>
+        <div class="proj-price" style="color:var(--red);">$1,200</div>
+        <div class="proj-unit">per kWh · Pack</div>
+        <p class="proj-note">18650 era. EV batteries prohibitively expensive — a Model S 85 kWh pack cost ~$102,000 to manufacture at these rates. Only possible with massive subsidies and luxury pricing.</p>
+        <p class="proj-source">Source · BloombergNEF · Historical</p>
+      </div>
+      <div class="proj-card">
+        <div class="proj-year">2021 · Post-Pandemic Peak</div>
+        <div class="proj-bar" style="background:var(--amber);width:65%;"></div>
+        <div class="proj-price" style="color:var(--amber);">$132</div>
+        <div class="proj-unit">per kWh · Industry Avg</div>
+        <p class="proj-note">Tesla estimated at ~$112/kWh — 15% below industry. Commodity price spikes (lithium, nickel, cobalt) from 2021 supply chain stress briefly paused the decline. Tesla's vertical integration provided a buffer.</p>
+        <p class="proj-source">Source · BloombergNEF 2021 Survey</p>
+      </div>
+      <div class="proj-card">
+        <div class="proj-year">2024 · 4680 Milestone</div>
+        <div class="proj-bar" style="background:var(--cyan);width:35%;"></div>
+        <div class="proj-price" style="color:var(--cyan);">$115</div>
+        <div class="proj-unit">per kWh · Industry · Tesla ~$100</div>
+        <p class="proj-note">4680 becomes Tesla's lowest-cost cell. The Cybercell (Gen 2) achieved lowest $/kWh in Tesla's portfolio — surpassing outside suppliers despite Tesla not being a pure battery company. Dry electrode tech ramp-up next.</p>
+        <p class="proj-source">Source · BNEF 2024 · Tesla Guilfoy 2025</p>
+      </div>
+      <div class="proj-card">
+        <div class="proj-year">2026–2030 · Projection</div>
+        <div class="proj-bar" style="background:var(--green);width:20%;"></div>
+        <div class="proj-price" style="color:var(--green);">$68</div>
+        <div class="proj-unit">per kWh · Tesla 4680 Target</div>
+        <p class="proj-note">Elon Musk's long-term target of $50–55/kWh at pack level. Goldman Sachs projects industry to $80/kWh by 2026, $69/kWh by 2030. Dry battery electrode (DBE) process cuts production cost 19–22% further.</p>
+        <p class="proj-source">Source · Goldman Sachs · Musk Battery Day</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3: MANUFACTURING COST BREAKDOWN
+═══════════════════════════════════════════════ -->
+<section class="mfg-section" id="manufacturing">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">03</span> Manufacturing & Cost Breakdown</div>
+      <h2 class="sec-title">WHERE<br/><span class="r">MONEY</span><br/>GOES</h2>
+    </div>
+
+    <!-- Cost donut breakdown -->
+    <div class="cost-breakdown fade">
+      <div class="donut-wrap">
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Background circle -->
+          <circle cx="140" cy="140" r="110" fill="none" stroke="#1C2733" stroke-width="1"/>
+          <!-- Donut segments using stroke-dasharray trick -->
+          <!-- Cathode: 45% of 691 circumference = 311 -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#E31937" stroke-width="36"
+            stroke-dasharray="254 637" stroke-dashoffset="0" filter="url(#glow)"/>
+          <!-- Anode: 15% = 95 -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#00C8FF" stroke-width="36"
+            stroke-dasharray="85 806" stroke-dashoffset="-254"/>
+          <!-- Electrolyte: 10% = 63 -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#FFB300" stroke-width="36"
+            stroke-dasharray="57 834" stroke-dashoffset="-339"/>
+          <!-- Separator: 7% = 44 -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#9B6DFF" stroke-width="36"
+            stroke-dasharray="40 851" stroke-dashoffset="-396"/>
+          <!-- Cell case: 8% -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#4A6275" stroke-width="36"
+            stroke-dasharray="45 846" stroke-dashoffset="-436"/>
+          <!-- Mfg overhead: 15% -->
+          <circle cx="140" cy="140" r="90" fill="none" stroke="#00E676" stroke-width="36"
+            stroke-dasharray="85 806" stroke-dashoffset="-481"/>
+          <!-- Center -->
+          <circle cx="140" cy="140" r="68" fill="#0D1117"/>
+          <text x="140" y="132" text-anchor="middle" fill="#E31937" font-family="'Bebas Neue'" font-size="36">~$115</text>
+          <text x="140" y="148" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">PER KWH</text>
+          <text x="140" y="160" text-anchor="middle" fill="#4A6275" font-family="'IBM Plex Mono'" font-size="8" letter-spacing="1">2024 PACK</text>
+        </svg>
+      </div>
+      <div class="cost-legend">
+        <p style="font-family:var(--mono);font-size:9px;letter-spacing:.22em;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;">Cell Cost Components (% of total pack cost)</p>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--red);"></div>
+          <div>
+            <div class="cl-label">Cathode Materials (NMC / LFP)</div>
+            <div class="cl-note">Nickel, Manganese, Cobalt or Iron Phosphate — largest single cost. Tesla reduces cobalt to &lt;5% in latest cells.</div>
+          </div>
+          <div class="cl-pct">40%</div>
+        </div>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--green);"></div>
+          <div>
+            <div class="cl-label">Manufacturing Overhead</div>
+            <div class="cl-note">Gigafactory capex amortization, labor, energy. Dry electrode saves 19–22% here — no toxic solvents, no furnace baking.</div>
+          </div>
+          <div class="cl-pct">15%</div>
+        </div>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--cyan);"></div>
+          <div>
+            <div class="cl-label">Anode (Graphite / Silicon)</div>
+            <div class="cl-note">4680 uses silicon-based graphite anode — higher energy density but more complex. Tesla moves toward zero-cobalt silicon anode.</div>
+          </div>
+          <div class="cl-pct">15%</div>
+        </div>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--amber);"></div>
+          <div>
+            <div class="cl-label">Electrolyte</div>
+            <div class="cl-note">Liquid lithium salt solution. Solid-state electrolyte (future) promises 2× energy density and fire elimination.</div>
+          </div>
+          <div class="cl-pct">10%</div>
+        </div>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--text-dim);"></div>
+          <div>
+            <div class="cl-label">Cell Case + Current Collectors</div>
+            <div class="cl-note">Stainless steel casing (thicker in 4680 for structural role). Aluminum/copper current collectors.</div>
+          </div>
+          <div class="cl-pct">8%</div>
+        </div>
+        <div class="cl-row">
+          <div class="cl-swatch" style="background:var(--purple);"></div>
+          <div>
+            <div class="cl-label">Separator + Pack Assembly</div>
+            <div class="cl-note">Polymer separator between anode/cathode. Pack assembly (BMS, thermal, wiring, housing) adds ~$15–20/kWh at pack vs. cell level.</div>
+          </div>
+          <div class="cl-pct">12%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mfg-grid fade">
+      <div class="mfg-card t">
+        <div class="mfg-card-icon">🏭</div>
+        <div class="mfg-card-title">Gigafactory Vertical Integration</div>
+        <p class="mfg-card-body">Tesla manufactures its own cells (Giga Texas for 4680), which is exceptionally rare for an automaker. Traditional OEMs buy cells from CATL, Panasonic, or LG. By controlling the entire cell → pack → vehicle chain, Tesla captures margin at every step and iterates faster. The 4680 ramp-up showed that in-house can beat specialist suppliers on cost.</p>
+        <div class="mfg-metric"><span class="val val-red">100M+</span><span style="color:var(--text-dim);font-size:9px;"> 4680 cells produced by Sept 2024</span></div>
+      </div>
+      <div class="mfg-card c">
+        <div class="mfg-card-icon">🧪</div>
+        <div class="mfg-card-title">Dry Electrode Process (DBE)</div>
+        <p class="mfg-card-body">Traditional cathode manufacturing requires toxic liquid solvents baked in massive furnaces — energy-intensive, slow, and environmentally damaging. Tesla's Dry Battery Electrode process (first commercialized for anodes, expanding to cathodes in 2025) uses a "powder to film" approach: no solvents, no furnace, direct dry powder compression. ACS Applied Energy confirms 19–22% cost reduction, 1.8–2.6% off total pack price.</p>
+        <div class="mfg-metric"><span class="val val-cyan">19–22%</span><span style="color:var(--text-dim);font-size:9px;"> cost reduction via DBE process</span></div>
+      </div>
+      <div class="mfg-card g">
+        <div class="mfg-card-icon">🔩</div>
+        <div class="mfg-card-title">Cell-to-Chassis (CTC) Integration</div>
+        <p class="mfg-card-body">The 4680 pack is not just a battery — it's a structural member of the vehicle chassis. By eliminating the battery enclosure and letting the cells themselves form the floor structure, Tesla removes 370 parts, reduces body weight by 10%, and lowers battery cost per kWh by 7%. Combined with gigacast front and rear body sections, the Cybertruck and future Model Y achieve structural simplicity that rivals cannot match without redesigning from scratch.</p>
+        <div class="mfg-metric"><span class="val val-green">370</span><span style="color:var(--text-dim);font-size:9px;"> parts eliminated via CTC + gigacasting</span></div>
+      </div>
+      <div class="mfg-card a">
+        <div class="mfg-card-icon">♻️</div>
+        <div class="mfg-card-title">Raw Material Cost Strategy</div>
+        <p class="mfg-card-body">Tesla's cobalt reduction strategy is both ethical and economic: NCA cells went from 80% nickel / significant cobalt in 2012 to 90%+ nickel / &lt;5% cobalt by 2024. Cobalt is the most expensive and geopolitically volatile cathode material (primarily from DRC). By 2024, Tesla's Panasonic partnership targets zero-cobalt NCA. Meanwhile, LFP cells (no cobalt, no nickel) are used in Standard Range models — iron is essentially free.</p>
+        <div class="mfg-metric"><span class="val val-amber">60%</span><span style="color:var(--text-dim);font-size:9px;"> cobalt reduction in cathode since 2018</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4: SUPPLY CHAIN & IMPORTS
+═══════════════════════════════════════════════ -->
+<section class="supply-section" id="supply">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">04</span> Supply Chain & Raw Materials</div>
+      <h2 class="sec-title">WHERE<br/><span class="c">MATERIALS</span><br/>COME FROM</h2>
+    </div>
+    <p style="font-family:var(--serif);font-size:16px;max-width:700px;line-height:1.8;" class="fade">
+      Battery cost is inseparable from raw material geopolitics. The minerals that make lithium-ion cells possible are concentrated in a handful of countries — creating supply chain risk that Tesla actively hedges through contracts, recycling, and chemistry choices.
+    </p>
+
+    <div class="flow-stages fade">
+      <div class="flow-stage">
+        <div class="flow-icon">⛏️</div>
+        <div class="flow-title">Mining</div>
+        <p class="flow-body">Lithium (Chile, Australia, China), Nickel (Indonesia, Russia, Philippines), Cobalt (DRC 70%+), Manganese (South Africa, China)</p>
+        <div class="flow-cost" style="color:var(--red);">High geopolitical risk</div>
+      </div>
+      <div class="flow-stage">
+        <div class="flow-icon">🔬</div>
+        <div class="flow-title">Refining</div>
+        <p class="flow-body">China dominates: 60%+ of global lithium refining, 85%+ of anode graphite processing. Tesla's US IRA incentives drive domestic refining investment.</p>
+        <div class="flow-cost" style="color:var(--amber);">China chokepoint</div>
+      </div>
+      <div class="flow-stage">
+        <div class="flow-icon">🏗️</div>
+        <div class="flow-title">Cell Mfg</div>
+        <p class="flow-body">Tesla (Giga Texas), Panasonic (Nevada + Japan), LG ES (Poland + Korea). CATL supplies competitors. 4680 in-house gives Tesla direct cost control.</p>
+        <div class="flow-cost" style="color:var(--cyan);">Tesla = in-house</div>
+      </div>
+      <div class="flow-stage">
+        <div class="flow-icon">🔋</div>
+        <div class="flow-title">Pack Assembly</div>
+        <p class="flow-body">Giga Nevada (Model S/X), Giga Texas (Cybertruck + 4680 future), Giga Shanghai (Model 3/Y China), Giga Berlin (Model Y Europe). CTC eliminates the module layer entirely.</p>
+        <div class="flow-cost" style="color:var(--green);">Vertical · 4 Gigafactories</div>
+      </div>
+      <div class="flow-stage">
+        <div class="flow-icon">🚗</div>
+        <div class="flow-title">Vehicle</div>
+        <p class="flow-body">Battery pack becomes structural chassis member (CTC). Gigacast front/rear (1–2 parts replacing 70+). Full BMS integration. OTA update capability built into battery architecture.</p>
+        <div class="flow-cost" style="color:var(--green);">Software-defined</div>
+      </div>
+    </div>
+
+    <table class="supply-table fade">
+      <thead>
+        <tr>
+          <th>Raw Material</th>
+          <th>Key Source Countries</th>
+          <th>% Battery Cost</th>
+          <th>Supply Risk</th>
+          <th>Tesla Strategy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-material">Lithium</td>
+          <td class="td-country">Chile (42%), Australia (31%), China (15%)</td>
+          <td class="td-pct">18%</td>
+          <td><span class="td-risk risk-med">MEDIUM</span></td>
+          <td class="td-tesla">Direct mining contracts (Liontown, Core Lithium). Lithium Nevada project. Recycling via Redwood Materials.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Nickel</td>
+          <td class="td-country">Indonesia (37%), Philippines (13%), Russia (11%)</td>
+          <td class="td-pct">22%</td>
+          <td><span class="td-risk risk-high">HIGH</span></td>
+          <td class="td-tesla">NCA → near-zero cobalt NMC (90%+ Ni). Long-term offtake with Prony Resources (New Caledonia). LFP for Standard Range avoids nickel entirely.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Cobalt</td>
+          <td class="td-country">DRC (70%+), Australia (3%), Philippines (3%)</td>
+          <td class="td-pct">8%</td>
+          <td><span class="td-risk risk-high">VERY HIGH</span></td>
+          <td class="td-tesla">Actively eliminating: 60% reduction since 2018. Target zero-cobalt NCA by 2025. LFP cells (zero cobalt) deployed in Standard Range globally.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Manganese</td>
+          <td class="td-country">South Africa (36%), Gabon (20%), China (12%)</td>
+          <td class="td-pct">5%</td>
+          <td><span class="td-risk risk-low">LOW</span></td>
+          <td class="td-tesla">Abundant and geopolitically stable. New LMR (lithium manganese rich) chemistry being developed for next-gen cells — higher Mn, cheaper.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Graphite (Anode)</td>
+          <td class="td-country">China (65%+ synthetic), Mozambique (natural)</td>
+          <td class="td-pct">12%</td>
+          <td><span class="td-risk risk-high">HIGH</span></td>
+          <td class="td-tesla">Domestic synthetic graphite investment (US IRA). 4680 silicon-graphite anode reduces graphite dependency. Long-term: silicon/lithium metal anode entirely.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Iron Phosphate (LFP)</td>
+          <td class="td-country">China (dominant), small US deposits</td>
+          <td class="td-pct">6%</td>
+          <td><span class="td-risk risk-med">MEDIUM</span></td>
+          <td class="td-tesla">CATL supplies LFP to Tesla China. IRA incentivizes US LFP production. Iron is essentially free — cost is in the phosphate refinement and China's processing dominance.</td>
+        </tr>
+        <tr>
+          <td class="td-material">Dry Electrode (DBE savings)</td>
+          <td class="td-country">N/A — process innovation</td>
+          <td class="td-pct">−22%</td>
+          <td><span class="td-risk risk-low">ADVANTAGE</span></td>
+          <td class="td-tesla">Eliminates NMP solvent ($billions in infrastructure savings), furnace energy, and drying time. ACS: 19–22% cost reduction. 2025: full ramp at Giga Texas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5: BMS + SOC DETAIL
+═══════════════════════════════════════════════ -->
+<section class="section dark" id="bms">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">05</span> BMS & SOC Intelligence</div>
+      <h2 class="sec-title">THE<br/><span class="c">BRAIN</span><br/>INSIDE</h2>
+    </div>
+
+    <div class="callout fade">
+      Tesla's BMS has been rewritten many times via OTA. Researcher wk057 on reverse-engineering it: "It knows when a cell group will need balancing before it's even out of balance. Which is really freaking weird. It keeps track of which groups will need it, which won't, how long they'll need it... It really is an epic setup now."
+      <cite>Source · Tesla Motors Club · wk057 Community Research</cite>
+    </div>
+
+    <!-- SOC Pipeline visual -->
+    <p style="font-family:var(--mono);font-size:9px;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:20px;" class="fade">SOC Estimation Pipeline</p>
+    <div class="soc-pipe fade">
+      <div class="soc-step">
+        <div class="soc-n">01</div>
+        <div class="soc-name">Raw Sensors</div>
+        <p class="soc-body">Voltage at 2–3mV precision per cell. Current ±0.1A. Temperature per module. High-frequency sampling. 10× finer than industry norm.</p>
+      </div>
+      <div class="soc-step">
+        <div class="soc-n">02</div>
+        <div class="soc-name">Kalman Filter</div>
+        <p class="soc-body">Extended Kalman Filter provides real-time state estimation. Corrects for sensor noise. Physics-based model updated on each measurement cycle.</p>
+      </div>
+      <div class="soc-step">
+        <div class="soc-n">03</div>
+        <div class="soc-name">LSTM Neural Net</div>
+        <p class="soc-body">Long Short-Term Memory network (trained on fleet data millions of vehicles). Models temperature effects, aging curves, load history that physics models miss.</p>
+      </div>
+      <div class="soc-step">
+        <div class="soc-n">04</div>
+        <div class="soc-name">Fused Output</div>
+        <p class="soc-body">Hybrid SOC: &lt;1% error. Enables tighter buffer margins, more usable capacity, accurate range prediction, confident charge limits.</p>
+      </div>
+    </div>
+
+    <div class="bms-grid fade">
+      <div class="bms-card">
+        <div class="bms-card-num">01</div>
+        <div class="bms-icon">⚡</div>
+        <div class="bms-title">Cell Voltage Precision</div>
+        <div class="bms-tech">2–3 mV per cell · 10× industry</div>
+        <p class="bms-body">Tighter voltage measurement lets the BMS know exactly where each cell sits electrochemically — enabling intervention before problems escalate and active balancing to ±0.5% variance.</p>
+        <div class="bms-stat"><span class="v" style="color:var(--green);">2–3mV</span> Tesla vs <span style="color:var(--text-dim);">20–30mV</span> industry</div>
+      </div>
+      <div class="bms-card">
+        <div class="bms-card-num">02</div>
+        <div class="bms-icon">🧠</div>
+        <div class="bms-title">Neural SOC Prediction</div>
+        <div class="bms-tech">LSTM + Extended Kalman Filter Hybrid</div>
+        <p class="bms-body">Sub-1% prediction error vs. 3–5% from basic Coulomb counting. Enables Tesla to use a higher proportion of actual cell capacity and deliver accurate range estimates in all conditions.</p>
+        <div class="bms-stat"><span class="v" style="color:var(--green);">&lt;1%</span> error vs <span style="color:var(--text-dim);">3–5%</span> lookup tables</div>
+      </div>
+      <div class="bms-card">
+        <div class="bms-card-num">03</div>
+        <div class="bms-icon">⚖️</div>
+        <div class="bms-title">Predictive Balancing</div>
+        <div class="bms-tech">Acts before imbalance appears</div>
+        <p class="bms-body">±0.5% cell variance maintained via proactive balancing — the system acts on cell groups before voltage divergence is even visible. Unlocks +15% more usable capacity, equivalent to ~100 km extra range.</p>
+        <div class="bms-stat"><span class="v" style="color:var(--green);">±0.5%</span> variance → <span style="color:var(--green);">+15% capacity</span></div>
+      </div>
+      <div class="bms-card">
+        <div class="bms-card-num">04</div>
+        <div class="bms-icon">🌡️</div>
+        <div class="bms-title">Thermal + Octovalve</div>
+        <div class="bms-tech">Unified heat pump management</div>
+        <p class="bms-body">BMS integrates with the Octovalve heat pump to route coolant, cabin heat, and battery conditioning in one loop. At −10°C, dynamic SOC + preconditioning maintains accuracy where rivals show 30–40% range loss.</p>
+        <div class="bms-stat">Dynamic SOC at −10°C vs <span style="color:var(--text-dim);">static thresholds</span></div>
+      </div>
+      <div class="bms-card">
+        <div class="bms-card-num">05</div>
+        <div class="bms-icon">📊</div>
+        <div class="bms-title">Fleet SOH Learning</div>
+        <div class="bms-tech">Federated learning · Millions of vehicles</div>
+        <p class="bms-body">State of Health models are trained on real-world degradation data from the global Tesla fleet. Each vehicle benefits from what every other vehicle has learned about how cells age under different climates and usage patterns.</p>
+        <div class="bms-stat">~<span class="v" style="color:var(--green);">0.5% annual</span> capacity loss (real owner data)</div>
+      </div>
+      <div class="bms-card">
+        <div class="bms-card-num">06</div>
+        <div class="bms-icon">📡</div>
+        <div class="bms-title">OTA Battery Updates</div>
+        <div class="bms-tech">Software-defined battery · Continuous</div>
+        <p class="bms-body">The compounding moat: BMS algorithms, charge curves, SOC buffers, and balancing strategies all update over-the-air. A 2021 Tesla has better battery management software in 2026 than the day it was delivered. Fixed-firmware competitors cannot close this gap without hardware replacement.</p>
+        <div class="bms-stat"><span class="v" style="color:var(--green);">Continuous improvement</span> post-purchase</div>
+      </div>
+    </div>
+
+    <!-- Tech comparison table -->
+    <table class="tech-table fade">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th style="color:var(--red);">Tesla</th>
+          <th>Industry Norm</th>
+          <th style="color:var(--cyan);">Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="td-l">Voltage monitoring</td><td class="td-t">2–3 mV / cell</td><td class="td-i">20–30 mV error</td><td class="td-x">10× precision → active balance to ±0.5%</td></tr>
+        <tr><td class="td-l">SOC method</td><td class="td-t">LSTM + EKF hybrid</td><td class="td-i">Coulomb + lookup</td><td class="td-x">&lt;1% error vs 3–5% → more usable kWh</td></tr>
+        <tr><td class="td-l">Balancing strategy</td><td class="td-t">Predictive (before divergence)</td><td class="td-i">Reactive threshold</td><td class="td-x">+15% usable capacity ≈ +100 km</td></tr>
+        <tr><td class="td-l">Cold temp handling</td><td class="td-t">Dynamic SOC + preconditioning</td><td class="td-i">Static thresholds</td><td class="td-x">Accurate at −10°C vs 30–40% loss rivals</td></tr>
+        <tr><td class="td-l">Algorithm updates</td><td class="td-t">OTA · continuous</td><td class="td-i">Fixed firmware</td><td class="td-x">Battery improves after purchase</td></tr>
+        <tr><td class="td-l">SOH degradation model</td><td class="td-t">Fleet data · federated</td><td class="td-i">Lab-derived curves</td><td class="td-x">More accurate → longer warranty confidence</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 6: PHYSICS
+═══════════════════════════════════════════════ -->
+<section class="section" id="physics">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">06</span> Physics of Range</div>
+      <h2 class="sec-title">MASS<br/><span class="g">DRAG</span><br/>REGEN</h2>
+    </div>
+    <div class="phys-grid fade">
+      <div>
+        <div class="weight-card">
+          <div class="wc-title">Curb Weight — Model Y vs. Rivals</div>
+          <div class="w-row"><span class="w-lbl">Model Y LR</span><div class="w-bar"><div class="w-fill t" style="width:70%;">1,990 kg</div></div></div>
+          <div class="w-row" style="margin-top:8px;"><span class="w-lbl">Rival A</span><div class="w-bar"><div class="w-fill r" style="width:86%;">2,350 kg</div></div></div>
+          <div class="w-row" style="margin-top:8px;"><span class="w-lbl">Rival B</span><div class="w-bar"><div class="w-fill r" style="width:95%;">2,500 kg</div></div></div>
+          <div style="margin-top:24px;">
+            <div class="wc-title" style="margin-bottom:12px;">Drag Coefficient (Cd)</div>
+            <div class="w-row"><span class="w-lbl">Model Y '25</span><div class="w-bar"><div class="w-fill t" style="width:38%;">Cd 0.22</div></div></div>
+            <div class="w-row" style="margin-top:8px;"><span class="w-lbl">Rivals avg.</span><div class="w-bar"><div class="w-fill r" style="width:62%;">Cd 0.28–0.32</div></div></div>
+          </div>
+          <div class="callout amber" style="margin:20px 0 0;">
+            400 kg mass penalty = permanently carrying 5 adults. Physics is binary: 10% lighter = 6% less energy needed. Before a single BMS parameter is tuned.
+          </div>
+        </div>
+      </div>
+      <div class="phys-rules">
+        <div class="phys-rule">
+          <div class="pr-num">01</div>
+          <div>
+            <div class="pr-title">The Mass-Energy Law</div>
+            <p class="pr-body">Energy required scales linearly with mass under most driving conditions. Tesla's gigacast rear underbody (70+ parts → ~2 castings) and CTC structural battery achieve mass reduction at the architectural level — not through material substitution alone.</p>
+            <div class="pr-calc">10% mass reduction → ~6% energy reduction → ~6% range gain</div>
+          </div>
+        </div>
+        <div class="phys-rule">
+          <div class="pr-num">02</div>
+          <div>
+            <div class="pr-title">Aerodynamic Drag (V²)</div>
+            <p class="pr-body">Drag scales with the square of velocity — at highway speed, it's the dominant energy consumer. Model Y Juniper's Cd 0.22 (down from 0.23 original) is a 4% drag improvement, contributing 2.8–5.1% range increase. Rivals at Cd 0.30 face ~36% more drag force — a continuous kWh tax at every motorway kilometre.</p>
+            <div class="pr-calc">Cd 0.22 vs 0.30 = ~36% less drag force at speed</div>
+          </div>
+        </div>
+        <div class="phys-rule">
+          <div class="pr-num">03</div>
+          <div>
+            <div class="pr-title">Regenerative Braking Depth</div>
+            <p class="pr-body">Tesla's &lt;1% SOC confidence means the BMS can accept aggressive regeneration across a wider charge window. Competitors with 3–5% SOC error must limit regen at higher SOC to avoid overcharge risk — leaving kinetic energy on the table that Tesla recaptures on every braking event.</p>
+            <div class="pr-calc">Tighter SOC confidence → wider regen window → more range recovered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 7: CHARGING CHEMISTRY
+═══════════════════════════════════════════════ -->
+<section class="section dark">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">07</span> Charging Intelligence</div>
+      <h2 class="sec-title">NMC<br/><span class="r">VS</span><br/>LFP</h2>
+    </div>
+    <div class="charge-grid fade">
+      <!-- NMC -->
+      <div class="chg">
+        <span class="chg-badge badge-nmc">NMC · Nickel Manganese Cobalt</span>
+        <div class="chg-title">78.4 kWh Long Range AWD · Panasonic / LG</div>
+        <p class="chg-body">High energy density, performance-optimized. More sensitive to full-charge stress. BMS enforces daily 90% limit, aggressive taper above 90%. Dynamic charge curves based on cell health, temperature, and history.</p>
+        <div class="chg-svg-wrap">
+          <svg viewBox="0 0 400 110" preserveAspectRatio="none" width="100%" height="100%">
+            <line x1="0" y1="27" x2="400" y2="27" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="54" x2="400" y2="54" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="81" x2="400" y2="81" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="100" y1="0" x2="100" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="200" y1="0" x2="200" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="300" y1="0" x2="300" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <polyline points="0,18 180,16 250,28 320,64 380,98 400,104" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="0,18 180,16 250,28 320,64 380,98 400,104 400,110 0,110" fill="rgba(0,200,255,0.06)"/>
+            <line x1="250" y1="0" x2="250" y2="110" stroke="var(--amber)" stroke-width="1" stroke-dasharray="4,3"/>
+            <text x="254" y="12" fill="var(--amber)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1">90% LIMIT</text>
+            <text x="6" y="14" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">250kW</text>
+            <text x="6" y="52" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">125kW</text>
+            <text x="6" y="100" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">25kW</text>
+            <text x="2" y="109" fill="rgba(255,255,255,0.18)" font-family="'IBM Plex Mono'" font-size="6">0%</text>
+            <text x="378" y="109" fill="rgba(255,255,255,0.18)" font-family="'IBM Plex Mono'" font-size="6">100%</text>
+          </svg>
+        </div>
+        <div class="chg-rule"><span class="cr-ico">⚡</span><span class="cr-txt"><strong>Daily 90% limit</strong> — reduces NMC cell stress at high-voltage state, extending cycle life significantly. Default set by BMS on delivery.</span></div>
+        <div class="chg-rule"><span class="cr-ico">📉</span><span class="cr-txt"><strong>Aggressive taper above 90%</strong> — BMS reduces charge rate in final 10% to protect chemistry. Visible in Supercharger charging graph.</span></div>
+        <div class="chg-rule"><span class="cr-ico">🧭</span><span class="cr-txt"><strong>Trip-adaptive charging</strong> — set destination in nav, BMS charges to exact optimal level for route — not 100%, not 80%, precisely what's needed.</span></div>
+        <div class="chg-rule"><span class="cr-ico">❄️</span><span class="cr-txt"><strong>Thermal preconditioning</strong> — BMS warms/cools pack before Supercharger arrival, enabling peak charge rate on arrival rather than after warm-up.</span></div>
+      </div>
+      <!-- LFP -->
+      <div class="chg">
+        <span class="chg-badge badge-lfp">LFP · Lithium Iron Phosphate</span>
+        <div class="chg-title">62.5 kWh Standard Range · CATL</div>
+        <p class="chg-body">Cheaper, more stable, safer at full charge. Charge to 100% regularly — the opposite of NMC advice. Flat voltage curve is a BMS challenge: voltage alone poorly indicates SOC, requiring more complex estimation algorithms.</p>
+        <div class="chg-svg-wrap">
+          <svg viewBox="0 0 400 110" preserveAspectRatio="none" width="100%" height="100%">
+            <line x1="0" y1="27" x2="400" y2="27" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="54" x2="400" y2="54" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="81" x2="400" y2="81" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="100" y1="0" x2="100" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="200" y1="0" x2="200" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="300" y1="0" x2="300" y2="110" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <polyline points="0,20 300,18 360,36 390,76 400,98" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/>
+            <polygon points="0,20 300,18 360,36 390,76 400,98 400,110 0,110" fill="rgba(0,230,118,0.06)"/>
+            <text x="80" y="42" fill="var(--green)" font-family="'IBM Plex Mono'" font-size="7" letter-spacing="1" opacity=".7">FLAT CURVE → SOC ESTIMATION CHALLENGE</text>
+            <text x="6" y="14" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">175kW</text>
+            <text x="6" y="52" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">87kW</text>
+            <text x="6" y="100" fill="rgba(255,255,255,0.25)" font-family="'IBM Plex Mono'" font-size="7">15kW</text>
+            <text x="2" y="109" fill="rgba(255,255,255,0.18)" font-family="'IBM Plex Mono'" font-size="6">0%</text>
+            <text x="378" y="109" fill="rgba(255,255,255,0.18)" font-family="'IBM Plex Mono'" font-size="6">100%</text>
+          </svg>
+        </div>
+        <div class="chg-rule"><span class="cr-ico">✅</span><span class="cr-txt"><strong>Charge to 100% daily — recommended</strong> for LFP. Unlike NMC, iron-phosphate chemistry handles full-charge storage without degradation.</span></div>
+        <div class="chg-rule"><span class="cr-ico">🔬</span><span class="cr-txt"><strong>Flat voltage challenge</strong> — LFP's nearly flat V-SOC curve means BMS can't rely on voltage to estimate charge. Current integration + periodic full charges required for recalibration.</span></div>
+        <div class="chg-rule"><span class="cr-ico">♻️</span><span class="cr-txt"><strong>3,500+ full cycles</strong> — LFP longevity at daily charging: 10+ years before meaningful degradation. Cobalt-free, thermally stable (no thermal runaway risk).</span></div>
+        <div class="chg-rule"><span class="cr-ico">💰</span><span class="cr-txt"><strong>30% cheaper than NMC</strong> — iron is cheap and abundant. No cobalt, no nickel. BMS must be smarter to compensate for the flat curve and lower energy density.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 8: VERDICT
+═══════════════════════════════════════════════ -->
+<section class="verdict-section" id="verdict">
+  <div class="wrap">
+    <div class="sec-hdr fade">
+      <div class="sec-eyebrow"><span class="n">08</span> Verdict</div>
+      <h2 class="sec-title">THE<br/><span class="r">IDEOLOGY</span></h2>
+    </div>
+    <div class="verdict-grid fade">
+      <div class="vc">
+        <div class="vc-big" style="color:var(--red);">RANGE<br/>THROUGH<br/>EFFICIENCY</div>
+        <div class="vc-sub">Not capacity · The Tesla Battery Thesis</div>
+        <p class="vc-body">
+          Tesla's battery philosophy is not "install a bigger pack." It is a systems doctrine: <strong>reduce energy demand</strong> through mass reduction and aerodynamics. <strong>Maximise extraction</strong> from every cell through precision monitoring and predictive balancing. <strong>Reduce cost</strong> through vertical integration, dry electrode, and CTC structural design. <strong>Compound improvement</strong> through OTA updates that make every vehicle better over time.
+          <br/><br/>
+          The result is a 78.4 kWh battery that operates at a meaningfully higher usable capacity ratio, in a vehicle that demands less energy per km, costs less per kWh to manufacture than any competitor or supplier, and gets materially better every year through software.
+          <br/><br/>
+          <strong>The 4680 Cybercell hitting lowest-cost status in 2024 is the inflection point.</strong> From here, Tesla has cost leadership, manufacturing leadership, and software leadership simultaneously. That combination — especially with dry electrode fully ramped in 2025 — is a moat rivals will need years to cross.
+        </p>
+      </div>
+      <div class="vc" style="background:var(--panel);">
+        <div class="vc-big" style="font-size:40px;">THE FIVE<br/>PILLARS</div>
+        <div class="vc-sub">Why 78.4 kWh beats 100 kWh</div>
+        <div class="pillars">
+          <div class="pillar"><span class="pillar-n" style="color:var(--red);">1</span><div><div class="pillar-title">2–3mV Cell Precision</div><p class="pillar-body">10× tighter monitoring → active balance to ±0.5% → +15% usable capacity from same pack</p></div></div>
+          <div class="pillar"><span class="pillar-n" style="color:var(--cyan);">2</span><div><div class="pillar-title">Neural LSTM SOC</div><p class="pillar-body">&lt;1% prediction error vs 3–5% → more headroom, accurate range, confident charge limits</p></div></div>
+          <div class="pillar"><span class="pillar-n" style="color:var(--green);">3</span><div><div class="pillar-title">400 kg Mass Reduction</div><p class="pillar-body">Gigacast + CTC = lightest in class. 10% lighter = ~6% less energy consumed before BMS tuning</p></div></div>
+          <div class="pillar"><span class="pillar-n" style="color:var(--amber);">4</span><div><div class="pillar-title">Cd 0.22 Aerodynamics</div><p class="pillar-body">36% less drag force vs Cd 0.30. 4% drag improvement = 2.8–5.1% range increase</p></div></div>
+          <div class="pillar"><span class="pillar-n" style="color:var(--red);">5</span><div><div class="pillar-title">OTA + 4680 Cost Leadership</div><p class="pillar-body">Software-defined battery improves post-delivery. 4680 now lowest $/kWh in Tesla portfolio — compounding moat</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REFS -->
+<section class="refs-section">
+  <div class="wrap">
+    <div class="sec-eyebrow"><span class="n">09</span> Sources & References</div>
+    <div class="refs-grid fade">
+      <a class="ref" href="https://www.notateslaapp.com/news/2637/teslas-4680-battery-achieves-lowest-cost-per-kwh" target="_blank">
+        <div class="ref-src">NotATeslaApp · April 2025</div>
+        <div class="ref-title">Tesla's 4680 Battery Achieves Lowest Cost Per kWh</div>
+        <div class="ref-detail">Cybercell Gen 2 milestone · Director Guilfoy LinkedIn · DBE roadmap</div>
+      </a>
+      <a class="ref" href="https://about.bnef.com/insights/clean-energy/battery-pack-prices-fall-to-an-average-of-132-kwh-but-rising-commodity-prices-start-to-bite/" target="_blank">
+        <div class="ref-src">BloombergNEF · 2021–2024</div>
+        <div class="ref-title">Battery Pack Prices Annual Survey</div>
+        <div class="ref-detail">$1,200 → $132 historical · $115/kWh 2024 · Tesla 15% below average estimate</div>
+      </a>
+      <a class="ref" href="https://solartechonline.com/blog/ev-battery-replacement-cost-guide-2025/" target="_blank">
+        <div class="ref-src">SolarTech / Goldman Sachs · 2025</div>
+        <div class="ref-title">EV Battery Replacement Cost 2025 — Complete Guide</div>
+        <div class="ref-detail">$115/kWh 2024 pack avg · Goldman $80/kWh 2026 · $69/kWh 2030 projection</div>
+      </a>
+      <a class="ref" href="https://teslamagz.com/tesla/tesla-energy/teslas-4680-battery-cell-hits-major-cost-milestone/" target="_blank">
+        <div class="ref-src">TeslaMagz · April 2025</div>
+        <div class="ref-title">Tesla's 4680 Battery Cell Hits Major Cost Milestone</div>
+        <div class="ref-detail">50% cost drop target · 100M cells · DBE 19–22% saving · ACS Applied Energy</div>
+      </a>
+      <a class="ref" href="https://www.sciencedirect.com/science/article/pii/S2352484725009047" target="_blank">
+        <div class="ref-src">ScienceDirect · Jan 2026</div>
+        <div class="ref-title">Deep Learning in Battery Management Systems</div>
+        <div class="ref-detail">LSTM/CNN/GRU review · Tesla/BMW/CATL industrial applications · SOC/SOH methods</div>
+      </a>
+      <a class="ref" href="https://www.torquenews.com/14093/tesla-18650-2170-and-4680-battery-cell-comparison-basics" target="_blank">
+        <div class="ref-src">Torque News · 2021</div>
+        <div class="ref-title">Tesla 18650, 2170 and 4680 Battery Cell Comparison</div>
+        <div class="ref-detail">960 vs 4,416 cells · 5× energy · 6× power · Tabless thermal advantage explained</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="ft-l">BLACKLOVERTECH · JANARTHANAN · CASE STUDY XIV · TESLA BATTERY ALGORITHM · 2026</span>
+  <span class="ft-r">SERIES: PAYPAY · ZOHO · CLOUDFLARE · E-COMMERCE · SYSTEMS ENGINEERING · TESLA</span>
+</footer>
+
+<script>
+// Nav on scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('show',window.scrollY>500));
+
+// Fade in on scroll
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{threshold:.07,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Perplexity AI: The Answer Engine – Detailed Case Study</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Epilogue:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #050816;
+      --bg-darker: #02010c;
+      --surface: #111827;
+      --surface-soft: #1f2937;
+      --surface-soft-alt: #111827;
+      --accent-primary: #00d4ff;
+      --accent-secondary: #ff6b35;
+      --accent-tertiary: #00f5d4;
+      --accent-purple: #a855f7;
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --border-subtle: #1f2933;
+      --border-strong: #374151;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.8);
+      --radius-lg: 18px;
+      --radius-xl: 28px;
+      --radius-pill: 999px;
+      --nav-height: 72px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Epilogue", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-primary);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(0, 212, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.2), transparent 60%),
+        linear-gradient(145deg, var(--bg-darker), #030712 40%, #020617 100%);
+      background-attachment: fixed;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Floating glow layer */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.08), transparent 55%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 53, 0.08), transparent 55%);
+      opacity: 0.8;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: -1;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(-12px, 10px, 0) scale(1.02);
+      }
+      100% {
+        transform: translate3d(10px, -16px, 0) scale(1.01);
+      }
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 1.6rem;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(
+        to bottom,
+        rgba(15, 23, 42, 0.95),
+        rgba(15, 23, 42, 0.78),
+        transparent
+      );
+      border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+    }
+
+    .nav-inner {
+      height: var(--nav-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .nav-logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background:
+        conic-gradient(from 180deg, #00d4ff, #00f5d4, #ff6b35, #a855f7, #00d4ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 16px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-logo-mark span {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 30% 20%, #e5f8ff, #111827 75%);
+    }
+
+    .nav-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .nav-title-main {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .nav-title-sub {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.8rem;
+      font-size: 0.88rem;
+    }
+
+    .nav-links a {
+      position: relative;
+      color: var(--text-secondary);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-weight: 500;
+      font-size: 0.78rem;
+      padding-bottom: 0.2rem;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-tertiary));
+      transition: width 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-badge {
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #10b981);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    /* Mobile nav */
+    .nav-toggle {
+      display: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .nav-toggle-line {
+      width: 16px;
+      height: 1.8px;
+      background: var(--text-secondary);
+      position: relative;
+    }
+
+    .nav-toggle-line::before,
+    .nav-toggle-line::after {
+      content: "";
+      width: 16px;
+      height: 1.8px;
+      background: var(--text-secondary);
+      position: absolute;
+      left: 0;
+    }
+
+    .nav-toggle-line::before {
+      top: -5px;
+    }
+
+    .nav-toggle-line::after {
+      top: 5px;
+    }
+
+    /* HERO */
+    .hero {
+      padding-top: 3.8rem;
+      padding-bottom: 4.5rem;
+    }
+
+    .hero-inner {
+      min-height: calc(100vh - var(--nav-height) - 3rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
+      gap: 3.2rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: radial-gradient(circle at 10% 0, rgba(0, 212, 255, 0.2), transparent 60%);
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 1.3rem;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--accent-primary), var(--accent-tertiary));
+    }
+
+    .hero-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(2.9rem, 5vw, 3.9rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.1rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(120deg, var(--accent-primary), var(--accent-tertiary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.03rem;
+      color: var(--text-secondary);
+      max-width: 40rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .meta-chip {
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .meta-dot-latency {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #38bdf8);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+    }
+
+    .meta-dot-accuracy {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #22c55e);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn {
+      position: relative;
+      isolation: isolate;
+      border-radius: var(--radius-pill);
+      padding: 0.9rem 1.6rem;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-decoration: none;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at 0% 0%, #e0f2fe, #0ea5e9 40%, #0369a1 95%);
+      color: #020617;
+      box-shadow: 0 16px 40px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      transform: translateX(-120%);
+      transition: transform 0.5s;
+      opacity: 0.5;
+    }
+
+    .btn-primary:hover::before {
+      transform: translateX(120%);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-secondary);
+      border-color: rgba(55, 65, 81, 0.9);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-secondary);
+      color: var(--accent-secondary);
+      background: linear-gradient(
+        120deg,
+        rgba(248, 113, 113, 0.12),
+        rgba(248, 250, 252, 0.02)
+      );
+    }
+
+    .btn-icon {
+      width: 19px;
+      height: 19px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.4);
+      background: rgba(15, 23, 42, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+    }
+
+    /* Hero right – metrics card */
+    .hero-card {
+      background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.14), transparent 65%),
+        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.17), transparent 65%),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.88));
+      border-radius: var(--radius-xl);
+      padding: 1.6rem 1.6rem 1.4rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      top: -160px;
+      right: -160px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: conic-gradient(from 220deg, #22d3ee, #a855f7, #fb923c, #22d3ee);
+      opacity: 0.32;
+      filter: blur(10px);
+    }
+
+    .hero-card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-card-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .hero-card-tag {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      color: #e0f2fe;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .hero-card-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #38bdf8);
+    }
+
+    .hero-card-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .metric-pod {
+      background: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.9));
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.85);
+      padding: 0.8rem 0.9rem;
+    }
+
+    .metric-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .metric-value {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .metric-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    .hero-card-footnote {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px dashed rgba(55, 65, 81, 0.8);
+      padding-top: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* GENERIC SECTIONS */
+    section.section {
+      padding: 3.6rem 0 3.9rem;
+      border-top: 1px solid rgba(31, 41, 55, 0.85);
+    }
+
+    .section-header {
+      margin-bottom: 2.2rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1.8rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .section-kicker {
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-tertiary);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.9rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      max-width: 30rem;
+      font-size: 0.96rem;
+      color: var(--text-secondary);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      font-size: 0.78rem;
+    }
+
+    .pill {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.75);
+    }
+
+    /* EXECUTIVE SUMMARY / OBJECTIVES */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
+      gap: 2.4rem;
+    }
+
+    .card {
+      background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.14), transparent 70%),
+        linear-gradient(150deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.98));
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.6rem 1.7rem;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.85);
+    }
+
+    .card-alt {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96));
+    }
+
+    .card-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.12rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .card-body {
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.8rem;
+    }
+
+    .list {
+      list-style: none;
+      margin-top: 0.7rem;
+    }
+
+    .list li {
+      position: relative;
+      padding-left: 1.1rem;
+      margin-bottom: 0.45rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55rem;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-tertiary));
+    }
+
+    /* PIPELINE SECTION */
+    .pipeline-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 2.4rem;
+      align-items: flex-start;
+    }
+
+    .pipeline-steps {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .step-card {
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      padding: 0.9rem 1rem;
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr) auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .step-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 0.86rem;
+      color: #e0f2fe;
+    }
+
+    .step-main {
+      font-size: 0.88rem;
+    }
+
+    .step-main-title {
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .step-main-desc {
+      color: var(--text-secondary);
+    }
+
+    .step-latency {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .step-latency span {
+      display: inline-block;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(55, 65, 81, 0.85);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .pipeline-meta {
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .pipeline-diagram {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.12), transparent 60%),
+        linear-gradient(150deg, #020617, #020617 40%, #020617 100%);
+      padding: 1.5rem 1.4rem 1.3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pipeline-diagram-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .pill-row-small {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+
+    .pill-small {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .lane {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .lane-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .lane-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.95);
+      overflow: hidden;
+    }
+
+    .lane-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22d3ee, #a855f7);
+    }
+
+    /* MODELS TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    thead {
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    th,
+    td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid rgba(55, 65, 81, 0.7);
+    }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(17, 24, 39, 0.95);
+    }
+
+    tbody tr:hover {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .cell-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* COMPARISON GRID */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+
+    .comparison-card {
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.5rem 1.5rem;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.16), transparent 65%),
+        rgba(15, 23, 42, 0.98);
+    }
+
+    .comparison-card-alt {
+      background: radial-gradient(circle at 0% 0%, rgba(248, 113, 113, 0.16), transparent 65%),
+        rgba(15, 23, 42, 0.98);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .badge-dot-green {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #22c55e);
+    }
+
+    .badge-dot-amber {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fef3c7, #f97316);
+    }
+
+    .comparison-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .scenario-grid {
+      margin-top: 1.9rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .scenario-card {
+      border-radius: 14px;
+      padding: 1rem 1rem 1.05rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .scenario-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 0.92rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .scenario-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-bottom: 0.15rem;
+    }
+
+    .scenario-body {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    /* HALLUCINATION PREVENTION DEEP DIVE */
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 2.3rem;
+      align-items: flex-start;
+    }
+
+    .stacked {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .stack-item {
+      border-radius: 14px;
+      padding: 0.9rem 1rem 1rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.97);
+    }
+
+    .stack-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-tertiary);
+      margin-bottom: 0.3rem;
+    }
+
+    .stack-title {
+      font-size: 0.96rem;
+      font-family: "Space Grotesk", sans-serif;
+      margin-bottom: 0.35rem;
+    }
+
+    .stack-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .risk-table td:first-child {
+      width: 32%;
+      font-weight: 500;
+    }
+
+    /* FUTURE / TIMELINE */
+    .timeline {
+      position: relative;
+      padding-left: 1.6rem;
+      border-left: 1px solid rgba(55, 65, 81, 0.9);
+      margin-top: 0.5rem;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 1.1rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -0.98rem;
+      top: 0.25rem;
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #e5f8ff, #22d3ee);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    .timeline-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 0.96rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 3.6rem 0 3rem;
+      border-top: 1px solid rgba(31, 41, 55, 0.85);
+      margin-top: 1rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    footer .footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-card {
+        order: -1;
+        margin-bottom: 1rem;
+      }
+
+      .summary-grid,
+      .pipeline-layout,
+      .comparison-grid,
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .nav-toggle {
+        display: inline-flex;
+      }
+
+      .nav-inner {
+        justify-content: space-between;
+      }
+
+      section.section {
+        padding: 3rem 0 3.2rem;
+      }
+
+      .section-header {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        padding: 0 1.1rem;
+      }
+
+      .hero {
+        padding-top: 2.5rem;
+      }
+
+      .hero-title {
+        font-size: 2.4rem;
+      }
+
+      .hero-meta {
+        gap: 0.6rem;
+      }
+
+      .hero-card-metrics {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <div class="nav-left">
+          <div class="nav-logo-mark"><span></span></div>
+          <div class="nav-title">
+            <div class="nav-title-main">Perplexity AI</div>
+            <div class="nav-title-sub">The Answer Engine</div>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="#summary">Summary</a>
+          <a href="#pipeline">Pipeline</a>
+          <a href="#models">Models</a>
+          <a href="#hallucinations">Reliability</a>
+          <a href="#comparison">Google AIO</a>
+          <a href="#future">Future</a>
+        </div>
+        <div class="nav-badge">
+          <span class="nav-dot"></span>
+          Live search + LLM
+        </div>
+        <button class="nav-toggle" aria-label="Open navigation">
+          <div class="nav-toggle-line"></div>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Systems Case Study · 2026
+          </div>
+          <h1 class="hero-title">
+            Perplexity AI as<br />
+            a Real‑Time <span>“Answer Engine”</span>
+          </h1>
+          <p class="hero-subtitle">
+            How Perplexity orchestrates real-time web search, retrieval‑augmented generation, and citation‑native LLMs
+            to deliver reliable answers in 2.5–3.5 seconds—contrasted with Google’s AI Overviews.[file:1][web:2][web:3][web:9]
+          </p>
+          <div class="hero-meta">
+            <div class="meta-chip">
+              <span class="meta-dot-latency"></span>
+              Latency target: &lt;3.5s end‑to‑end[file:1][web:3]
+            </div>
+            <div class="meta-chip">
+              <span class="meta-dot-accuracy"></span>
+              96–98% factual answers with citations[file:1][web:8]
+            </div>
+            <div class="meta-chip">
+              Cost ≈ $0.089 / query (LLM + search + infra)[file:1]
+            </div>
+          </div>
+          <div class="hero-ctas">
+            <a href="#pipeline" class="btn btn-primary">
+              <span class="btn-icon">⟶</span>
+              View Architecture
+            </a>
+            <a href="#comparison" class="btn btn-secondary">
+              <span class="btn-icon">☰</span>
+              Google AI Overviews Contrast
+            </a>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="hero-card-inner">
+            <div class="hero-card-header">
+              <div>
+                <div class="hero-card-title">Key Reliability Metrics</div>
+                <div style="font-size:0.78rem;color:var(--text-secondary);">
+                  Based on internal evaluations and external studies of web‑grounded LLM answers.[web:3][web:8]
+                </div>
+              </div>
+              <div class="hero-card-tag">
+                <span class="hero-card-tag-dot"></span>
+                Production SLO
+              </div>
+            </div>
+            <div class="hero-card-metrics">
+              <div class="metric-pod">
+                <div class="metric-label">Citation accuracy</div>
+                <div class="metric-value">98.2%</div>
+                <div class="metric-sub">Citations truly support their spans[file:1][web:8]</div>
+              </div>
+              <div class="metric-pod">
+                <div class="metric-label">Hallucination rate</div>
+                <div class="metric-value">2–3%</div>
+                <div class="metric-sub">Measured on web‑answer benchmarks[file:1][web:8]</div>
+              </div>
+              <div class="metric-pod">
+                <div class="metric-label">Median latency</div>
+                <div class="metric-value">2.8s</div>
+                <div class="metric-sub">Query → first token streamed[file:1][web:3]</div>
+              </div>
+              <div class="metric-pod">
+                <div class="metric-label">Cost / query</div>
+                <div class="metric-value">$0.089</div>
+                <div class="metric-sub">LLM + search APIs + infra[file:1]</div>
+              </div>
+            </div>
+            <div class="hero-card-footnote">
+              <span>
+                Latency SLO: &lt;4s for 95% of queries, including search, ranking, LLM, and verification.[file:1][web:3]
+              </span>
+              <span>
+                Follow‑ups reuse context and caches, often returning within 500 ms.[file:1][web:2]
+              </span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- EXECUTIVE SUMMARY & PROBLEM -->
+  <section class="section" id="summary">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Executive Summary</div>
+          <h2 class="section-title">From Link Lists to Grounded Answers</h2>
+        </div>
+        <p class="section-subtitle">
+          Traditional search returns ranked documents and leaves synthesis to the user. Perplexity inverts this: it
+          first synthesizes an answer, then exposes sources and follow‑up questions around that synthesis.[file:1][web:2][web:10]
+        </p>
+      </div>
+
+      <div class="summary-grid">
+        <article class="card">
+          <h3 class="card-title">Problem: Limitations of Legacy Search & Early AI Overviews</h3>
+          <p class="card-body">
+            Classic web search optimizes for click‑through and ad revenue, not for a single grounded explanation. Google’s early
+            AI Overviews add a generative layer on top of its index but still inherit issues from cached data, loose
+            grounding, and opaque summarization.[web:9]
+          </p>
+          <ul class="list">
+            <li>
+              <strong>Fragmented user effort:</strong> Users open multiple tabs and manually reconcile conflicting or
+              outdated information.[web:10]
+            </li>
+            <li>
+              <strong>Index‑staleness risk:</strong> Summaries built over cached documents may miss breaking changes
+              (prices, incidents, research), especially for volatile domains.[web:9]
+            </li>
+            <li>
+              <strong>Post‑hoc citations:</strong> AI Overviews usually generate text first, then attach links, which
+              weakens guarantees that each claim is tightly supported.[web:9]
+            </li>
+            <li>
+              <strong>Hallucination visibility:</strong> Users receive fluent but sometimes unsupported claims without
+              clear indicators of confidence or verification.[web:8][web:9]
+            </li>
+          </ul>
+        </article>
+
+        <article class="card card-alt">
+          <h3 class="card-title">Design Goals for Perplexity’s “Answer Engine”</h3>
+          <p class="card-body">
+            Perplexity’s system is engineered to behave less like a search results page and more like an on‑demand
+            research assistant, under strict time and cost budgets.[file:1][web:2][web:3]
+          </p>
+          <ul class="list">
+            <li><strong>Goal 1 – Real‑time:</strong> No static knowledge cutoff; every question can trigger fresh web retrieval.[file:1][web:3]</li>
+            <li><strong>Goal 2 – Native citations:</strong> The LLM must only state facts it can back with explicit citations in context.[file:1][web:2]</li>
+            <li><strong>Goal 3 – Low hallucinations:</strong> Multi‑layer verification rejects or softens unsupported claims before streaming.[web:8][file:1]</li>
+            <li><strong>Goal 4 – Conversational:</strong> Follow‑ups reuse prior context, caches, and retrieval results so that exploration feels like a dialogue, not isolated searches.[file:1][web:2]</li>
+            <li><strong>Goal 5 – Sustainable cost:</strong> Hit &lt;$0.10 per query at web‑scale usage through routing and batching optimizations.[file:1][web:3]</li>
+          </ul>
+        </article>
+      </div>
+
+      <div style="margin-top:1.9rem;" class="pill-row">
+        <span class="pill">User intent classification</span>
+        <span class="pill">Real‑time retrieval</span>
+        <span class="pill">RAG orchestration</span>
+        <span class="pill">Verification & safety</span>
+        <span class="pill">Conversation memory</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE / ARCHITECTURE -->
+  <section class="section" id="pipeline">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">System Architecture</div>
+          <h2 class="section-title">Six‑Stage Real‑Time Answer Pipeline</h2>
+        </div>
+        <p class="section-subtitle">
+          The production pipeline is a 6‑stage RAG system with aggressive parallelism: query understanding, web
+          search, hybrid ranking, LLM synthesis, fact verification, and streaming answer assembly.[file:1][web:2][web:3]
+        </p>
+      </div>
+
+      <div class="pipeline-layout">
+        <div>
+          <div class="pipeline-steps">
+            <div class="step-card">
+              <div class="step-badge">01</div>
+              <div class="step-main">
+                <div class="step-main-title">Query Understanding (≈50 ms)</div>
+                <div class="step-main-desc">
+                  Lightweight transformer performs intent classification, named‑entity recognition, and query expansion
+                  to generate multiple search forms (web, academic, code, etc.).[file:1][web:2]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>DistilBERT‑class encoder · &lt;50 ms[file:1]</span>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">02</div>
+              <div class="step-main">
+                <div class="step-main-title">Real‑Time Web Search (≈1.2 s)</div>
+                <div class="step-main-desc">
+                  Parallel calls to Bing, Google, and Brave (where allowed) fetch ~25–30 candidate documents with
+                  titles, snippets, and domains, filtered for quality and recency.[file:1][web:3][web:7]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>3 APIs, parallel · ~1.2 s[file:1][web:7]</span>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">03</div>
+              <div class="step-main">
+                <div class="step-main-title">Hybrid Ranking & Embeddings (≈400 ms)</div>
+                <div class="step-main-desc">
+                  Title/snippet chunks are embedded and scored using a hybrid of BM25, semantic similarity, and
+                  recency, narrowing to ~10 high‑value contexts passed into the LLM.[file:1][web:2]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>text-embedding‑3‑large · 3072‑D[file:1]</span>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">04</div>
+              <div class="step-main">
+                <div class="step-main-title">Citation‑Native LLM Synthesis (≈800 ms)</div>
+                <div class="step-main-desc">
+                  A router chooses between Claude 3.5 Sonnet, Claude 3 Haiku, GPT‑4o, or a Perplexity‑tuned 7B model,
+                  enforcing a format where every factual span is grounded in one or more retrieved snippets.[file:1][web:2][web:3]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>Streaming starts &lt;1.5 s[file:1][web:3]</span>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">05</div>
+              <div class="step-main">
+                <div class="step-main-title">Verification & Safety (≈300 ms)</div>
+                <div class="step-main-desc">
+                  A verification micro‑pipeline runs NLI, sub‑span matching, and contradiction checks to downgrade,
+                  re‑cite, or remove unsupported statements before they are fully streamed.[file:1][web:8]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>4 verification layers[file:1][web:8]</span>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">06</div>
+              <div class="step-main">
+                <div class="step-main-title">Streaming & Conversation Memory</div>
+                <div class="step-main-desc">
+                  Answer tokens stream to the client as they pass verification; Redis‑backed caches and conversation
+                  memory store embeddings, search results, and partial summaries for sub‑second follow‑ups.[file:1][web:2]
+                </div>
+              </div>
+              <div class="step-latency">
+                <span>Follow‑ups often &lt;500 ms[file:1][web:3]</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="pipeline-meta">
+            Across this pipeline, the orchestration layer (built on Kubernetes + Ray/vLLM) aggressively overlaps
+            network I/O, embedding, and model inference to keep the tail latency inside a &lt;4‑second SLO while still
+            hitting 96–98% factuality on benchmarked queries.[file:1][web:2][web:3][web:8]
+          </p>
+        </div>
+
+        <aside class="pipeline-diagram">
+          <div class="pipeline-diagram-title">Latency Budget & Parallelism</div>
+          <div class="pill-row-small">
+            <span class="pill-small">Client → Edge → Orchestrator</span>
+            <span class="pill-small">Search APIs</span>
+            <span class="pill-small">Embeddings</span>
+            <span class="pill-small">LLM Router</span>
+            <span class="pill-small">Verifier</span>
+          </div>
+          <div class="lane">
+            <div class="lane-label">Network I/O</div>
+            <div class="lane-track">
+              <div class="lane-fill" style="width:30%;opacity:0.85;"></div>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-label">Search APIs</div>
+            <div class="lane-track">
+              <div class="lane-fill" style="width:70%;"></div>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-label">Embeddings</div>
+            <div class="lane-track">
+              <div class="lane-fill" style="width:35%;background:linear-gradient(90deg,#22d3ee,#22c55e);"></div>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-label">LLM Inference</div>
+            <div class="lane-track">
+              <div class="lane-fill" style="width:55%;background:linear-gradient(90deg,#a855f7,#fb923c);"></div>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-label">Verification</div>
+            <div class="lane-track">
+              <div class="lane-fill" style="width:20%;background:linear-gradient(90deg,#22c55e,#0ea5e9);"></div>
+            </div>
+          </div>
+          <p style="margin-top:1rem;font-size:0.82rem;color:var(--text-secondary);">
+            Real‑time search, embeddings, and LLM calls overlap as much as possible; only verification is strictly
+            downstream of generation, allowing first tokens to appear &lt;1.5 s while still checking claims before full
+            completion.[file:1][web:2][web:3]
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELS & COSTS -->
+  <section class="section" id="models">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Model & Infrastructure Stack</div>
+          <h2 class="section-title">Routing Across Multiple LLMs Under Cost Constraints</h2>
+        </div>
+        <p class="section-subtitle">
+          A router selects between premium frontier models and an in‑house 7B model based on query complexity,
+          sensitivity, and latency requirements, keeping average cost around $0.089 per query.[file:1][web:2][web:3]
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Provider</th>
+              <th>Primary Role</th>
+              <th>Typical Latency</th>
+              <th>LLM Cost / 1M tokens</th>
+              <th>Routing Criteria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Claude 3.5 Sonnet</strong><br />
+                <span class="cell-label">Default for complex queries</span>
+              </td>
+              <td>Anthropic</td>
+              <td>Open‑ended reasoning, multi‑document synthesis, safety‑critical topics.[file:1][web:2]</td>
+              <td>1.5–2.0 s</td>
+              <td>≈$3.00</td>
+              <td>High complexity, multi‑step reasoning, or safety‑sensitive domains (health, finance, legal).[web:2][web:3]</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>GPT‑4o</strong><br />
+                <span class="cell-label">Multimodal fallback</span>
+              </td>
+              <td>OpenAI</td>
+              <td>Image‑ and document‑understanding, multimodal queries.[web:3]</td>
+              <td>1.5–2.0 s</td>
+              <td>≈$5.00</td>
+              <td>Queries with images/screenshots or complex PDF extraction.[web:3]</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Claude 3 Haiku</strong><br />
+                <span class="cell-label">Fast follow‑up</span>
+              </td>
+              <td>Anthropic</td>
+              <td>Short follow‑ups, clarifications, low‑stakes Q&A.[file:1][web:2]</td>
+              <td>0.3–0.5 s</td>
+              <td>≈$0.25</td>
+              <td>Low complexity, heavy cache‑reuse from previous retrievals.[file:1]</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Perplexity‑Custom‑7B</strong><br />
+                <span class="cell-label">Citation‑aware assistant</span>
+              </td>
+              <td>Perplexity</td>
+              <td>Specialized for citation formatting and structured answers (lists, tables, snippets).[file:1]</td>
+              <td>0.4–0.6 s</td>
+              <td>≈$0.50</td>
+              <td>Snippets, sidebars, and cases where answer shape is templated.[file:1][web:2]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:1.8rem;display:grid;grid-template-columns:minmax(0,1.1fr)minmax(0,1.2fr);gap:2.3rem;">
+        <article class="card">
+          <h3 class="card-title">Token Budget & Cost Structure</h3>
+          <p class="card-body">
+            A typical query consumes around 11K total tokens end‑to‑end: ~512 tokens for query + system prompts,
+            ~8K tokens for retrieved documents, and ~2K tokens for the answer plus verification context.[file:1][web:3]
+          </p>
+          <ul class="list">
+            <li>LLM usage dominates cost at ≈$0.033 / query for ~11K tokens on premium models.[file:1][web:3]</li>
+            <li>Search APIs (Bing/Google/Brave) contribute ≈$0.010 / query at current volume.[file:1][web:7]</li>
+            <li>Embedding inference and infra overhead (GPU/CPU, orchestration) add ≈$0.046 / query combined.[file:1][web:3]</li>
+          </ul>
+          <p class="card-body">
+            This yields a blended cost in the $0.08–$0.09 range—roughly 3× more expensive than a pure index‑based search
+            result, which is why Perplexity currently targets a premium, high‑engagement use case rather than generic
+            navigational queries.[file:1][web:9][web:10]
+          </p>
+        </article>
+
+        <article class="card card-alt">
+          <h3 class="card-title">Inference & Caching Infrastructure</h3>
+          <p class="card-body">
+            The serving stack is built on Kubernetes with Ray/vLLM to maximize GPU utilization, backed by Redis for both
+            query‑level and KV‑cache‑level reuse.[file:1][web:2]
+          </p>
+          <ul class="list">
+            <li><strong>Hardware:</strong> H100/A100 clusters on AWS, tuned for batch sizes 64–128 queries.[file:1][web:2]</li>
+            <li><strong>Query cache:</strong> Redis with 1‑day TTL; 15–20% hit rate for head queries and repeated trends.[file:1]</li>
+            <li><strong>KV cache sharing:</strong> Multi‑GPU pooling of transformer KV states across similar prompts / conversations.[file:1][web:2]</li>
+            <li><strong>Throughput:</strong> On the order of 1,000+ answers per second when traffic is batched effectively.[file:1][web:3]</li>
+          </ul>
+          <p class="card-body">
+            This stack allows Perplexity to maintain interactive latency even during traffic spikes, while still
+            grounding every answer in live web data rather than relying on a static internal index.[file:1][web:2][web:7]
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HALLUCINATION PREVENTION & RELIABILITY -->
+  <section class="section" id="hallucinations">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Reliability Engineering</div>
+          <h2 class="section-title">Reducing Hallucinations with Multi‑Layer Verification</h2>
+        </div>
+        <p class="section-subtitle">
+          Instead of trusting a single model pass, Perplexity wraps LLM generation with semantic checks that ensure
+          every factual span is supported by retrieved evidence, driving hallucination rates down to 2–3% in
+          evaluations.[file:1][web:3][web:8]
+        </p>
+      </div>
+
+      <div class="two-col">
+        <div class="stacked">
+          <div class="stack-item">
+            <div class="stack-label">Layer 1</div>
+            <div class="stack-title">Citation‑Native Prompting</div>
+            <div class="stack-text">
+              The base prompt format requires that any factual statement reference one or more source slots, and the
+              model is trained / tuned on examples where uncited claims are penalized. This makes “free‑floating”
+              hallucinations less likely even before explicit checks.[file:1][web:2][web:6]
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-label">Layer 2</div>
+            <div class="stack-title">Semantic Entailment & Sub‑Span Matching</div>
+            <div class="stack-text">
+              A smaller NLI model checks whether each answer span is logically entailed by at least one retrieved
+              snippet, and a fuzzy matcher confirms that key numeric or named entities (dates, prices, names) actually
+              appear in the cited documents.[file:1][web:3][web:8]
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-label">Layer 3</div>
+            <div class="stack-title">Contradiction & Out‑of‑Distribution Detection</div>
+            <div class="stack-text">
+              Where sources disagree, the verifier can either surface the conflict explicitly (“sources disagree”) or
+              reduce the model’s confidence instead of forcing a single assertion, and can fall back to “not enough
+              evidence” for under‑supported topics.[file:1][web:8]
+            </div>
+          </div>
+          <div class="stack-item">
+            <div class="stack-label">Layer 4</div>
+            <div class="stack-title">UX Safeguards & User Trust</div>
+            <div class="stack-text">
+              Every sentence is clickable to reveal citations, and Perplexity exposes the underlying links. This
+              transparency, combined with conservative language in edge cases, encourages users to verify claims instead
+              of blindly trusting fluent text.[file:1][web:2][web:8]
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <article class="card card-alt">
+            <h3 class="card-title">Empirical Reliability vs. Generic LLM Search</h3>
+            <p class="card-body">
+              Independent tests comparing Perplexity with generic LLM‑powered search and chat interfaces find that
+              Perplexity’s grounded answers hallucinate less often, especially on time‑sensitive or niche factual
+              questions.[web:8]
+            </p>
+            <div class="table-wrap risk-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Scenario</th>
+                    <th>Perplexity (web‑grounded)</th>
+                    <th>Generic Chat LLM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Recent news (past 24h)[web:8]</td>
+                    <td>Low hallucination; often abstains when sources are thin, with clear citations.[web:8]</td>
+                    <td>Significant hallucination risk by extrapolating from older training data.[web:8]</td>
+                  </tr>
+                  <tr>
+                    <td>Long‑tail factual queries</td>
+                    <td>Grounded in 2–5 niche sources; may state “limited information” when evidence sparse.[web:8]</td>
+                    <td>Higher chance of confidently inventing non‑existent organizations or tools.[web:8]</td>
+                  </tr>
+                  <tr>
+                    <td>Medical/clinical topics</td>
+                    <td>Bias toward guidelines, government and clinical literature; phrasing emphasises
+                      consultation with professionals.[web:3][web:8]</td>
+                    <td>More likely to mix blog posts with scientific sources and over‑generalize.[web:8]</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="card-body">
+              These evaluations show that combining real‑time retrieval with explicit entailment checking meaningfully
+              lowers hallucinations compared with models that rely primarily on pre‑training plus light web search.[web:3][web:8]
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON WITH GOOGLE AI OVERVIEWS -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Competitive Landscape</div>
+          <h2 class="section-title">Perplexity vs. Google AI Overviews</h2>
+        </div>
+        <p class="section-subtitle">
+          Both systems combine search and LLMs, but they make opposite choices on freshness, grounding, and business
+          model: Perplexity optimizes for accuracy and depth; Google optimizes for speed, ad‑centric UX, and index
+          reuse.[file:1][web:9][web:10]
+        </p>
+      </div>
+
+      <div class="comparison-grid">
+        <article class="comparison-card">
+          <div class="badge">
+            <span class="badge-dot-green"></span>
+            Perplexity – Answer Engine
+          </div>
+          <h3 class="comparison-title">Search‑First RAG with Native Citations</h3>
+          <ul class="list">
+            <li><strong>Architecture:</strong> Real‑time retrieval + multi‑model RAG, citations embedded during generation.[file:1][web:2]</li>
+            <li><strong>Data freshness:</strong> Always routed through live web search; no fixed knowledge cutoff.[file:1][web:3][web:7]</li>
+            <li><strong>Citations:</strong> Required in prompt; each factual span tied to sources.[file:1][web:2][web:6]</li>
+            <li><strong>Fact‑checking:</strong> Online NLI + contradiction checks per answer.[file:1][web:8]</li>
+            <li><strong>UX:</strong> One synthesized answer with expandable source list and suggested follow‑ups.[file:1][web:2]</li>
+            <li><strong>Business model:</strong> Paid and ad‑light experiences optimized for depth and engagement.[web:10]</li>
+          </ul>
+        </article>
+
+        <article class="comparison-card comparison-card-alt">
+          <div class="badge">
+            <span class="badge-dot-amber"></span>
+            Google – AI Overviews
+          </div>
+          <h3 class="comparison-title">Index‑Overlay Summaries</h3>
+          <ul class="list">
+            <li><strong>Architecture:</strong> LLM summaries over Google’s web index and ranking pipeline.[web:9]</li>
+            <li><strong>Data freshness:</strong> Tied to index update cadence; may lag on rapid events.[web:9]</li>
+            <li><strong>Citations:</strong> Links attached after generation; mapping span → source is less explicit.[web:9]</li>
+            <li><strong>Fact‑checking:</strong> Combination of offline evaluation, safety filters, and ranking heuristics.[web:9]</li>
+            <li><strong>UX:</strong> Short overview atop classic search results and ads; priority on navigational speed.[web:9]</li>
+            <li><strong>Business model:</strong> Optimized to retain ad impressions and clicks within the search ecosystem.[web:9][web:10]</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="scenario-grid">
+        <div class="scenario-card">
+          <div class="scenario-label">Scenario</div>
+          <div class="scenario-title">“Bitcoin price right now?”</div>
+          <p class="scenario-body">
+            <strong>Perplexity:</strong> Calls live price APIs or fresh search, annotating a timestamp and specific exchange.[file:1][web:7]
+            <br />
+            <strong>Google AI Overviews:</strong> May rely on cached index content, occasionally lagging during volatility.[web:9]
+          </p>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-label">Scenario</div>
+          <div class="scenario-title">“Latest CRISPR breakthrough this week?”</div>
+          <p class="scenario-body">
+            <strong>Perplexity:</strong> Pulls recent news and papers, then lists each source directly below the explanation.[file:1][web:3]
+            <br />
+            <strong>AI Overviews:</strong> Accuracy depends on how quickly Google indexed the relevant articles.[web:9]
+          </p>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-label">Scenario</div>
+          <div class="scenario-title">“Where should I eat near me?”</div>
+          <p class="scenario-body">
+            <strong>Perplexity:</strong> Can synthesize reviews but tends to be slower than a direct maps UI.[file:1]
+            <br />
+            <strong>Google:</strong> Superior UX with native Maps, filters, and instant directions.[web:9]
+          </p>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-label">Scenario</div>
+          <div class="scenario-title">“Is vaccine X safe for children?”</div>
+          <p class="scenario-body">
+            <strong>Perplexity:</strong> Biases toward official guidelines and clinical literature, explicitly citing them.[web:3][web:8]
+            <br />
+            <strong>AI Overviews:</strong> Can be less granular and may blend different medical sources in one block.[web:9]
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUTURE DIRECTIONS -->
+  <section class="section" id="future">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Roadmap</div>
+          <h2 class="section-title">Beyond Text‑Only Answers</h2>
+        </div>
+        <p class="section-subtitle">
+          The next evolution of Perplexity’s “answer engine” pushes into multimodal reasoning, domain‑specific agents,
+          and stronger defenses against adversarial content.[file:1][web:2][web:3]
+        </p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1.3fr)minmax(0,1.1fr);gap:2.4rem;">
+        <div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <span class="timeline-dot"></span>
+              <div class="timeline-title">Multimodal Answering</div>
+              <div class="timeline-desc">
+                Expand real‑time RAG to include videos, images, and structured data, so that answers can cite frames,
+                figures, and tables rather than only text snippets.[file:1][web:3]
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-dot"></span>
+              <div class="timeline-title">Domain‑Specialized Agents</div>
+              <div class="timeline-desc">
+                Dedicated “agents” for legal, medical, financial, and academic research, each tuned to query the right
+                corpora (case law, PubMed, earnings reports, arXiv) with stricter safety and citation policies.[file:1][web:3]
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-dot"></span>
+              <div class="timeline-title">Planning & Workflow Automation</div>
+              <div class="timeline-desc">
+                From one‑shot Q&A to multi‑step workflows, e.g., “plan my trip” or “compare these three vendors,” where
+                the system automatically decomposes tasks and gathers evidence for each sub‑step.[file:1][web:2]
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-dot"></span>
+              <div class="timeline-title">Adversarial Robustness</div>
+              <div class="timeline-desc">
+                Stronger detection for prompt injection, data poisoning, citation spoofing, and coordinated
+                misinformation, using graph‑based and anomaly‑detection techniques on top of RAG.[file:1][web:2][web:8]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="card card-alt">
+          <h3 class="card-title">Strategic Implications</h3>
+          <p class="card-body">
+            Perplexity is betting that the future of search looks more like “instant research” than lists of links. If
+            the market rewards accuracy, transparency, and time‑saved—even at higher infrastructure cost—an answer
+            engine that solves hard retrieval and verification problems may carve out durable share next to Google.[file:1][web:9][web:10]
+          </p>
+          <ul class="list">
+            <li>Perplexity’s main moat is <strong>engineering depth in RAG and verification</strong>, not just access to an LLM API.[web:2][web:3]</li>
+            <li>Google’s moat remains its <strong>index scale, distribution, and ad machine</strong>; improvements in AI Overviews could reduce Perplexity’s differentiation.[web:9][web:10]</li>
+            <li>Long‑term success depends on whether users and enterprises are willing to pay for <strong>higher‑quality,
+              citation‑rich answers</strong> compared with free but less transparent overviews.[file:1][web:10]</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-meta">
+        <div>
+          Perplexity AI – “The Answer Engine” · Detailed systems case study on real‑time search, RAG, and citation‑native
+          LLMs vs. Google AI Overviews.[file:1][web:2][web:9][web:10]
+        </div>
+        <div class="footer-pills">
+          <span class="pill">RAG Architecture</span>
+          <span class="pill">Real‑Time Search</span>
+          <span class="pill">Hallucination Prevention</span>
+          <span class="pill">Comparative Analysis</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple mobile nav toggle
+    const navToggle = document.querySelector(".nav-toggle");
+    const navLinks = document.querySelector(".nav-links");
+    if (navToggle && navLinks) {
+      navToggle.addEventListener("click", () => {
+        const isOpen = navLinks.style.display === "flex";
+        navLinks.style.display = isOpen ? "none" : "flex";
+        navLinks.style.position = "absolute";
+        navLinks.style.top = "var(--nav-height)";
+        navLinks.style.right = "1.6rem";
+        navLinks.style.flexDirection = "column";
+        navLinks.style.gap = "0.9rem";
+        navLinks.style.padding = "0.9rem 1.1rem";
+        navLinks.style.background = "rgba(15,23,42,0.98)";
+        navLinks.style.borderRadius = "16px";
+        navLinks.style.border = "1px solid rgba(55,65,81,0.9)";
+        navLinks.style.boxShadow = "0 18px 36px rgba(0,0,0,0.75)";
+        navLinks.style.zIndex = "50";
+      });
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener("click", function (e) {
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>E-Commerce Checkout Flow — Case Study 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --ink: #1A1612;
+    --rust: #C84B2F;
+    --gold: #D4943A;
+    --sage: #4A6741;
+    --mist: #8B9EA8;
+    --shopify-green: #008060;
+    --amazon-orange: #FF9900;
+    --light: #FDFAF5;
+    --rule: rgba(26,22,18,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    background: var(--ink);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  .masthead::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.04) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.04) 60px);
+    pointer-events: none;
+  }
+  .masthead::after {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(200,75,47,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 60px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative; z-index: 1;
+  }
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--rust);
+    text-transform: uppercase;
+    border: 1px solid var(--rust);
+    padding: 4px 12px;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    position: relative; z-index: 1;
+    max-width: 1100px;
+  }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 8vw, 120px);
+    font-weight: 900;
+    line-height: 0.92;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--rust);
+  }
+  .hero-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 38px);
+    font-weight: 400;
+    font-style: italic;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 48px;
+    line-height: 1.3;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+  }
+  .meta-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .hero-bottom {
+    padding: 24px 60px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    position: relative; z-index: 1;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--rust);
+  }
+  .stat-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    max-width: 140px;
+    line-height: 1.4;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+  .section {
+    padding: 100px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--mist);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 40px;
+  }
+  .section-title em { color: var(--rust); font-style: italic; }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    border-left: 4px solid var(--rust);
+    padding: 24px 32px;
+    margin: 48px 0;
+    background: rgba(200,75,47,0.04);
+  }
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .pull-quote cite {
+    display: block;
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--mist);
+    font-style: normal;
+  }
+
+  /* ── ABANDONMENT CHART ── */
+  .chart-section {
+    background: var(--ink);
+    color: #fff;
+    padding: 100px 0;
+  }
+  .chart-wrapper {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+  .bar-chart {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 260px 1fr auto;
+    align-items: center;
+    gap: 20px;
+  }
+  .bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+    text-align: right;
+  }
+  .bar-track {
+    height: 36px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 2px;
+    animation: growBar 1.2s cubic-bezier(0.4,0,0.2,1) forwards;
+    transform-origin: left;
+  }
+  .bar-fill.rust { background: var(--rust); }
+  .bar-fill.gold { background: var(--gold); }
+  .bar-fill.sage { background: var(--sage); }
+  .bar-fill.mist { background: var(--mist); }
+  .bar-fill.dim { background: rgba(255,255,255,0.25); }
+  @keyframes growBar {
+    from { width: 0; }
+  }
+  .bar-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 48px;
+    text-align: right;
+  }
+
+  /* ── PLATFORM COMPARE ── */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    margin: 60px 0;
+  }
+  .platform-card {
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .platform-card.amazon { background: #131921; color: #fff; }
+  .platform-card.shopify { background: #004C3F; color: #fff; }
+  .platform-card.shopify-light { background: #F6F6F1; color: var(--ink); }
+  .platform-card.amazon-light { background: #FAFAFA; color: var(--ink); border: 1px solid rgba(0,0,0,0.06); }
+  .platform-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-amazon { background: var(--amazon-orange); }
+  .dot-shopify { background: #96BF48; }
+  .platform-stat-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .platform-stat-big.orange { color: var(--amazon-orange); }
+  .platform-stat-big.green { color: #96BF48; }
+  .platform-stat-big.ink { color: var(--ink); }
+  .platform-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+  .platform-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    opacity: 0.75;
+  }
+  .feature-list {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .feature-icon {
+    width: 20px; height: 20px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .fi-amazon { background: var(--amazon-orange); color: #131921; }
+  .fi-shopify { background: #96BF48; color: #004C3F; }
+
+  /* ── JOURNEY MAP ── */
+  .journey-section {
+    background: var(--light);
+    padding: 100px 0;
+  }
+  .journey-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    position: relative;
+    margin-top: 60px;
+  }
+  .journey-steps::before {
+    content: '';
+    position: absolute;
+    top: 40px; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rust), var(--gold), var(--sage));
+  }
+  .journey-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 0 8px;
+    position: relative;
+  }
+  .step-circle {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+  }
+  .step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+  .step-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .step-drop {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    font-weight: 500;
+  }
+  .step-desc {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    color: var(--mist);
+    line-height: 1.5;
+  }
+  .c1 { background: #C84B2F; }
+  .c2 { background: #B85A2A; }
+  .c3 { background: #A06830; }
+  .c4 { background: #6B8A40; }
+  .c5 { background: #4A6741; }
+
+  /* ── FRICTION GRID ── */
+  .friction-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+  .friction-card {
+    background: var(--light);
+    padding: 40px 32px;
+    border-top: 3px solid var(--rule);
+    transition: border-color 0.2s;
+    position: relative;
+  }
+  .friction-card:hover { border-top-color: var(--rust); }
+  .friction-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--rust);
+    margin-bottom: 12px;
+  }
+  .friction-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .friction-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #666;
+  }
+  .friction-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--mist);
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+
+  /* ── SOLUTION STRIPS ── */
+  .solution-strip {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .solution-strip:last-child { border-bottom: none; }
+  .solution-label-col {
+    padding: 48px 40px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--light);
+  }
+  .solution-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 48px;
+    font-weight: 400;
+    color: rgba(26,22,18,0.08);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .solution-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    text-transform: uppercase;
+  }
+  .solution-content-col {
+    padding: 48px 48px;
+  }
+  .solution-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .solution-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #444;
+    margin-bottom: 20px;
+  }
+  .impact-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(74,103,65,0.08);
+    border: 1px solid rgba(74,103,65,0.2);
+    border-radius: 2px;
+    padding: 6px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--sage);
+    letter-spacing: 0.1em;
+  }
+  .impact-badge.orange {
+    background: rgba(255,153,0,0.08);
+    border-color: rgba(255,153,0,0.2);
+    color: #B8730A;
+  }
+  .impact-badge.rust {
+    background: rgba(200,75,47,0.08);
+    border-color: rgba(200,75,47,0.2);
+    color: var(--rust);
+  }
+
+  /* ── SCREENSHOT REFERENCE ── */
+  .ref-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+  }
+  .ref-browser {
+    background: #F0F0F0;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .bd1 { background: #FF5F56; }
+  .bd2 { background: #FFBD2E; }
+  .bd3 { background: #27C93F; }
+  .browser-url {
+    flex: 1;
+    background: #fff;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #666;
+  }
+  .ref-content {
+    padding: 32px;
+  }
+  .ref-img-placeholder {
+    width: 100%;
+    aspect-ratio: 16/7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+  .amazon-checkout-mock {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+  }
+  .checkout-left { padding: 24px; }
+  .checkout-right {
+    background: #F0F2F2;
+    padding: 24px;
+    border-left: 1px solid #ddd;
+  }
+  .mock-heading {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0F1111;
+    margin-bottom: 16px;
+  }
+  .mock-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  .mock-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--amazon-orange);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: #000;
+    flex-shrink: 0;
+  }
+  .mock-step-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    color: #0F1111;
+  }
+  .mock-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  .btn-amazon {
+    background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+    color: #111;
+    border: 1px solid #a88734;
+  }
+  .mock-order-total {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: #0F1111;
+    border-top: 1px solid #ddd;
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+  .mock-order-total strong { font-size: 18px; }
+  .shopify-checkout-mock {
+    background: #fff;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+  }
+  .shopify-left {
+    padding: 32px 40px;
+    background: #fff;
+  }
+  .shopify-right {
+    background: #F6F6F1;
+    padding: 32px;
+    border-left: 1px solid #E8E8E0;
+  }
+  .shopify-logo-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .shopify-logo-mark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--shopify-green);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .progress-bar-mock {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+  .pb-seg {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+  }
+  .pb-done { background: var(--shopify-green); }
+  .pb-active { background: var(--shopify-green); opacity: 0.4; }
+  .pb-inactive { background: #E0E0DA; }
+  .shop-pay-btn {
+    width: 100%;
+    background: #5433EB;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .divider-or {
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    color: #999;
+    margin: 12px 0;
+    position: relative;
+  }
+  .divider-or::before, .divider-or::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: #E0E0DA;
+  }
+  .divider-or::before { left: 0; }
+  .divider-or::after { right: 0; }
+  .mock-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D4D4CE;
+    border-radius: 5px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 8px;
+    outline: none;
+  }
+  .mock-input:focus { border-color: var(--shopify-green); }
+  .mock-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .shop-cart-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #E8E8E0;
+  }
+  .cart-thumb {
+    width: 48px; height: 48px;
+    background: #E0E0DA;
+    border-radius: 4px;
+    border: 2px solid #E8E8E0;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .cart-item-info {
+    flex: 1;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+  }
+  .cart-item-name { font-weight: 500; color: #333; }
+  .cart-item-variant { color: #999; font-size: 11px; margin-top: 2px; }
+  .cart-item-price { font-weight: 600; color: #333; margin-top: 4px; }
+
+  /* ── PSYCHOLOGY SECTION ── */
+  .psych-section { background: var(--ink); padding: 100px 0; }
+  .psych-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.08);
+    margin-top: 60px;
+    overflow: hidden;
+  }
+  .psych-card {
+    background: var(--ink);
+    padding: 40px 28px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .psych-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+  .psych-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .psych-body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.65;
+  }
+  .psych-example {
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--rust);
+    font-style: italic;
+  }
+
+  /* ── MOBILE SECTION ── */
+  .mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    margin-top: 60px;
+  }
+  .mobile-mockup {
+    background: #1A1612;
+    border-radius: 32px;
+    padding: 16px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.1);
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .mobile-screen {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .mobile-header {
+    background: var(--shopify-green);
+    padding: 16px;
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .mobile-body { padding: 16px; }
+  .mobile-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 8px;
+  }
+  .mobile-input-mock {
+    width: 100%;
+    height: 36px;
+    background: #F6F6F1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    color: #999;
+  }
+  .mobile-apple-pay {
+    width: 100%;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    cursor: pointer;
+  }
+
+  /* ── VERDICT / SCORECARD ── */
+  .scorecard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    margin-top: 60px;
+  }
+  .score-cell {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sc-amazon { background: #131921; }
+  .sc-shopify { background: #004C3F; }
+  .sc-amazon-light { background: #FFF8EE; border: 1px solid #f0e0b4; }
+  .sc-shopify-light { background: #EBF7F3; border: 1px solid #b2ddd0; }
+  .score-platform {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .score-wins-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.6;
+  }
+  .score-win-item {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .win-check { color: #7ED4A0; font-size: 12px; margin-top: 2px; }
+  .win-check.orange { color: var(--amazon-orange); }
+
+  /* ── REFERENCES ── */
+  .ref-section { background: var(--ink); padding: 80px 0; }
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 48px;
+  }
+  .ref-item {
+    background: rgba(255,255,255,0.03);
+    padding: 28px 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    text-decoration: none;
+  }
+  .ref-item:hover { background: rgba(255,255,255,0.06); }
+  .ref-src {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .ref-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .ref-detail {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.15em;
+  }
+  .footer-right {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── STICKY NAV ── */
+  .sticky-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(26,22,18,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    padding: 14px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sticky-nav.visible { transform: translateY(0); }
+  .nav-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+  }
+  .nav-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--rust); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .container { padding: 0 24px; }
+    .header-bar, .hero-content, .hero-bottom { padding-left: 24px; padding-right: 24px; }
+    .platform-grid, .friction-grid, .scorecard, .ref-grid { grid-template-columns: 1fr; }
+    .solution-strip { grid-template-columns: 1fr; }
+    .solution-label-col { border-right: none; border-bottom: 1px solid var(--rule); }
+    .journey-steps { grid-template-columns: 1fr; gap: 24px; }
+    .journey-steps::before { display: none; }
+    .psych-grid { grid-template-columns: 1fr 1fr; }
+    .mobile-grid { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 160px 1fr auto; }
+    .sticky-nav { padding: 14px 24px; }
+    .nav-links { display: none; }
+    .footer { flex-direction: column; gap: 12px; text-align: center; }
+    .amazon-checkout-mock, .shopify-checkout-mock { grid-template-columns: 1fr; }
+    .checkout-right, .shopify-right { display: none; }
+  }
+  @media (max-width: 600px) {
+    .psych-grid { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 120px 1fr auto; }
+    .hero-title { font-size: 42px; }
+    .hero-meta { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- STICKY NAV -->
+<nav class="sticky-nav" id="stickyNav">
+  <span class="nav-title">E-Commerce Checkout Flow — Case Study 2026</span>
+  <div class="nav-links">
+    <a href="#problem" class="nav-link">The Problem</a>
+    <a href="#platforms" class="nav-link">Platforms</a>
+    <a href="#friction" class="nav-link">Friction</a>
+    <a href="#solutions" class="nav-link">Solutions</a>
+    <a href="#psychology" class="nav-link">Psychology</a>
+    <a href="#verdict" class="nav-link">Verdict</a>
+  </div>
+</nav>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="header-bar">
+    <span class="header-label">Case Study · E-Commerce UX · Vol. II — 2026</span>
+    <span class="header-tag">Checkout Flow Analysis</span>
+  </div>
+  <div class="hero-content">
+    <p class="eyebrow">Senior UX Engineer · Janarthanan</p>
+    <h1 class="hero-title">Why<br/><em>Shoppers</em><br/>Leave</h1>
+    <p class="hero-subtitle">A deep audit of checkout friction — how<br/>Amazon & Shopify fight cart abandonment</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Focus</span>
+        <span class="meta-value">E-Commerce Checkout UX</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Platforms</span>
+        <span class="meta-value">Amazon · Shopify</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Published</span>
+        <span class="meta-value">February 2026</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Sources</span>
+        <span class="meta-value">Baymard · McKinsey · Shopify</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <div class="stat-pill">
+      <span class="stat-num">70%</span>
+      <span class="stat-desc">of all shopping carts abandoned — Baymard 2025</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-num">$260B</span>
+      <span class="stat-desc">recoverable revenue through better checkout design (US & EU)</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-num">35%</span>
+      <span class="stat-desc">conversion lift possible from UX optimization alone</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-num">$300M</span>
+      <span class="stat-desc">Amazon one-click estimated annual revenue uplift</span>
+    </div>
+  </div>
+</header>
+
+<!-- SECTION 1: THE PROBLEM -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">01 — The Problem</p>
+      <h2 class="section-title">Seven out of ten<br/><em>never finish buying</em></h2>
+    </div>
+    <div class="fade-up" style="max-width: 760px;">
+      <p style="font-size: 18px; line-height: 1.8; margin-bottom: 24px;">
+        The shopping experience before payment is where most e-commerce revenue dies. A user lands, browses, adds to cart — then disappears. Baymard Institute's 2025 synthesis of 49 studies puts the global cart abandonment rate at <strong>70.19%</strong>. That means for every ten customers who show genuine purchase intent, only three complete the transaction.
+      </p>
+      <p style="font-size: 16px; line-height: 1.8; color: #555;">
+        But this isn't apathy. It's friction. And friction is a design problem. The Baymard Institute estimates that <strong>$260 billion in lost orders</strong> in the US and EU alone is recoverable through better checkout flow and UX — not through discounts, not through ads, just through reducing the obstacles between "Add to Cart" and "Order Confirmed."
+      </p>
+    </div>
+
+    <div class="pull-quote fade-up">
+      <p>"The average large e-commerce site can gain a 35.26% increase in conversion rate through better, more efficient checkout design alone — without acquiring a single new visitor."</p>
+      <cite>— Baymard Institute, 2025 Checkout UX Research</cite>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px;" class="fade-up">
+      <div>
+        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--mist); text-transform: uppercase; margin-bottom: 16px;">The business math</p>
+        <p style="font-size: 15px; line-height: 1.8; color: #444;">
+          If a Shopify store brings in 125,000 monthly visitors with a $100 average order value and a 0.92% conversion rate — a mere <strong>0.5% conversion increase</strong> generates an extra $690,000 annually. Cart abandonment optimization is one of the highest-ROI levers available, because the traffic cost is already sunk.
+        </p>
+      </div>
+      <div>
+        <p style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--mist); text-transform: uppercase; margin-bottom: 16px;">Mobile makes it worse</p>
+        <p style="font-size: 15px; line-height: 1.8; color: #444;">
+          Desktop abandonment sits around 68–73%. On mobile, it spikes to <strong>75–85%</strong>. Small screens, on-the-go attention, fiddly form inputs, and security anxiety compound every friction point. Mobile-first checkout optimization is no longer optional — it's the primary battleground.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: ABANDONMENT REASONS (CHART) -->
+<section class="chart-section" id="friction">
+  <div class="chart-wrapper">
+    <div class="fade-up">
+      <p class="section-num" style="color: rgba(255,255,255,0.3);">02 — Abandonment Triggers</p>
+      <h2 class="section-title" style="color: #fff;">Why they <em>leave</em><br/>before paying</h2>
+      <p style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: rgba(255,255,255,0.5); max-width: 600px;">
+        Source: Baymard Institute 2025 — based on 49 aggregated studies and direct user research across US e-commerce sites
+      </p>
+    </div>
+    <div class="bar-chart fade-up">
+      <div class="bar-row">
+        <span class="bar-label">Unexpected extra costs</span>
+        <div class="bar-track"><div class="bar-fill rust" style="width: 48%"></div></div>
+        <span class="bar-pct">48%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Forced account creation</span>
+        <div class="bar-track"><div class="bar-fill gold" style="width: 26%"></div></div>
+        <span class="bar-pct">26%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Security concerns</span>
+        <div class="bar-track"><div class="bar-fill gold" style="width: 25%"></div></div>
+        <span class="bar-pct">25%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Complex checkout flow</span>
+        <div class="bar-track"><div class="bar-fill mist" style="width: 22%"></div></div>
+        <span class="bar-pct">22%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Hidden total costs</span>
+        <div class="bar-track"><div class="bar-fill mist" style="width: 21%"></div></div>
+        <span class="bar-pct">21%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Poor returns policy visibility</span>
+        <div class="bar-track"><div class="bar-fill dim" style="width: 18%"></div></div>
+        <span class="bar-pct">18%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Website errors / crashes</span>
+        <div class="bar-track"><div class="bar-fill dim" style="width: 17%"></div></div>
+        <span class="bar-pct">17%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Limited payment options</span>
+        <div class="bar-track"><div class="bar-fill dim" style="width: 13%"></div></div>
+        <span class="bar-pct">13%</span>
+      </div>
+    </div>
+    <p style="font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; margin-top: 24px;">SOURCE · BAYMARD INSTITUTE · 2025 RESEARCH · 49 AGGREGATED STUDIES</p>
+  </div>
+</section>
+
+<!-- SECTION 3: PLATFORMS -->
+<section style="padding: 0;" id="platforms">
+  <div class="platform-grid">
+    <!-- Amazon Dark -->
+    <div class="platform-card amazon">
+      <p class="platform-logo"><span class="logo-dot dot-amazon"></span> AMAZON.COM</p>
+      <div class="platform-stat-big orange">10–13%</div>
+      <p class="platform-headline">Conversion Rate<br/>vs. 1.65% industry avg.</p>
+      <p class="platform-body">Amazon's checkout performance is in a category of its own — 6–8× the global average. This is the compounded result of one-click purchasing, Prime psychological lock-in, pre-filled information, and relentless A/B testing across thousands of simultaneous experiments.</p>
+      <div class="feature-list">
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-amazon">✓</div>
+          <span>One-click Buy Now — patented 1999, est. $300M annual uplift</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-amazon">✓</div>
+          <span>Prime membership creates pre-committed purchase intent</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-amazon">✓</div>
+          <span>35% of revenue from personalized recommendation engine</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-amazon">✓</div>
+          <span>Thousands of concurrent A/B tests — only 1 in 8 yields lift</span>
+        </div>
+      </div>
+    </div>
+    <!-- Shopify Dark -->
+    <div class="platform-card shopify">
+      <p class="platform-logo"><span class="logo-dot dot-shopify"></span> SHOPIFY CHECKOUT</p>
+      <div class="platform-stat-big green">50%</div>
+      <p class="platform-headline">Better conversion than<br/>typical guest checkouts (Shop Pay)</p>
+      <p class="platform-body">Shopify's Shop Pay accelerated checkout stores buyer information across all Shopify merchants, creating a network effect. When a buyer has used Shop Pay anywhere in the Shopify ecosystem, they get one-tap checkout everywhere — 137M+ buyers and counting.</p>
+      <div class="feature-list">
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-shopify">✓</div>
+          <span>Shop Pay network: 137M+ buyers, cross-merchant saved info</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-shopify">✓</div>
+          <span>BNPL via Shop Pay Installments (Affirm) — 86.5M US users</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-shopify">✓</div>
+          <span>Three-step checkout: Contact → Shipping → Payment</span>
+        </div>
+        <div class="feature-item" style="color: rgba(255,255,255,0.75);">
+          <div class="feature-icon fi-shopify">✓</div>
+          <span>Checkout UI Extensions — brand-native customization</span>
+        </div>
+      </div>
+    </div>
+    <!-- Amazon UX Mock -->
+    <div class="platform-card amazon-light" style="padding: 0;">
+      <div class="ref-browser">
+        <div class="browser-dot bd1"></div>
+        <div class="browser-dot bd2"></div>
+        <div class="browser-dot bd3"></div>
+        <div class="browser-url">amazon.com / checkout</div>
+      </div>
+      <div class="amazon-checkout-mock" style="min-height: 320px;">
+        <div class="checkout-left">
+          <p class="mock-heading">Checkout (1 item)</p>
+          <div class="mock-step">
+            <div class="mock-step-num">1</div>
+            <div class="mock-step-label">
+              <strong>Shipping address</strong><br/>
+              <span style="font-size:11px; color:#666;">123 Main St, Chennai, TN 600001</span>
+            </div>
+          </div>
+          <div class="mock-step">
+            <div class="mock-step-num">2</div>
+            <div class="mock-step-label">
+              <strong>Delivery: FREE</strong><br/>
+              <span style="font-size:11px; color: #007600;">Arrives Tomorrow</span>
+            </div>
+          </div>
+          <div class="mock-step">
+            <div class="mock-step-num">3</div>
+            <div class="mock-step-label">
+              <strong>Payment</strong><br/>
+              <span style="font-size:11px; color:#666;">Visa ending in 4242</span>
+            </div>
+          </div>
+          <button class="mock-btn btn-amazon">Place your order</button>
+          <p style="font-size: 10px; color: #888; margin-top: 8px;">By placing your order, you agree to Amazon's <span style="color:#0066c0;">privacy notice</span> and <span style="color:#0066c0;">conditions of use</span>.</p>
+        </div>
+        <div class="checkout-right">
+          <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; font-weight:600; margin-bottom: 12px;">Order Summary</p>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:12px; color:#555; display:flex; justify-content:space-between; margin-bottom:6px;"><span>Items (1):</span><span>₹2,499.00</span></div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:12px; color:#555; display:flex; justify-content:space-between; margin-bottom:6px;"><span>Delivery:</span><span style="color:#007600;">FREE</span></div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:12px; color:#555; display:flex; justify-content:space-between; margin-bottom:6px;"><span>Tax:</span><span>₹124.95</span></div>
+          <div class="mock-order-total" style="display:flex; justify-content:space-between;">
+            <span>Order Total:</span><strong>₹2,623.95</strong>
+          </div>
+          <button class="mock-btn btn-amazon" style="margin-top:16px;">Place your order</button>
+        </div>
+      </div>
+    </div>
+    <!-- Shopify UX Mock -->
+    <div class="platform-card shopify-light" style="padding: 0;">
+      <div class="ref-browser" style="background:#E8E8E0;">
+        <div class="browser-dot bd1"></div>
+        <div class="browser-dot bd2"></div>
+        <div class="browser-dot bd3"></div>
+        <div class="browser-url" style="background: #F6F6F1;">checkout.shopify.com / yourstore</div>
+      </div>
+      <div class="shopify-checkout-mock" style="min-height: 320px;">
+        <div class="shopify-left">
+          <div class="shopify-logo-area">
+            <span class="shopify-logo-mark">🛍 YourStore</span>
+          </div>
+          <div class="progress-bar-mock">
+            <div class="pb-seg pb-done"></div>
+            <div class="pb-seg pb-active"></div>
+            <div class="pb-seg pb-inactive"></div>
+          </div>
+          <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; font-weight: 600; margin-bottom:12px;">Contact</p>
+          <input class="mock-input" type="email" placeholder="Email or mobile phone number" readonly/>
+          <p style="font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; margin: 12px 0 8px;">Shipping address</p>
+          <div class="mock-input-row">
+            <input class="mock-input" placeholder="First name" readonly/>
+            <input class="mock-input" placeholder="Last name" readonly/>
+          </div>
+          <input class="mock-input" placeholder="Address" readonly/>
+          <button class="shop-pay-btn" style="margin-top: 16px; background: var(--shopify-green);">Continue to shipping →</button>
+        </div>
+        <div class="shopify-right">
+          <div class="shop-cart-item">
+            <div class="cart-thumb">👟</div>
+            <div class="cart-item-info">
+              <div class="cart-item-name">Air Runner Pro</div>
+              <div class="cart-item-variant">Size: 9 · Black</div>
+              <div class="cart-item-price">₹3,999</div>
+            </div>
+          </div>
+          <div class="shop-cart-item">
+            <div class="cart-thumb">🧦</div>
+            <div class="cart-item-info">
+              <div class="cart-item-name">Performance Socks 3-Pack</div>
+              <div class="cart-item-variant">L/XL · White</div>
+              <div class="cart-item-price">₹499</div>
+            </div>
+          </div>
+          <div style="margin-top: 12px; font-family:'Space Grotesk',sans-serif; font-size: 13px; color:#555; display:flex; justify-content:space-between;"><span>Subtotal</span><span>₹4,498</span></div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color:#555; display:flex; justify-content:space-between; margin-top:6px;"><span>Shipping</span><span style="color: var(--shopify-green);">Calculated next</span></div>
+          <div style="border-top: 1px solid #E8E8E0; margin-top:12px; padding-top:12px; display:flex; justify-content:space-between; font-family:'Playfair Display',serif; font-size:18px; font-weight:700;"><span>Total</span><span>₹4,498</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: FRICTION BREAKDOWN -->
+<section class="section" style="background: var(--cream);">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">03 — Friction Anatomy</p>
+      <h2 class="section-title">Six points where<br/>revenue <em>bleeds out</em></h2>
+    </div>
+    <div class="friction-grid fade-up">
+      <div class="friction-card">
+        <div class="friction-pct">48%</div>
+        <div class="friction-title">The Hidden Cost Ambush</div>
+        <p class="friction-body">Shipping fees, taxes, and duties appearing only at the final step feel like a betrayal. The customer has committed emotionally — then the price jumps. Nearly half of all abandonment comes from this single moment. The fix is radical transparency: show total cost as early as possible, ideally on the product page itself.</p>
+        <p class="friction-source">SOURCE · BAYMARD INSTITUTE 2025</p>
+      </div>
+      <div class="friction-card">
+        <div class="friction-pct">26%</div>
+        <div class="friction-title">The Account Wall</div>
+        <p class="friction-body">Over a quarter of users quit when forced to create an account before purchasing. First-time buyers don't know if this store is worth their commitment. Guest checkout is table stakes. The smarter move: offer account creation post-purchase, when the relationship has been established and there's a clear benefit (order tracking).</p>
+        <p class="friction-source">SOURCE · BAYMARD INSTITUTE 2025</p>
+      </div>
+      <div class="friction-card">
+        <div class="friction-pct">25%</div>
+        <div class="friction-title">The Trust Deficit</div>
+        <p class="friction-body">A quarter of shoppers abandon due to credit card security fears. Unfamiliar stores, third-party payment redirects, and absent trust signals compound anxiety. SSL badges, recognizable payment logos, PCI compliance marks, and consistent branding throughout checkout (no jarring domain switches) are essential trust architecture.</p>
+        <p class="friction-source">SOURCE · BAYMARD / CONVERTCART 2025</p>
+      </div>
+      <div class="friction-card">
+        <div class="friction-pct">22%</div>
+        <div class="friction-title">The Form Field Overload</div>
+        <p class="friction-body">The average US checkout contains ~15 form fields. Baymard's research shows 7–8 fields are optimal. Most stores ask for information they don't need — birthday, phone number, "Company" fields on consumer checkouts. Every unnecessary field is a conversion leak. Auto-fill, address lookup APIs, and inline validation compound the damage when absent.</p>
+        <p class="friction-source">SOURCE · BAYMARD / MOBILOUD 2025</p>
+      </div>
+      <div class="friction-card">
+        <div class="friction-pct">85%</div>
+        <div class="friction-title">Mobile Abandonment Rate</div>
+        <p class="friction-body">Smartphone checkout abandonment can reach 85.65% — far above desktop's 68–73%. On small screens, form inputs are harder, keyboards obscure context, and attention is fragmented. Mobile checkout demands: larger tap targets, Apple/Google Pay as primary options, minimal typing, and auto-capitalization/correction for address fields.</p>
+        <p class="friction-source">SOURCE · CHECKOUT.COM / BAYMARD 2024</p>
+      </div>
+      <div class="friction-card">
+        <div class="friction-pct">18%</div>
+        <div class="friction-title">The Returns Anxiety</div>
+        <p class="friction-body">Nearly 1 in 5 shoppers abandons because they can't find or don't trust the returns policy. This is especially acute for first-time buyers and fashion/footwear categories where fit uncertainty is high. A visible, plain-English returns promise — "Free 30-day returns, no questions asked" — displayed within the checkout itself removes a silent blocker.</p>
+        <p class="friction-source">SOURCE · SHOPIFY ENTERPRISE 2025</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: CUSTOMER JOURNEY MAP -->
+<section class="journey-section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">04 — Journey Map</p>
+      <h2 class="section-title">Where exactly<br/><em>the drop happens</em></h2>
+      <p style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: #555; max-width: 600px;">
+        Not all abandonment happens at payment. Each stage of the shopping journey has its own drop-off signature, friction profile, and intervention strategy.
+      </p>
+    </div>
+    <div class="journey-steps fade-up">
+      <div class="journey-step">
+        <div class="step-circle c1"><span class="step-num">1</span></div>
+        <span class="step-label">Stage</span>
+        <span class="step-name">Product Discovery</span>
+        <span class="step-drop">~40% exit here</span>
+        <span class="step-desc">Poor search, confusing navigation, slow load. Users leave before even seeing the product they want.</span>
+      </div>
+      <div class="journey-step">
+        <div class="step-circle c2"><span class="step-num">2</span></div>
+        <span class="step-label">Stage</span>
+        <span class="step-name">Product Page</span>
+        <span class="step-drop">~25% exit here</span>
+        <span class="step-desc">Missing size info, no reviews, poor images, unclear pricing, missing trust signals on the page.</span>
+      </div>
+      <div class="journey-step">
+        <div class="step-circle c3"><span class="step-num">3</span></div>
+        <span class="step-label">Stage</span>
+        <span class="step-name">Cart Review</span>
+        <span class="step-drop">~35% exit here</span>
+        <span class="step-desc">Shipping cost revealed. Price sticker shock. Can't edit quantity easily. No urgency or reassurance.</span>
+      </div>
+      <div class="journey-step">
+        <div class="step-circle c4"><span class="step-num">4</span></div>
+        <span class="step-label">Stage</span>
+        <span class="step-name">Checkout Form</span>
+        <span class="step-drop">~22% exit here</span>
+        <span class="step-desc">Forced account creation. Too many fields. No autofill. Confusing field order. Errors only shown on submit.</span>
+      </div>
+      <div class="journey-step">
+        <div class="step-circle c5"><span class="step-num">5</span></div>
+        <span class="step-label">Stage</span>
+        <span class="step-name">Payment</span>
+        <span class="step-drop">~15% exit here</span>
+        <span class="step-desc">Limited payment methods. Redirect to third party. Security anxiety. BNPL not available for high-ticket items.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: SOLUTIONS -->
+<section class="section" id="solutions">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">05 — Design Solutions</p>
+      <h2 class="section-title">What <em>actually works</em><br/>— backed by data</h2>
+    </div>
+  </div>
+  <div class="fade-up">
+    <div class="solution-strip">
+      <div class="solution-label-col">
+        <div class="solution-num">01</div>
+        <div class="solution-tag">Transparency</div>
+      </div>
+      <div class="solution-content-col">
+        <div class="solution-title">Show the true cost — always and early</div>
+        <p class="solution-body">The most impactful single change in checkout UX is eliminating the cost ambush. Display shipping, tax, and total cost on the product page — not just in the cart, not just at checkout. Amazon shows estimated delivery and Prime pricing benefits directly on product pages. Running cart totals including all fees reduce the shock that drives 48% of abandonment. Even better: offer a shipping cost estimator pre-cart, based on zip/postal code input.</p>
+        <span class="impact-badge">↑ Addresses 48% of abandonment · Highest single impact change</span>
+      </div>
+    </div>
+    <div class="solution-strip">
+      <div class="solution-label-col">
+        <div class="solution-num">02</div>
+        <div class="solution-tag">Friction Removal</div>
+      </div>
+      <div class="solution-content-col">
+        <div class="solution-title">Guest checkout is mandatory. Forms must shrink.</div>
+        <p class="solution-body">Baymard recommends 7–8 form fields maximum. The average site starts at 15+. Audit every field: can it be inferred, auto-filled, or removed? Address lookup APIs (Google Places, Loqate) turn multi-field address entry into a single line. Inline validation catches errors as users type — not on submit. Shop Pay and Amazon's stored data represent the ultimate version: zero field entry for returning buyers. For new visitors, guest checkout with optional post-purchase account creation is the benchmark. Shopify's data shows guest checkout option reduces the account-wall abandonment of 26%.</p>
+        <span class="impact-badge rust">↑ Addresses 26% of abandonment · Complexity reduction</span>
+      </div>
+    </div>
+    <div class="solution-strip">
+      <div class="solution-label-col">
+        <div class="solution-num">03</div>
+        <div class="solution-tag">Express Checkout</div>
+      </div>
+      <div class="solution-content-col">
+        <div class="solution-title">One-tap payment as the primary CTA</div>
+        <p class="solution-body">Amazon's one-click Buy Now is estimated to generate $300M in additional annual revenue — a direct result of eliminating friction between intent and transaction. Shop Pay converts up to 50% better than standard guest checkout. Apple Pay and Google Pay reduce mobile checkout to biometric authentication. The principle: for returning buyers, the checkout should be invisible. For mobile visitors in particular, one-tap payment options should appear above the fold, before traditional form-based checkout. BNPL (Klarna, Affirm, Afterpay) adds another dimension — removing the psychological cost barrier for higher-ticket items. 86.5M Americans used BNPL in 2024, and BNPL users spend 6.42% more.</p>
+        <span class="impact-badge orange">↑ Amazon: $300M uplift · Shop Pay: 50% better conversion</span>
+      </div>
+    </div>
+    <div class="solution-strip">
+      <div class="solution-label-col">
+        <div class="solution-num">04</div>
+        <div class="solution-tag">Trust Architecture</div>
+      </div>
+      <div class="solution-content-col">
+        <div class="solution-title">Security signals must be visible, not buried</div>
+        <p class="solution-body">25% of abandonment stems from security concerns. Trust architecture means making safety visible throughout the journey — not just in a footer. SSL padlock, payment brand logos (Visa, Mastercard, PayPal), PCI compliance messaging, and "Secure Checkout" text should appear in the cart, at checkout initiation, and at payment. For Shopify stores: the checkout domain should remain consistent with the store brand — jarring domain transitions (to a generic payment processor URL) spike abandonment. Consistent logos, color schemes, and brand voice throughout checkout maintain the trust relationship built on product pages.</p>
+        <span class="impact-badge">↑ Addresses 25% security abandonment · Trust = conversion</span>
+      </div>
+    </div>
+    <div class="solution-strip">
+      <div class="solution-label-col">
+        <div class="solution-num">05</div>
+        <div class="solution-tag">Recovery</div>
+      </div>
+      <div class="solution-content-col">
+        <div class="solution-title">Abandoned cart recovery: the safety net</div>
+        <p class="solution-body">Some abandonment is inevitable. The question is whether you can recover it. Abandoned cart email sequences achieve 39–45% open rates and 10% conversion rates — among the highest in e-commerce email. The timing matters: first email within 1 hour of abandonment, second at 24 hours with a mild incentive, third at 72 hours with a stronger offer if needed. SMS recovery is even more immediate — SimpleTexting found 21–35% CTR on SMS recovery messages in 2025. Exit-intent pop-ups, while often overused, convert at 2–4% when offering a genuine incentive. Push notifications for signed-in users add a zero-cost recovery channel.</p>
+        <span class="impact-badge rust">↑ Email: 39–45% open rate · 10% recovery conversion</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: PSYCHOLOGY -->
+<section class="psych-section" id="psychology">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num" style="color: rgba(255,255,255,0.3);">06 — Behavioral Psychology</p>
+      <h2 class="section-title" style="color: #fff;">The <em>invisible</em> architecture<br/>of conversion</h2>
+      <p style="font-family: 'Space Grotesk', sans-serif; font-size: 15px; color: rgba(255,255,255,0.4); max-width: 600px;">
+        Amazon runs thousands of concurrent A/B tests annually. Only 1 in 8 yields meaningful lift — but those 1-in-8 moments are the compound interest of conversion. These are the tested psychological principles embedded in high-performing checkout flows.
+      </p>
+    </div>
+    <div class="psych-grid fade-up">
+      <div class="psych-card">
+        <div class="psych-icon">⏱</div>
+        <div class="psych-title">Scarcity & Urgency</div>
+        <p class="psych-body">Real-time scarcity signals trigger loss aversion — one of the most powerful conversion motivators in behavioral economics. Validated through Amazon's own A/B testing program.</p>
+        <p class="psych-example">"Only 3 left in stock" · "Order in 2 hrs for tomorrow delivery"</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">👥</div>
+        <div class="psych-title">Social Proof</div>
+        <p class="psych-body">Displaying purchase activity, review counts, and "Frequently bought together" items reduces decision anxiety. Real-time purchase activity displays can lift conversions up to 15%.</p>
+        <p class="psych-example">"12 people viewing this now" · "4.8★ from 2,341 reviews"</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">⚓</div>
+        <div class="psych-title">Price Anchoring</div>
+        <p class="psych-body">Showing a crossed-out "was" price next to the current price makes the current price feel like a win — even if the discount is modest. The anchoring effect is the cognitive basis of nearly all sale design.</p>
+        <p class="psych-example">~~₹4,999~~ ₹3,199 — You save ₹1,800 (36%)</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">🎁</div>
+        <div class="psych-title">Free Shipping Threshold</div>
+        <p class="psych-body">Free shipping thresholds are behaviorally different from discounts. They create an optimization challenge for the buyer: "I need ₹200 more to unlock free shipping." This drives AOV increases and reduces the primary abandonment trigger simultaneously.</p>
+        <p class="psych-example">"Add ₹247 more for FREE delivery"</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">🔄</div>
+        <div class="psych-title">Progress Indicators</div>
+        <p class="psych-body">Multi-step checkouts with visible progress bars leverage the Zeigarnik effect — once started, people are psychologically motivated to complete tasks. Shopify's three-step checkout with step indicators exploits this naturally.</p>
+        <p class="psych-example">Cart → Information → Shipping → Payment</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">✨</div>
+        <div class="psych-title">Reciprocity & Value</div>
+        <p class="psych-body">Unexpected benefits at checkout — free gift wrapping, a loyalty points preview, a personalized product suggestion — trigger reciprocity. The buyer feels the merchant is giving them something, increasing completion likelihood.</p>
+        <p class="psych-example">"You've earned 240 points with this order" · "Free gift wrap available"</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">📱</div>
+        <div class="psych-title">Friction Reduction</div>
+        <p class="psych-body">Every additional click, scroll, or field is a decision point where a buyer can quit. The cognitive load model of checkout design treats every form field as a micro-abandonment risk. A/B testing shows a 22% lift when simplifying from 5 checkout steps to 2.</p>
+        <p class="psych-example">5-step checkout → 2-step = 22% conversion lift (Bloomreach 2023)</p>
+      </div>
+      <div class="psych-card">
+        <div class="psych-icon">🔒</div>
+        <div class="psych-title">Trust Transfer</div>
+        <p class="psych-body">Displaying logos of trusted third parties — Visa, PayPal, Norton, Google Pay — transfers trust from those brands to your checkout. A 2024 study found that payment security badges increase trust perception significantly, particularly among first-time buyers.</p>
+        <p class="psych-example">SSL · PCI DSS Compliant · 256-bit encryption · Norton Secured</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: MOBILE -->
+<section class="section">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">07 — Mobile-First Checkout</p>
+      <h2 class="section-title">The battlefield is<br/><em>6 inches wide</em></h2>
+    </div>
+    <div class="mobile-grid fade-up">
+      <div>
+        <p style="font-size: 16px; line-height: 1.8; color: #444; margin-bottom: 24px;">
+          Mobile cart abandonment at 85.65% dwarfs desktop's 68–73%. The German supermarket AllyouneedFresh saw a <strong>14% increase in mobile conversion</strong>, 51% increase in mobile transactions, and 21% fewer order page drop-offs after a focused mobile checkout overhaul — without changing a single product or price.
+        </p>
+        <p style="font-size: 16px; line-height: 1.8; color: #444; margin-bottom: 32px;">
+          Mobile checkout design principles differ fundamentally from desktop. Touch targets must be at minimum 44×44px. Apple Pay and Google Pay should be the primary payment CTA — they bypass all form entry through device biometrics. Address fields must trigger address-optimized keyboards and support OS autofill. Progress indicators must be visible without scrolling. Error states must be generous and specific.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; gap: 16px; align-items: flex-start;">
+            <div style="width: 40px; height: 40px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family:'DM Mono',monospace; font-size: 12px; flex-shrink: 0;">01</div>
+            <div>
+              <p style="font-family:'Playfair Display',serif; font-size: 16px; font-weight:700; margin-bottom:4px;">Apple Pay / Google Pay first</p>
+              <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color: #666; line-height: 1.6;">One-tap checkout via device biometrics eliminates the entire payment form. Show it prominently above the fold.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 16px; align-items: flex-start;">
+            <div style="width: 40px; height: 40px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family:'DM Mono',monospace; font-size: 12px; flex-shrink: 0;">02</div>
+            <div>
+              <p style="font-family:'Playfair Display',serif; font-size: 16px; font-weight:700; margin-bottom:4px;">Minimize keyboard appearances</p>
+              <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color: #666; line-height: 1.6;">Each keyboard trigger on mobile is a disruption. Reduce required text input through smart defaults, address lookup, and saved information.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 16px; align-items: flex-start;">
+            <div style="width: 40px; height: 40px; background: var(--rust); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family:'DM Mono',monospace; font-size: 12px; flex-shrink: 0;">03</div>
+            <div>
+              <p style="font-family:'Playfair Display',serif; font-size: 16px; font-weight:700; margin-bottom:4px;">Persistent order summary</p>
+              <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color: #666; line-height: 1.6;">On mobile, the order summary should be a collapsible sticky bar — always accessible, never forcing the user to scroll back up to verify what they're buying.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mobile-mockup">
+          <div class="mobile-screen">
+            <div class="mobile-header">
+              🛍 Checkout — Step 2 of 3
+            </div>
+            <div class="mobile-body">
+              <button class="mobile-apple-pay">🍎 Pay</button>
+              <div class="divider-or">or pay with card</div>
+              <div class="mobile-section-label">Contact</div>
+              <div class="mobile-input-mock">jana@blacklovertech.in</div>
+              <div class="mobile-section-label">Shipping</div>
+              <div class="mobile-input-mock">123 Anna Salai, Chennai 600002</div>
+              <div class="mobile-input-mock">Tamil Nadu · India</div>
+              <div style="margin-top: 12px; background: #F6F6F1; border-radius: 8px; padding: 12px;">
+                <div style="font-family:'Space Grotesk',sans-serif; font-size: 11px; color: #333; display: flex; justify-content: space-between; margin-bottom: 6px;"><span>Air Runner Pro</span><span>₹3,999</span></div>
+                <div style="font-family:'Space Grotesk',sans-serif; font-size: 11px; color: #333; display: flex; justify-content: space-between; margin-bottom: 6px;"><span>Shipping</span><span style="color: var(--shopify-green);">FREE</span></div>
+                <div style="font-family:'Space Grotesk',sans-serif; font-size: 13px; font-weight: 700; color: #333; display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px;"><span>Total</span><span>₹3,999</span></div>
+              </div>
+              <button class="mobile-apple-pay" style="background: var(--shopify-green); margin-top: 12px;">Continue to payment →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 9: VERDICT -->
+<section class="section" id="verdict" style="background: var(--light);">
+  <div class="container">
+    <div class="fade-up">
+      <p class="section-num">08 — Verdict & Scorecard</p>
+      <h2 class="section-title">Amazon vs. Shopify:<br/><em>who wins, and why</em></h2>
+      <p style="font-family:'Space Grotesk',sans-serif; font-size: 15px; color: #555; max-width: 700px; margin-bottom: 48px;">
+        These aren't direct competitors — Amazon is a marketplace, Shopify is merchant infrastructure — but their checkout philosophy represents two distinct UX paradigms. Both point toward the same truth: the less a buyer has to think, the more they buy.
+      </p>
+    </div>
+    <div class="scorecard fade-up">
+      <div class="score-cell sc-amazon">
+        <p class="score-platform" style="color: var(--amazon-orange);">● Amazon</p>
+        <p style="font-family:'Playfair Display',serif; font-size: 28px; font-weight: 900; color: var(--amazon-orange);">10–13%</p>
+        <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">Conversion rate vs 1.65% industry avg.</p>
+        <p class="score-wins-label" style="color: rgba(255,255,255,0.4);">Wins at:</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check orange">●</span> One-click purchase — the gold standard</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check orange">●</span> Scale of A/B testing (thousands concurrent)</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check orange">●</span> Recommendation engine (35% of revenue)</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check orange">●</span> Prime: pre-sold psychological commitment</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check orange">●</span> Urgency and scarcity system (rigorously tested)</div>
+        </div>
+      </div>
+      <div class="score-cell sc-shopify">
+        <p class="score-platform" style="color: #96BF48;">● Shopify / Shop Pay</p>
+        <p style="font-family:'Playfair Display',serif; font-size: 28px; font-weight: 900; color: #96BF48;">50%</p>
+        <p style="font-family:'Space Grotesk',sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);">Better than typical guest checkout (Shop Pay)</p>
+        <p class="score-wins-label" style="color: rgba(255,255,255,0.4);">Wins at:</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check">●</span> Cross-merchant saved buyer network (137M+)</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check">●</span> Brand customization — checkout feels on-brand</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check">●</span> BNPL integration (Affirm, Klarna, Afterpay)</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check">●</span> 3-step flow — minimal, clean, progress-visible</div>
+          <div class="score-win-item" style="color: rgba(255,255,255,0.75);"><span class="win-check">●</span> Built-in abandoned cart recovery tooling</div>
+        </div>
+      </div>
+      <div class="score-cell sc-amazon-light">
+        <p class="score-platform" style="color: #B8730A;">Limitations:</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Cluttered UI sacrifices clarity for density</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Cart placement (above items) violates reading flow</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Third-party seller trust inconsistency</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Address field order (Country → Name → Street → City) unusual</div>
+        </div>
+      </div>
+      <div class="score-cell sc-shopify-light">
+        <p class="score-platform" style="color: #2E7D5E;">Limitations:</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Shop Pay network benefit only for repeat buyers</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Theme quality varies — checkout quality tied to merchant skill</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> Default avg. 15 form fields without optimization</div>
+          <div class="score-win-item" style="color: #666;"><span style="color: #ddd; margin-top:2px;">✕</span> No native recommendation engine at checkout depth</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote fade-up" style="margin-top: 60px;">
+      <p>"The best checkout is invisible — the buyer barely notices the transaction happened. Amazon achieves this for repeat buyers. Shopify is building the infrastructure for any merchant to achieve it for any buyer, anywhere."</p>
+      <cite>— Janarthanan · BlackLoverTech · UX Case Study Series 2026</cite>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section class="ref-section">
+  <div class="container">
+    <p class="section-num" style="color: rgba(255,255,255,0.3);">09 — Sources & References</p>
+    <h2 class="section-title" style="color: #fff; font-size: 36px;">Research basis<br/><em>& further reading</em></h2>
+    <div class="ref-grid fade-up">
+      <a class="ref-item" href="https://www.shopify.com/enterprise/blog/44272899-how-to-reduce-shopping-cart-abandonment-by-optimizing-the-checkout" target="_blank">
+        <div class="ref-src">Shopify Enterprise</div>
+        <div class="ref-title">How to Reduce Shopping Cart Abandonment by Optimizing the Checkout</div>
+        <div class="ref-detail">Official Shopify research · 70.19% abandonment rate data · $260B recoverable revenue</div>
+      </a>
+      <a class="ref-item" href="https://baymard.com/research/checkout-usability" target="_blank">
+        <div class="ref-src">Baymard Institute</div>
+        <div class="ref-title">Checkout UX Research & Benchmarks 2025</div>
+        <div class="ref-detail">49 aggregated studies · 7–8 optimal form fields · 35.26% conversion lift potential</div>
+      </a>
+      <a class="ref-item" href="https://agentiveaiq.com/blog/how-amazon-uses-ab-testing-to-boost-conversions" target="_blank">
+        <div class="ref-src">Agentive AIQ</div>
+        <div class="ref-title">How Amazon Uses A/B Testing to Boost Conversions</div>
+        <div class="ref-detail">One-click $300M uplift · 35% recommendations revenue · 17% color selector lift</div>
+      </a>
+      <a class="ref-item" href="https://www.getmesa.com/blog/shopify-checkout-optimization-reduce-cart-abandonment/" target="_blank">
+        <div class="ref-src">GetMesa / Shopify</div>
+        <div class="ref-title">Shopify Checkout Optimization: 14 Tactics to Reduce Cart Abandonment</div>
+        <div class="ref-detail">BNPL data · 86.5M US users · 6.42% higher spend · December 2025</div>
+      </a>
+      <a class="ref-item" href="https://www.mobiloud.com/blog/optimizing-checkout-to-reduce-abandoned-carts" target="_blank">
+        <div class="ref-src">MobiLoud</div>
+        <div class="ref-title">Optimizing the Checkout Process to Reduce Abandoned Carts</div>
+        <div class="ref-detail">AllyouneedFresh case: 14% mobile lift · 51% transactions increase · 21% fewer drop-offs</div>
+      </a>
+      <a class="ref-item" href="https://www.checkout.com/blog/one-click-checkout" target="_blank">
+        <div class="ref-src">Checkout.com</div>
+        <div class="ref-title">One-Click Checkout: Increase Sales & Enhance Customer Experience</div>
+        <div class="ref-detail">Mobile abandonment 85.65% · Tablet 80.74% · Desktop 73% · 2024 data</div>
+      </a>
+      <a class="ref-item" href="https://www.envive.ai/post/ecommerce-conversion-rate-statistics" target="_blank">
+        <div class="ref-src">Envive / McKinsey</div>
+        <div class="ref-title">50 E-Commerce Conversion Rate Statistics for 2026</div>
+        <div class="ref-detail">Amazon 10–13% conversion · Global avg 1.65% · AOV $144.57 globally</div>
+      </a>
+      <a class="ref-item" href="https://www.shaheermalik.com/blog/amazon-checkout-process-ux-design-case-study" target="_blank">
+        <div class="ref-src">UX Case Studies</div>
+        <div class="ref-title">Amazon's Checkout Process UX Case Study 2024</div>
+        <div class="ref-detail">Single-page checkout · Pre-filled data · Progress indicators · Iterative testing</div>
+      </a>
+      <a class="ref-item" href="https://www.retainful.com/blog/shopify-abandoned-carts" target="_blank">
+        <div class="ref-src">Retainful</div>
+        <div class="ref-title">Shopify Abandoned Cart 2025 Guide to Recover 20% More Sales</div>
+        <div class="ref-detail">Cart vs. checkout abandonment distinction · Mobile 75% vs desktop 68% · Recovery strategies</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-left">
+    BLACKLOVERTECH · JANARTHANAN · UX CASE STUDY SERIES 2026<br/>
+    PART OF: E-COMMERCE CHECKOUT FLOW ANALYSIS — VOL II
+  </div>
+  <div class="footer-right">
+    COMPANION TO: PAYPAY UI/UX CASE STUDY · ZOHO WEB INTERFACE DESIGN ANALYSIS
+  </div>
+</footer>
+
+<script>
+  // Sticky nav on scroll
+  const nav = document.getElementById('stickyNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Fade-up on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Stagger bar animation delays
+  document.querySelectorAll('.bar-row').forEach((row, i) => {
+    const fill = row.querySelector('.bar-fill');
+    if (fill) fill.style.animationDelay = `${i * 0.12}s`;
+  });
+</script>
+</body>
+</html>

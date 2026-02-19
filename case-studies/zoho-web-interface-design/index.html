@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoho UI Case Study — Deep Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --zoho-red:    #CE2232;
+    --zoho-green:  #219E4A;
+    --zoho-blue:   #0974B0;
+    --zoho-yellow: #FFE004;
+    --zoho-dark:   #1A1A2E;
+    --zoho-navy:   #162447;
+    --ink:         #1C1C2E;
+    --muted:       #5A5A72;
+    --border:      #E2E4EF;
+    --surface:     #F7F8FD;
+    --white:       #FFFFFF;
+    --accent-grad: linear-gradient(135deg, #0974B0 0%, #219E4A 100%);
+    --warm-grad:   linear-gradient(135deg, #CE2232 0%, #FFE004 100%);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F4F5FA;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--zoho-dark);
+    min-height: 92vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 80px 7vw;
+    gap: 60px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 70% 50%, rgba(9,116,176,.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 80% at 100% 80%, rgba(33,158,74,.10) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 40% at 10% 10%, rgba(206,34,50,.10) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-text { position: relative; z-index: 1; }
+  .hero-label {
+    display: inline-block;
+    background: rgba(255,224,4,.12);
+    border: 1px solid rgba(255,224,4,.35);
+    color: var(--zoho-yellow);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 4.5vw, 4rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero h1 span {
+    background: var(--accent-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-desc {
+    color: rgba(255,255,255,.65);
+    font-size: 1.05rem;
+    font-weight: 300;
+    max-width: 500px;
+    margin-bottom: 34px;
+    line-height: 1.8;
+  }
+  .hero-meta { display: flex; gap: 28px; flex-wrap: wrap; }
+  .hero-meta-item { color: rgba(255,255,255,.5); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+  .hero-meta-item strong { display: block; color: rgba(255,255,255,.9); font-size: 14px; margin-bottom: 2px; }
+
+  /* Right panel: colour swatches */
+  .hero-visual { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; }
+  .brand-swatches {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .swatch {
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .swatch-name { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .75; }
+  .swatch-hex { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; }
+  .swatch-role { font-size: 11px; opacity: .6; }
+  .swatch.red    { background: #CE2232; color: #fff; }
+  .swatch.green  { background: #219E4A; color: #fff; }
+  .swatch.blue   { background: #0974B0; color: #fff; }
+  .swatch.yellow { background: #FFE004; color: #1A1A2E; }
+
+  .hero-stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-number { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fff; font-weight: 700; }
+  .stat-label  { font-size: 11px; color: rgba(255,255,255,.5); font-weight: 400; margin-top: 2px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,.9);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 7vw;
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 54px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-link {
+    flex-shrink: 0;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .nav-link:hover { background: var(--surface); color: var(--ink); }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 7vw;
+  }
+
+  .section {
+    padding: 80px 0;
+  }
+  .section + .section {
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--zoho-blue);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-intro {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 700px;
+    line-height: 1.8;
+    margin-bottom: 50px;
+  }
+
+  /* ─── CONTENT CARDS ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 22px;
+  }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: box-shadow .25s, transform .25s;
+  }
+  .card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.07); transform: translateY(-2px); }
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+  .card-icon.blue   { background: rgba(9,116,176,.1); }
+  .card-icon.green  { background: rgba(33,158,74,.1); }
+  .card-icon.red    { background: rgba(206,34,50,.1); }
+  .card-icon.yellow { background: rgba(255,224,4,.2); }
+  .card-icon.purple { background: rgba(120,80,200,.1); }
+  .card h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .card p { color: var(--muted); font-size: .93rem; line-height: 1.7; }
+
+  /* ─── TWO-COLUMN ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .two-col.flip { direction: rtl; }
+  .two-col.flip > * { direction: ltr; }
+
+  /* ─── DIAGRAM BOXES ─── */
+  .diagram {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .diagram-header {
+    background: var(--zoho-dark);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .diagram-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .diagram-dot.r { background: #CE2232; }
+  .diagram-dot.y { background: #FFE004; }
+  .diagram-dot.g { background: #219E4A; }
+  .diagram-title { color: rgba(255,255,255,.6); font-size: 12px; margin-left: 8px; font-family: 'DM Mono', monospace; }
+  .diagram-body { padding: 24px; }
+
+  /* Wireframe nav mock */
+  .mock-nav {
+    background: #fff;
+    border-bottom: 2px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 16px;
+  }
+  .mock-logo { width: 72px; height: 20px; background: var(--accent-grad); border-radius: 4px; }
+  .mock-nav-links { display: flex; gap: 8px; flex: 1; justify-content: center; }
+  .mock-nav-link { height: 10px; width: 52px; background: var(--border); border-radius: 3px; }
+  .mock-cta { height: 28px; width: 80px; background: var(--zoho-blue); border-radius: 6px; }
+
+  .mock-hero-section {
+    background: linear-gradient(135deg, #EFF6FF, #F0FFF4);
+    border-radius: 8px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .mock-h1 { height: 18px; width: 70%; background: var(--ink); border-radius: 4px; margin: 0 auto 10px; }
+  .mock-sub { height: 10px; width: 50%; background: var(--border); border-radius: 3px; margin: 0 auto 16px; }
+  .mock-btns { display: flex; gap: 8px; justify-content: center; }
+  .mock-btn-primary { height: 28px; width: 90px; background: var(--zoho-blue); border-radius: 6px; }
+  .mock-btn-ghost   { height: 28px; width: 90px; background: transparent; border: 2px solid var(--border); border-radius: 6px; }
+
+  .mock-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .mock-card  { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .mock-card-icon { width: 30px; height: 30px; background: rgba(9,116,176,.15); border-radius: 6px; margin-bottom: 8px; }
+  .mock-card-line  { height: 8px; background: var(--border); border-radius: 3px; margin-bottom: 6px; }
+  .mock-card-line.short { width: 70%; }
+
+  /* ─── TYPE SCALE ─── */
+  .type-scale { display: flex; flex-direction: column; gap: 20px; }
+  .type-row   { display: flex; align-items: baseline; gap: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .type-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); min-width: 110px; }
+  .type-sample-h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--ink); }
+  .type-sample-h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; color: var(--ink); }
+  .type-sample-h3 { font-size: 1.15rem; font-weight: 600; color: var(--ink); }
+  .type-sample-body { font-size: 1rem; color: var(--muted); }
+  .type-sample-sm   { font-size: .85rem; color: var(--muted); }
+  .type-sample-label { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--zoho-blue); }
+
+  /* ─── SPACING GRID ─── */
+  .spacing-demo { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+  .spacing-block { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sp-bar { background: var(--accent-grad); border-radius: 4px; width: 32px; }
+  .sp-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* ─── COLOR PALETTE ─── */
+  .palette-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+  .palette-card { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .palette-swatch { height: 80px; }
+  .palette-info { background: #fff; padding: 10px 12px; }
+  .palette-info strong { display: block; font-size: .85rem; color: var(--ink); }
+  .palette-info span   { font-family: 'DM Mono', monospace; font-size: .75rem; color: var(--muted); }
+
+  /* ─── TECH STACK ─── */
+  .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+  .tech-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .tech-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .tech-tag.html { background: rgba(206,34,50,.12); color: var(--zoho-red); }
+  .tech-tag.css  { background: rgba(9,116,176,.12);  color: var(--zoho-blue); }
+  .tech-tag.js   { background: rgba(255,224,4,.35);  color: #7a6900; }
+  .tech-tag.ts   { background: rgba(33,158,74,.12);  color: var(--zoho-green); }
+  .tech-tag.build { background: rgba(120,80,200,.12); color: #7850C8; }
+  .tech-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+  .tech-card p  { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+  /* ─── SCORE BARS ─── */
+  .score-list { display: flex; flex-direction: column; gap: 18px; }
+  .score-item label { display: flex; justify-content: space-between; font-size: .9rem; font-weight: 500; margin-bottom: 8px; }
+  .score-item label span { font-family: 'DM Mono', monospace; color: var(--muted); }
+  .score-track { height: 8px; background: var(--border); border-radius: 20px; overflow: hidden; }
+  .score-fill  { height: 100%; border-radius: 20px; background: var(--accent-grad); transition: width .4s; }
+
+  /* ─── SWOT ─── */
+  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; border-radius: 16px; overflow: hidden; }
+  .swot-cell { padding: 28px; }
+  .swot-cell h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .swot-cell ul { list-style: none; }
+  .swot-cell ul li { font-size: .9rem; line-height: 1.6; padding: 4px 0; display: flex; gap: 8px; }
+  .swot-cell ul li::before { flex-shrink: 0; margin-top: 4px; }
+  .swot-s { background: #E8F5EE; }
+  .swot-s h3 { color: #1A6E38; }
+  .swot-s ul li::before { content: '✓'; color: #219E4A; font-weight: 700; }
+  .swot-w { background: #FFF3F4; }
+  .swot-w h3 { color: #9B1A24; }
+  .swot-w ul li::before { content: '—'; color: #CE2232; font-weight: 700; }
+  .swot-o { background: #EFF6FF; }
+  .swot-o h3 { color: #0A4F7E; }
+  .swot-o ul li::before { content: '→'; color: #0974B0; font-weight: 700; }
+  .swot-t { background: #FFFCE8; }
+  .swot-t h3 { color: #6B5800; }
+  .swot-t ul li::before { content: '!'; color: #c9a000; font-weight: 700; }
+
+  /* ─── PRINCIPLES ─── */
+  .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+  .principle-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 22px;
+    border-left: 4px solid;
+    border-right: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .principle-number { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; opacity: .12; line-height: 1; margin-bottom: 8px; }
+  .principle-card h4 { font-size: .95rem; font-weight: 600; margin-bottom: 8px; }
+  .principle-card p  { font-size: .87rem; color: var(--muted); line-height: 1.65; }
+
+  /* ─── NAV PATTERN BLOCK ─── */
+  .nav-pattern-demo {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .nav-demo-top {
+    background: var(--zoho-dark);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-demo-logo { width: 60px; height: 22px; background: var(--accent-grad); border-radius: 4px; }
+  .nav-demo-links { display: flex; gap: 6px; flex: 1; }
+  .nav-demo-link {
+    font-size: 12px;
+    color: rgba(255,255,255,.6);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .nav-demo-link.active { background: rgba(255,255,255,.12); color: #fff; }
+  .nav-demo-actions { display: flex; gap: 8px; }
+  .nav-demo-btn { height: 28px; padding: 0 14px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+  .nav-demo-btn.login { background: rgba(255,255,255,.1); color: #fff; }
+  .nav-demo-btn.signup { background: var(--zoho-blue); color: #fff; }
+  .nav-dropdown-layer {
+    border-top: 1px solid var(--border);
+    padding: 20px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    min-height: 160px;
+  }
+  .nav-dropdown-col h5 { font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+    margin-bottom: 2px;
+  }
+  .nav-dropdown-item:hover { background: var(--surface); }
+  .nav-dd-icon { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; }
+  .nav-dd-text strong { display: block; font-size: .85rem; font-weight: 600; color: var(--ink); }
+  .nav-dd-text span   { font-size: .75rem; color: var(--muted); }
+  .nav-dd-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+  /* ─── RESPONSIVENESS ─── */
+  .device-frames { display: flex; gap: 30px; align-items: flex-end; flex-wrap: wrap; }
+  .device { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .device-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .frame {
+    background: var(--white);
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+  .frame.desktop { width: 320px; height: 200px; }
+  .frame.tablet  { width: 200px; height: 260px; }
+  .frame.mobile  { width: 120px; height: 220px; border-radius: 18px; }
+  .frame-notch {
+    height: 8px;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .frame-content { padding: 8px; }
+  .fr-nav { height: 12px; background: var(--zoho-dark); border-radius: 2px; margin-bottom: 6px; display: flex; align-items: center; padding: 0 6px; gap: 4px; }
+  .fr-nav-dot { width: 6px; height: 6px; background: rgba(255,255,255,.4); border-radius: 50%; }
+  .fr-hero { height: 60px; background: linear-gradient(135deg, #EFF6FF, #F0FFF4); border-radius: 4px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; }
+  .fr-hero span { font-size: 7px; color: var(--muted); font-weight: 600; }
+  .fr-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+  .fr-card { height: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; }
+  .fr-hamburger { width: 16px; height: 10px; display: flex; flex-direction: column; justify-content: space-between; margin-left: auto; }
+  .fr-bar { height: 2px; background: rgba(255,255,255,.6); border-radius: 1px; }
+  .fr-cards-2col { display: grid; grid-template-columns: repeat(2,1fr); gap: 3px; }
+  .fr-cards-1col { display: flex; flex-direction: column; gap: 3px; }
+  .fr-card-full { height: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; }
+
+  /* ─── ACCESSIBILITY ─── */
+  .a11y-checks { display: flex; flex-direction: column; gap: 14px; }
+  .a11y-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .a11y-badge {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .a11y-badge.pass { background: rgba(33,158,74,.15); color: var(--zoho-green); }
+  .a11y-badge.warn { background: rgba(255,224,4,.3);   color: #8a7000; }
+  .a11y-badge.info { background: rgba(9,116,176,.12);  color: var(--zoho-blue); }
+  .a11y-item h4 { font-size: .9rem; font-weight: 600; margin-bottom: 4px; }
+  .a11y-item p  { font-size: .83rem; color: var(--muted); line-height: 1.55; }
+
+  /* ─── CONSISTENCY TABLE ─── */
+  .consistency-table { width: 100%; border-collapse: collapse; }
+  .consistency-table th {
+    background: var(--zoho-dark);
+    color: rgba(255,255,255,.8);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  .consistency-table th:first-child { border-radius: 10px 0 0 0; }
+  .consistency-table th:last-child  { border-radius: 0 10px 0 0; }
+  .consistency-table td {
+    padding: 12px 16px;
+    font-size: .88rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+  .consistency-table tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+  .consistency-table tr:last-child td:last-child  { border-radius: 0 0 10px 0; }
+  .consistency-table tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: .75rem; font-weight: 600; }
+  .pill.high   { background: rgba(33,158,74,.12);  color: var(--zoho-green); }
+  .pill.medium { background: rgba(255,224,4,.3);   color: #7a6900; }
+  .pill.low    { background: rgba(206,34,50,.12);  color: var(--zoho-red); }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    background: linear-gradient(135deg, #EFF6FF 0%, #F0FFF4 100%);
+    border-left: 4px solid var(--zoho-blue);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 30px 0;
+    font-size: .95rem;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  .callout strong { color: var(--zoho-blue); }
+
+  /* ─── CONCLUSION ─── */
+  .conclusion {
+    background: var(--zoho-dark);
+    padding: 80px 7vw;
+    color: #fff;
+  }
+  .conclusion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 1200px; margin: 0 auto; }
+  .conclusion h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .conclusion p { color: rgba(255,255,255,.65); font-size: .95rem; line-height: 1.8; }
+  .rec-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .rec-list li { display: flex; gap: 14px; align-items: flex-start; font-size: .9rem; color: rgba(255,255,255,.7); }
+  .rec-num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    background: rgba(255,255,255,.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,.8);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #11111E;
+    padding: 30px 7vw;
+    text-align: center;
+    color: rgba(255,255,255,.3);
+    font-size: .8rem;
+  }
+
+  /* ─── DARK MODE SECTION ─── */
+  .darkmode-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 36px;
+  }
+  .theme-card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .theme-header {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .theme-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .theme-body { padding: 18px; }
+  .theme-nav { height: 32px; border-radius: 6px; margin-bottom: 12px; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
+  .theme-nav-pill { height: 8px; border-radius: 10px; }
+  .theme-hero { height: 54px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
+  .theme-hero span { font-size: 11px; font-weight: 600; }
+  .theme-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .theme-card-inner { height: 38px; border-radius: 6px; border-width: 1px; border-style: solid; }
+
+  /* light theme */
+  .theme-light .theme-header { background: #F0F0F5; color: #555; }
+  .theme-light .theme-dot    { background: #0974B0; }
+  .theme-light .theme-body   { background: #F7F8FD; }
+  .theme-light .theme-nav    { background: #fff; border: 1px solid #E2E4EF; }
+  .theme-light .theme-nav-pill { background: #E2E4EF; }
+  .theme-light .theme-nav-pill.active { background: #0974B0; width: 50px; }
+  .theme-light .theme-hero   { background: linear-gradient(135deg, #EFF6FF, #F0FFF4); }
+  .theme-light .theme-hero span { color: #0974B0; }
+  .theme-light .theme-card-inner { background: #fff; border-color: #E2E4EF; }
+
+  /* dark theme */
+  .theme-dark .theme-header { background: #12121F; color: rgba(255,255,255,.5); }
+  .theme-dark .theme-dot    { background: #FFE004; }
+  .theme-dark .theme-body   { background: #1A1A2E; }
+  .theme-dark .theme-nav    { background: #12121F; border: 1px solid rgba(255,255,255,.08); }
+  .theme-dark .theme-nav-pill { background: rgba(255,255,255,.12); }
+  .theme-dark .theme-nav-pill.active { background: #0974B0; width: 50px; }
+  .theme-dark .theme-hero   { background: linear-gradient(135deg, rgba(9,116,176,.2), rgba(33,158,74,.15)); }
+  .theme-dark .theme-hero span { color: rgba(255,255,255,.7); }
+  .theme-dark .theme-card-inner { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); }
+
+  .token-compare { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .token-compare th { background: var(--zoho-dark); color: rgba(255,255,255,.7); padding: 10px 14px; text-align: left; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+  .token-compare th:first-child { border-radius: 8px 0 0 0; }
+  .token-compare th:last-child  { border-radius: 0 8px 0 0; }
+  .token-compare td { padding: 10px 14px; border-bottom: 1px solid var(--border); background: #fff; vertical-align: middle; }
+  .token-compare tr:last-child td { border-bottom: none; }
+  .token-compare tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  .token-compare tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+  .color-chip { display: inline-flex; align-items: center; gap: 8px; }
+  .chip { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,.08); flex-shrink: 0; }
+  code.token { font-family: 'DM Mono', monospace; font-size: .8rem; background: var(--surface); padding: 2px 7px; border-radius: 4px; color: var(--zoho-blue); }
+
+  /* ─── ONBOARDING ─── */
+  .onboarding-flow {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    margin-bottom: 40px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .ob-step {
+    flex: 1;
+    padding: 22px 18px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .ob-step:last-child { border-right: none; }
+  .ob-step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .ob-step h4 { font-size: .88rem; font-weight: 600; margin-bottom: 6px; }
+  .ob-step p  { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+  .ob-connector {
+    position: absolute;
+    right: -12px; top: 50%;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    z-index: 2;
+  }
+
+  .empty-state-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 36px; }
+  .empty-state-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+  }
+  .es-illustration {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .empty-state-card h4 { font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
+  .empty-state-card p  { font-size: .78rem; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .es-cta {
+    display: inline-block;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(9,116,176,.1);
+    color: var(--zoho-blue);
+    text-decoration: none;
+  }
+
+  /* ─── DATA VIZ ─── */
+  .chart-demo {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .chart-title-row h4 { font-size: .95rem; font-weight: 600; }
+  .chart-filters { display: flex; gap: 6px; }
+  .chart-filter-btn { font-size: 11px; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-weight: 500; color: var(--muted); }
+  .chart-filter-btn.active { background: var(--zoho-blue); color: #fff; border-color: var(--zoho-blue); }
+
+  /* Bar chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 140px; padding-bottom: 30px; position: relative; }
+  .bar-chart::after { content: ''; position: absolute; bottom: 30px; left: 0; right: 0; height: 1px; background: var(--border); }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: opacity .2s; position: relative; }
+  .bar:hover { opacity: .8; }
+  .bar-label { font-size: 10px; color: var(--muted); position: absolute; bottom: -22px; white-space: nowrap; left: 50%; transform: translateX(-50%); }
+  .bar-val { font-size: 10px; font-weight: 600; color: var(--ink); position: absolute; top: -16px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  .chart-legend { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot  { width: 10px; height: 10px; border-radius: 2px; }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .kpi-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .kpi-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+  .kpi-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--ink); line-height: 1; }
+  .kpi-delta { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .kpi-delta.up   { color: var(--zoho-green); }
+  .kpi-delta.down { color: var(--zoho-red); }
+
+  /* ─── FORM UX ─── */
+  .form-demo {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .form-demo-header {
+    background: var(--zoho-dark);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,.15); border-radius: 2px; overflow: hidden; }
+  .form-progress-fill { height: 100%; background: var(--accent-grad); border-radius: 2px; }
+  .form-step-label { font-size: 11px; color: rgba(255,255,255,.5); white-space: nowrap; }
+  .form-body { padding: 24px; }
+  .form-row { margin-bottom: 18px; }
+  .form-label { display: block; font-size: .82rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  .form-label span { color: var(--zoho-red); margin-left: 2px; }
+  .form-input {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: .9rem; font-family: inherit;
+    background: var(--surface); color: var(--ink);
+    outline: none; transition: border-color .2s;
+  }
+  .form-input:focus { border-color: var(--zoho-blue); background: #fff; }
+  .form-input.error { border-color: var(--zoho-red); background: #FFF3F4; }
+  .form-input.success { border-color: var(--zoho-green); }
+  .form-hint { font-size: .75rem; margin-top: 5px; }
+  .form-hint.error-msg { color: var(--zoho-red); }
+  .form-hint.success-msg { color: var(--zoho-green); }
+  .form-hint.neutral { color: var(--muted); }
+  .form-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-select {
+    width: 100%; padding: 10px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: .9rem; background: var(--surface);
+    appearance: none; cursor: pointer;
+  }
+  .form-actions { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; }
+  .form-btn { padding: 10px 24px; border-radius: 8px; font-size: .9rem; font-weight: 600; border: none; cursor: pointer; }
+  .form-btn.primary { background: var(--zoho-blue); color: #fff; }
+  .form-btn.ghost   { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+
+  /* ─── MOBILE APP ─── */
+  .phone-frame {
+    width: 220px;
+    min-height: 440px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .phone-notch {
+    height: 24px;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phone-pill { width: 50px; height: 5px; background: rgba(255,255,255,.3); border-radius: 3px; }
+  .phone-status { display: flex; justify-content: space-between; padding: 6px 12px; background: var(--zoho-dark); }
+  .phone-status span { font-size: 9px; color: rgba(255,255,255,.5); }
+  .phone-nav-bar { background: var(--zoho-dark); padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+  .phone-nav-title { color: #fff; font-size: 13px; font-weight: 600; flex: 1; }
+  .phone-nav-icon { width: 22px; height: 22px; background: rgba(255,255,255,.1); border-radius: 6px; }
+  .phone-body { padding: 10px; background: var(--surface); min-height: 300px; }
+  .phone-search { height: 32px; background: #fff; border: 1px solid var(--border); border-radius: 20px; margin-bottom: 10px; display: flex; align-items: center; padding: 0 12px; gap: 6px; }
+  .phone-search-icon { font-size: 11px; }
+  .phone-search-text { font-size: 10px; color: var(--muted); }
+  .phone-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+  .phone-card-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .phone-avatar { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; }
+  .phone-card-name { font-size: 11px; font-weight: 600; }
+  .phone-card-sub  { font-size: 10px; color: var(--muted); }
+  .phone-card-meta { display: flex; justify-content: space-between; align-items: center; }
+  .phone-tag { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 8px; }
+  .phone-tag.hot  { background: rgba(206,34,50,.12); color: var(--zoho-red); }
+  .phone-tag.warm { background: rgba(255,224,4,.3);   color: #7a6900; }
+  .phone-tag.cold { background: rgba(9,116,176,.12);  color: var(--zoho-blue); }
+  .phone-amount { font-size: 11px; font-weight: 700; color: var(--ink); }
+  .phone-bottom-nav {
+    display: flex;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    padding: 6px 0 2px;
+  }
+  .phone-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; }
+  .phone-tab-icon { font-size: 14px; }
+  .phone-tab-label { font-size: 8px; color: var(--muted); }
+  .phone-tab.active .phone-tab-label { color: var(--zoho-blue); font-weight: 600; }
+
+  .comparison-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: 24px; }
+  .comparison-table th { background: var(--zoho-dark); color: rgba(255,255,255,.7); padding: 10px 14px; text-align: left; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+  .comparison-table th:first-child { border-radius: 8px 0 0 0; }
+  .comparison-table th:last-child  { border-radius: 0 8px 0 0; }
+  .comparison-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); background: #fff; }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+  .comparison-table tr:last-child td:last-child  { border-radius: 0 0 8px 0; }
+  .comparison-table tr:nth-child(even) td { background: var(--surface); }
+  .check { color: var(--zoho-green); font-weight: 700; }
+  .cross { color: var(--zoho-red); }
+  .partial { color: #c9a000; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 860px) {
+    .hero          { grid-template-columns: 1fr; min-height: auto; padding: 60px 6vw; }
+    .hero-visual   { display: none; }
+    .two-col       { grid-template-columns: 1fr; gap: 36px; }
+    .swot-grid     { grid-template-columns: 1fr; }
+    .conclusion-grid { grid-template-columns: 1fr; gap: 36px; }
+    .fr-cards      { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 560px) {
+    .card-grid     { grid-template-columns: 1fr; }
+    .brand-swatches { grid-template-columns: 1fr 1fr; }
+    .hero h1       { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ HERO -->
+<header class="hero">
+  <div class="hero-text">
+    <div class="hero-label">UI / UX Case Study</div>
+    <h1>Zoho Web&nbsp;Interface<br><span>Design Analysis</span></h1>
+    <p class="hero-desc">A comprehensive audit of layout architecture, navigation systems, visual language, accessibility, dark mode, onboarding, form UX, data visualisation, mobile app UI, cross-product consistency, and front-end technology across the Zoho product ecosystem.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><strong>Scope</strong>Zoho.com + 55+ products</div>
+      <div class="hero-meta-item"><strong>Standard</strong>WCAG 2.2 AA</div>
+      <div class="hero-meta-item"><strong>Year</strong>2025–2026</div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="brand-swatches">
+      <div class="swatch red">
+        <span class="swatch-name">Foundation Red</span>
+        <span class="swatch-hex">#CE2232</span>
+        <span class="swatch-role">Brand / Danger</span>
+      </div>
+      <div class="swatch green">
+        <span class="swatch-name">Metallic Green</span>
+        <span class="swatch-hex">#219E4A</span>
+        <span class="swatch-role">Success / CTA</span>
+      </div>
+      <div class="swatch blue">
+        <span class="swatch-name">Honolulu Blue</span>
+        <span class="swatch-hex">#0974B0</span>
+        <span class="swatch-role">Primary Actions</span>
+      </div>
+      <div class="swatch yellow">
+        <span class="swatch-name">Cadmium Lemon</span>
+        <span class="swatch-hex">#FFE004</span>
+        <span class="swatch-role">Accent / Highlight</span>
+      </div>
+    </div>
+    <div class="hero-stat-row">
+      <div class="stat-card"><div class="stat-number">16</div><div class="stat-label">Sections</div></div>
+      <div class="stat-card"><div class="stat-number">100M+</div><div class="stat-label">Users</div></div>
+      <div class="stat-card"><div class="stat-number">WCAG<br>2.2</div><div class="stat-label">AA Certified</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════ NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-link" href="#layout">Layout</a>
+    <a class="nav-link" href="#navigation">Navigation</a>
+    <a class="nav-link" href="#hierarchy">Hierarchy</a>
+    <a class="nav-link" href="#visual">Visual Design</a>
+    <a class="nav-link" href="#typography">Typography</a>
+    <a class="nav-link" href="#color">Colour</a>
+    <a class="nav-link" href="#spacing">Spacing</a>
+    <a class="nav-link" href="#responsive">Responsive</a>
+    <a class="nav-link" href="#accessibility">Accessibility</a>
+    <a class="nav-link" href="#consistency">Consistency</a>
+    <a class="nav-link" href="#principles">Principles</a>
+    <a class="nav-link" href="#tech">Technology</a>
+    <a class="nav-link" href="#darkmode">Dark Mode</a>
+    <a class="nav-link" href="#onboarding">Onboarding</a>
+    <a class="nav-link" href="#dataviz">Data Viz</a>
+    <a class="nav-link" href="#formux">Form UX</a>
+    <a class="nav-link" href="#mobileapp">Mobile App</a>
+    <a class="nav-link" href="#swot">SWOT</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════ 1. LAYOUT -->
+<div class="container">
+<section class="section" id="layout">
+  <div class="section-label">Section 01</div>
+  <h2 class="section-title">Layout Structure</h2>
+  <p class="section-intro">Zoho.com uses a disciplined grid-based layout that balances marketing clarity on the homepage with dense information architecture inside product pages. The structure follows a three-zone anatomy — navigation bar, hero/content area, and footer — with an implicit 12-column grid driving alignment across all breakpoints.</p>
+
+  <div class="two-col" style="margin-bottom:50px">
+    <div>
+      <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:16px">Homepage Wireframe Anatomy</h3>
+      <div class="nav-pattern-demo">
+        <div class="diagram-header">
+          <div class="diagram-dot r"></div><div class="diagram-dot y"></div><div class="diagram-dot g"></div>
+          <span class="diagram-title">zoho.com — desktop layout mock</span>
+        </div>
+        <div class="diagram-body" style="padding:16px;">
+          <div class="mock-nav">
+            <div class="mock-logo"></div>
+            <div class="mock-nav-links">
+              <div class="mock-nav-link"></div><div class="mock-nav-link"></div>
+              <div class="mock-nav-link"></div><div class="mock-nav-link"></div>
+            </div>
+            <div class="mock-cta"></div>
+          </div>
+          <div class="mock-hero-section">
+            <div class="mock-h1"></div>
+            <div class="mock-sub"></div>
+            <div class="mock-btns">
+              <div class="mock-btn-primary"></div>
+              <div class="mock-btn-ghost"></div>
+            </div>
+          </div>
+          <div class="mock-cards">
+            <div class="mock-card"><div class="mock-card-icon"></div><div class="mock-card-line"></div><div class="mock-card-line short"></div></div>
+            <div class="mock-card"><div class="mock-card-icon" style="background:rgba(33,158,74,.15)"></div><div class="mock-card-line"></div><div class="mock-card-line short"></div></div>
+            <div class="mock-card"><div class="mock-card-icon" style="background:rgba(206,34,50,.12)"></div><div class="mock-card-line"></div><div class="mock-card-line short"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:16px">Layout Zones Analysis</h3>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon blue">🧭</div>
+        <h3>Global Navigation Bar</h3>
+        <p>Fixed/sticky top nav with logo left, mega-menu centre, and CTA buttons right. Uses a dark background contrast against white page body to create immediate visual separation and spatial clarity.</p>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon green">📐</div>
+        <h3>Hero Sections</h3>
+        <p>Full-width sections employ two-column splits (copy left, visual right) on desktop. Generous vertical padding (~80–120 px) creates "breathing room" and signals primary content clearly without user effort.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon yellow">🗂️</div>
+        <h3>Product Grid Zones</h3>
+        <p>Feature comparison sections use CSS Grid with auto-fill columns (typically 3-up on desktop, 2-up on tablet, 1-up on mobile) keeping cognitive load low and scan paths predictable.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Design Insight:</strong> Zoho's layout uses consistent <code>max-width: 1200–1280px</code> content containers centred with auto margins, a pattern that keeps line lengths readable (45–85 characters) across wide monitors while maintaining brand discipline.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 2. NAVIGATION -->
+<section class="section" id="navigation">
+  <div class="section-label">Section 02</div>
+  <h2 class="section-title">Navigation Patterns</h2>
+  <p class="section-intro">Zoho operates a multi-layered navigation model to accommodate a portfolio of 55+ products without overwhelming first-time visitors. The system intelligently separates discovery (marketing site) from task completion (product interfaces).</p>
+
+  <div style="margin-bottom:36px">
+    <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px;color:var(--muted)">Interactive Navigation Anatomy (Desktop)</h3>
+    <div class="nav-pattern-demo">
+      <div class="nav-demo-top">
+        <div class="nav-demo-logo"></div>
+        <div class="nav-demo-links">
+          <div class="nav-demo-link active">Products ▾</div>
+          <div class="nav-demo-link">Solutions ▾</div>
+          <div class="nav-demo-link">Pricing</div>
+          <div class="nav-demo-link">Resources ▾</div>
+          <div class="nav-demo-link">Company ▾</div>
+        </div>
+        <div class="nav-demo-actions">
+          <button class="nav-demo-btn login">Sign In</button>
+          <button class="nav-demo-btn signup">Get Started</button>
+        </div>
+      </div>
+      <div class="nav-dropdown-layer">
+        <div class="nav-dropdown-col">
+          <h5>Categories</h5>
+          <div class="nav-dropdown-item">
+            <div class="nav-dd-icon" style="background:rgba(9,116,176,.15)"></div>
+            <div class="nav-dd-text"><strong>CRM & Sales</strong><span>6 products</span></div>
+          </div>
+          <div class="nav-dropdown-item">
+            <div class="nav-dd-icon" style="background:rgba(33,158,74,.15)"></div>
+            <div class="nav-dd-text"><strong>Finance</strong><span>5 products</span></div>
+          </div>
+          <div class="nav-dropdown-item">
+            <div class="nav-dd-icon" style="background:rgba(206,34,50,.12)"></div>
+            <div class="nav-dd-text"><strong>Marketing</strong><span>8 products</span></div>
+          </div>
+          <div class="nav-dropdown-item">
+            <div class="nav-dd-icon" style="background:rgba(120,80,200,.12)"></div>
+            <div class="nav-dd-text"><strong>HR & People</strong><span>4 products</span></div>
+          </div>
+        </div>
+        <div class="nav-dropdown-col">
+          <h5>Featured Products</h5>
+          <div class="nav-dd-grid">
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#EFF6FF"></div><div class="nav-dd-text"><strong>CRM</strong><span>Sales Hub</span></div></div>
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#F0FFF4"></div><div class="nav-dd-text"><strong>Books</strong><span>Accounting</span></div></div>
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#FFF3F4"></div><div class="nav-dd-text"><strong>Mail</strong><span>Business email</span></div></div>
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#FFFCE8"></div><div class="nav-dd-text"><strong>One</strong><span>All-in-one</span></div></div>
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#F3F0FF"></div><div class="nav-dd-text"><strong>Desk</strong><span>Support</span></div></div>
+            <div class="nav-dropdown-item"><div class="nav-dd-icon" style="background:#EFF6FF"></div><div class="nav-dd-text"><strong>Projects</strong><span>PM tool</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon blue">📂</div>
+      <h3>Mega Menu System</h3>
+      <p>The dropdown mega menu groups products by business function (CRM, Finance, Marketing, HR, IT) with two-column layouts — category sidebar left, product grid right — enabling fast scanning across a large product portfolio without page loads.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">⬅️</div>
+      <h3>In-Product Left Rail Navigation</h3>
+      <p>Zoho CRM's 2024 redesign moved module navigation from the top bar to the left rail panel. This freed up vertical space, enabled drag-and-drop reordering, and reduced click depth for switching between modules — a direct response to user feedback.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon red">🧭</div>
+      <h3>Breadcrumb & Progress Trails</h3>
+      <p>Multi-step workflows (e.g., in Zoho Forms, Campaigns) use breadcrumb trails and horizontal progress bars. These serve as orientation anchors so users always know where they are in complex flows, reducing abandonment and support requests.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">🔍</div>
+      <h3>Global Search Integration</h3>
+      <p>Prominent search bars surface within each product's top navigation, while the Zoho One unified shell offers cross-product search. This reduces navigation depth and supports users who prefer to search rather than browse menu hierarchies.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 3. INFORMATION HIERARCHY -->
+<section class="section" id="hierarchy">
+  <div class="section-label">Section 03</div>
+  <h2 class="section-title">Information Hierarchy</h2>
+  <p class="section-intro">Zoho pages employ a clear visual hierarchy that guides attention from brand promise → feature evidence → social proof → conversion action. This inverted-pyramid structure mirrors how business buyers evaluate software.</p>
+
+  <div class="two-col">
+    <div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:22px">
+        <h3 style="font-size:1rem;font-weight:600;margin-bottom:20px">Attention Flow on Product Pages</h3>
+        <!-- Visual hierarchy pyramid -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="background:linear-gradient(135deg,#0974B0,#219E4A);border-radius:8px;padding:14px;text-align:center;color:#fff;font-size:.95rem;font-weight:600">① Hero Headline + CTA</div>
+          <div style="background:rgba(9,116,176,.12);border:1px solid rgba(9,116,176,.25);border-radius:8px;padding:12px;text-align:center;font-size:.88rem;font-weight:500">② Feature Benefits (icons + copy)</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;font-size:.84rem;color:var(--muted)">③ Product Screenshots / Demo</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;font-size:.84rem;color:var(--muted)">④ Testimonials / Case Studies</div>
+          <div style="background:rgba(33,158,74,.08);border:1px solid rgba(33,158,74,.2);border-radius:8px;padding:10px;text-align:center;font-size:.84rem;font-weight:500">⑤ Pricing / Plans CTA</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;font-size:.8rem;color:var(--muted)">⑥ FAQ + Support Links</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:18px">Hierarchy Techniques Applied</h3>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon blue">📏</div>
+        <h3>Size Contrast</h3>
+        <p>Primary headings are 3–5× the size of body text. CTA buttons are slightly oversized (40–48 px height) relative to secondary links, creating a clear interaction affordance without being garish.</p>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon green">🎨</div>
+        <h3>Colour & Weight Signals</h3>
+        <p>Zoho Inventory's design process explicitly uses subtle colour and font-weight differences to distinguish elements within complex data views — preventing visual blending in information-dense product screens.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon red">⬜</div>
+        <h3>Whitespace Hierarchy</h3>
+        <p>Section separators use progressively reduced whitespace as content importance decreases — top-level sections get ~100px padding; sub-sections get ~60px; within-card elements get ~16px — creating a natural rhythm.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ 4. VISUAL DESIGN -->
+<div style="background:var(--zoho-dark);padding:80px 0">
+<div class="container">
+<section id="visual">
+  <div class="section-label" style="color:var(--zoho-yellow)">Section 04</div>
+  <h2 class="section-title" style="color:#fff">Visual Design Elements</h2>
+  <p class="section-intro" style="color:rgba(255,255,255,.6)">Zoho's visual system has matured from a skeuomorphic era (pre-2015) through flat design into its current modern-flat aesthetic — clean surfaces, purposeful colour, product-specific accent palettes unified by the four brand primaries.</p>
+
+  <!-- TYPOGRAPHY -->
+  <h3 id="typography" style="color:rgba(255,255,255,.8);font-size:1.05rem;font-weight:600;margin-bottom:20px;margin-top:10px">Typography Scale</h3>
+  <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;margin-bottom:40px">
+    <div class="type-scale">
+      <div class="type-row">
+        <span class="type-label" style="color:rgba(255,255,255,.4)">Display / H1<br>32–48px bold</span>
+        <span class="type-sample-h1" style="color:#fff">Business Software for Growing Teams</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label" style="color:rgba(255,255,255,.4)">H2<br>24–32px semi</span>
+        <span class="type-sample-h2" style="color:rgba(255,255,255,.9)">Everything your business needs</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label" style="color:rgba(255,255,255,.4)">H3<br>18–20px 600</span>
+        <span class="type-sample-h3" style="color:rgba(255,255,255,.8)">CRM, Finance, HR & Marketing</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label" style="color:rgba(255,255,255,.4)">Body<br>15–16px 400</span>
+        <span class="type-sample-body" style="color:rgba(255,255,255,.55)">Zoho's product suite uses Proxima Nova across marketing and product interfaces, ensuring brand-consistent legibility at every scale across web and mobile.</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label" style="color:rgba(255,255,255,.4)">Small / Label<br>11–13px 600</span>
+        <span class="type-sample-label">CATEGORY · PRODUCT · FEATURE</span>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px;background:rgba(255,255,255,.06);border-color:var(--zoho-blue)">
+      <strong style="color:var(--zoho-yellow)">Font Strategy:</strong> <span style="color:rgba(255,255,255,.6)">Zoho uses <strong style="color:#fff">Proxima Nova</strong> as its primary typeface across marketing properties and most product UIs. This humanist sans-serif offers excellent legibility at small sizes and a professional-yet-approachable character — well-matched to Zoho's SMB target audience. Product-specific interfaces sometimes layer <strong style="color:#fff">system UI fonts</strong> (San Francisco, Segoe UI) for faster rendering on app shells.</span>
+    </div>
+  </div>
+
+  <!-- COLOR -->
+  <h3 id="color" style="color:rgba(255,255,255,.8);font-size:1.05rem;font-weight:600;margin-bottom:20px">Colour System</h3>
+  <div class="palette-grid" style="margin-bottom:40px">
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#CE2232"></div>
+      <div class="palette-info"><strong>Foundation Red</strong><span>#CE2232 — Brand Primary</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#219E4A"></div>
+      <div class="palette-info"><strong>Metallic Green</strong><span>#219E4A — Success / Growth</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#0974B0"></div>
+      <div class="palette-info"><strong>Honolulu Blue</strong><span>#0974B0 — Trust / Action</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#FFE004"></div>
+      <div class="palette-info"><strong>Cadmium Lemon</strong><span>#FFE004 — Attention / Highlight</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#1A1A2E"></div>
+      <div class="palette-info"><strong>Navy Dark</strong><span>#1A1A2E — Surface Dark</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#F7F8FD"></div>
+      <div class="palette-info"><strong>Cloud Grey</strong><span>#F7F8FD — Page Background</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#E2E4EF"></div>
+      <div class="palette-info"><strong>Slate Border</strong><span>#E2E4EF — Dividers / Lines</span></div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-swatch" style="background:#5A5A72"></div>
+      <div class="palette-info"><strong>Graphite</strong><span>#5A5A72 — Secondary Text</span></div>
+    </div>
+  </div>
+
+  <!-- SPACING -->
+  <h3 id="spacing" style="color:rgba(255,255,255,.8);font-size:1.05rem;font-weight:600;margin-bottom:20px">Spacing System (8-pt Grid)</h3>
+  <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px">
+    <p style="color:rgba(255,255,255,.55);font-size:.9rem;margin-bottom:24px">Zoho's UI follows an 8-point spacing grid. All padding, margin, and gap values are multiples of 8px — creating visual rhythm and predictable density across all products.</p>
+    <div class="spacing-demo">
+      <div class="spacing-block"><div class="sp-bar" style="height:8px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">8px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">xs</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:16px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">16px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">sm</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:24px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">24px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">md</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:32px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">32px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">lg</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:48px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">48px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">xl</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:64px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">64px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">2xl</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:96px"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">96px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">3xl</span></div>
+      <div class="spacing-block"><div class="sp-bar" style="height:120px;background:var(--warm-grad)"></div><span class="sp-label" style="color:rgba(255,255,255,.4)">120px</span><span class="sp-label" style="color:rgba(255,255,255,.3)">section</span></div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════ 5. RESPONSIVE -->
+<section class="section" id="responsive">
+  <div class="section-label">Section 05</div>
+  <h2 class="section-title">Responsiveness Across Devices</h2>
+  <p class="section-intro">Zoho marketing pages and product UIs implement a mobile-first responsive strategy with fluid grids, flexible images, and contextual navigation collapses. The design adapts across three primary breakpoints.</p>
+
+  <div class="device-frames" style="margin-bottom:50px;justify-content:center">
+    <!-- Desktop -->
+    <div class="device">
+      <div class="frame desktop">
+        <div class="frame-content" style="padding:0">
+          <div class="fr-nav">
+            <div class="fr-nav-dot"></div><div class="fr-nav-dot"></div><div class="fr-nav-dot"></div>
+            <span style="flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:2px;margin:0 6px"></span>
+          </div>
+          <div style="padding:8px">
+            <div class="fr-hero" style="height:70px"><span>Full-width Hero — 2-col copy+visual</span></div>
+            <div class="fr-cards"><div class="fr-card"></div><div class="fr-card"></div><div class="fr-card"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Desktop · 1280px+ · 3-col grid</div>
+    </div>
+
+    <!-- Tablet -->
+    <div class="device">
+      <div class="frame tablet">
+        <div class="frame-notch"></div>
+        <div class="frame-content" style="padding:6px">
+          <div class="fr-nav" style="height:10px">
+            <div class="fr-nav-dot"></div>
+            <div class="fr-hamburger" style="margin-left:auto"><div class="fr-bar"></div><div class="fr-bar"></div><div class="fr-bar"></div></div>
+          </div>
+          <div class="fr-hero" style="height:50px;margin-bottom:6px"><span>Hero — stacked layout</span></div>
+          <div class="fr-cards-2col">
+            <div class="fr-card" style="height:35px"></div>
+            <div class="fr-card" style="height:35px"></div>
+            <div class="fr-card" style="height:35px"></div>
+            <div class="fr-card" style="height:35px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Tablet · 768–1024px · 2-col grid</div>
+    </div>
+
+    <!-- Mobile -->
+    <div class="device">
+      <div class="frame mobile">
+        <div class="frame-notch" style="height:12px;border-radius:0">
+          <div style="width:30px;height:4px;background:rgba(255,255,255,.4);border-radius:2px"></div>
+        </div>
+        <div class="frame-content" style="padding:5px">
+          <div class="fr-nav" style="height:9px">
+            <div class="fr-nav-dot"></div>
+            <div class="fr-hamburger" style="margin-left:auto"><div class="fr-bar"></div><div class="fr-bar"></div></div>
+          </div>
+          <div class="fr-hero" style="height:45px;margin-bottom:5px"><span style="font-size:6px">Single-col hero</span></div>
+          <div class="fr-cards-1col">
+            <div class="fr-card-full"></div>
+            <div class="fr-card-full"></div>
+            <div class="fr-card-full"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-label">Mobile · &lt;768px · 1-col, hamburger nav</div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon blue">📱</div>
+      <h3>Mobile-First Approach</h3>
+      <p>Zoho's CSS architecture begins with styles for small viewports and uses min-width media queries to progressively enhance for larger screens — keeping mobile performance tight and avoiding over-downloading desktop-only assets.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">🍔</div>
+      <h3>Hamburger → Off-Canvas Nav</h3>
+      <p>On mobile, the mega-menu collapses into a hamburger icon triggering a slide-in off-canvas panel. Category sections are accordion-expanded on demand, preventing overwhelming nav trees on small screens.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon yellow">↔️</div>
+      <h3>RTL Language Support</h3>
+      <p>Zoho Sites 2.0 features native RTL layout support — adjusting text alignment, navigation order, and grid direction — serving Arabic, Hebrew, and Urdu markets without requiring separate page builds or plugins.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon red">⚡</div>
+      <h3>Performance Responsive Design</h3>
+      <p>Responsive images use <code>srcset</code> + <code>sizes</code> attributes and next-gen formats (WebP/AVIF) to deliver appropriately sized assets per device. Lazy loading is applied below-the-fold to reduce initial page weight.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 6. ACCESSIBILITY -->
+<section class="section" id="accessibility">
+  <div class="section-label">Section 06</div>
+  <h2 class="section-title">Accessibility Considerations</h2>
+  <p class="section-intro">Zoho has made meaningful strides toward WCAG 2.2 AA compliance across key products including Zoho CRM, Zoho Forms, and Zoho Desk. Accessibility is now a core product principle rather than an afterthought, though the 55+ product ecosystem means coverage is uneven.</p>
+
+  <div class="two-col">
+    <div class="a11y-checks">
+      <div class="a11y-item">
+        <div class="a11y-badge pass">✓</div>
+        <div>
+          <h4>WCAG 2.2 AA Certification (Select Products)</h4>
+          <p>Zoho CRM, Zoho Forms, and Zoho Desk have achieved formal WCAG 2.2 AA compliance through a combination of manual developer testing and automated static analysis tools — covering over 100 success criteria across Perceivable, Operable, Understandable, and Robust pillars.</p>
+        </div>
+      </div>
+      <div class="a11y-item">
+        <div class="a11y-badge pass">✓</div>
+        <div>
+          <h4>Screen Reader Compatibility</h4>
+          <p>Zoho Forms implements logical focus ordering and ARIA landmarks, enabling screen readers (NVDA, JAWS, VoiceOver) to traverse forms sequentially — mirroring the expected visual layout. Buttons and interactive elements carry descriptive aria-label attributes.</p>
+        </div>
+      </div>
+      <div class="a11y-item">
+        <div class="a11y-badge pass">✓</div>
+        <div>
+          <h4>Keyboard Navigation</h4>
+          <p>Product interfaces support Tab, Arrow key, Enter/Space, and Escape navigation patterns. Skip-to-content links are present on marketing pages. Interactive dropdowns and modals trap focus correctly and restore it on close.</p>
+        </div>
+      </div>
+      <div class="a11y-item">
+        <div class="a11y-badge pass">✓</div>
+        <div>
+          <h4>Responsive Forms with Accessibility</h4>
+          <p>Zoho Forms automatically adapts to screen sizes while preserving accessible label-input pairing, error messaging with ARIA live regions, and form field grouping with fieldset/legend elements across all breakpoints.</p>
+        </div>
+      </div>
+      <div class="a11y-item">
+        <div class="a11y-badge warn">⚠</div>
+        <div>
+          <h4>Colour Contrast — Partial Coverage</h4>
+          <p>Primary brand colours (blue #0974B0 on white, green #219E4A on white) meet 4.5:1 contrast ratios. However, secondary UI states, disabled form elements, and some data visualisation palettes in Zoho Analytics still fall below AA thresholds in default configurations.</p>
+        </div>
+      </div>
+      <div class="a11y-item">
+        <div class="a11y-badge info">i</div>
+        <div>
+          <h4>Multi-Product Uneven Coverage</h4>
+          <p>With 55+ products at varying maturity levels, accessibility compliance is not uniform. Newer products (Zoho Bigin, Zoho Notebook) lag behind flagship products in VPAT documentation and conformance levels — an acknowledged ongoing programme.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:20px">Accessibility Score by Area</h3>
+      <div class="score-list">
+        <div class="score-item">
+          <label>Screen Reader Support <span>88/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:88%"></div></div>
+        </div>
+        <div class="score-item">
+          <label>Keyboard Navigation <span>85/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:85%"></div></div>
+        </div>
+        <div class="score-item">
+          <label>Colour Contrast (Primary) <span>80/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:80%"></div></div>
+        </div>
+        <div class="score-item">
+          <label>ARIA Implementation <span>79/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:79%"></div></div>
+        </div>
+        <div class="score-item">
+          <label>Focus Management <span>82/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:82%"></div></div>
+        </div>
+        <div class="score-item">
+          <label>Multi-Product Consistency <span>61/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:61%;background:linear-gradient(135deg,#CE2232,#FFE004)"></div></div>
+        </div>
+        <div class="score-item">
+          <label>RTL Language Support <span>90/100</span></label>
+          <div class="score-track"><div class="score-fill" style="width:90%"></div></div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:28px">
+        <strong>Policy Commitment:</strong> Zoho's WCAG compliance programme applies to WCAG 2.2 A & AA — targeting Zoho CRM, Zoho Forms, and Zoho Desk as initial certified products, with VPAT (Voluntary Product Accessibility Templates) published for enterprise customers requiring procurement compliance documentation.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 7. CONSISTENCY -->
+<section class="section" id="consistency">
+  <div class="section-label">Section 07</div>
+  <h2 class="section-title">Cross-Product Consistency</h2>
+  <p class="section-intro">Consistency across a suite of 55+ products is Zoho's single greatest UI challenge. The company operates an internal design system that standardises shared component patterns, but individual product teams retain some autonomy over their UX — leading to intentional and unintentional variation.</p>
+
+  <table class="consistency-table" style="margin-bottom:40px">
+    <thead>
+      <tr>
+        <th>UI Element</th>
+        <th>Consistency Level</th>
+        <th>Flagship Products</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Brand Colour Usage</strong></td>
+        <td><span class="pill high">High</span></td>
+        <td>All products</td>
+        <td>4-colour logo palette used consistently in all nav bars and primary CTAs</td>
+      </tr>
+      <tr>
+        <td><strong>Typography (Proxima Nova)</strong></td>
+        <td><span class="pill high">High</span></td>
+        <td>CRM, Books, Desk, Mail</td>
+        <td>System fonts fallback on lightweight mobile builds for performance</td>
+      </tr>
+      <tr>
+        <td><strong>Button Styles</strong></td>
+        <td><span class="pill medium">Medium</span></td>
+        <td>Varies by product</td>
+        <td>Primary = blue fill; ghost = bordered. Older products use inconsistent radius values</td>
+      </tr>
+      <tr>
+        <td><strong>Icon Library</strong></td>
+        <td><span class="pill medium">Medium</span></td>
+        <td>CRM, Projects, Desk</td>
+        <td>Flat-style icon set used broadly; some legacy products retain older icon styles</td>
+      </tr>
+      <tr>
+        <td><strong>Navigation Shell (Zoho One)</strong></td>
+        <td><span class="pill high">High</span></td>
+        <td>Zoho One subscribers</td>
+        <td>Unified app launcher shell with consistent dark nav bar across all One products</td>
+      </tr>
+      <tr>
+        <td><strong>Form Field Design</strong></td>
+        <td><span class="pill medium">Medium</span></td>
+        <td>Forms, CRM, Desk</td>
+        <td>Label-above-input pattern consistent in newer products; older products use inline labels</td>
+      </tr>
+      <tr>
+        <td><strong>Data Table Patterns</strong></td>
+        <td><span class="pill low">Inconsistent</span></td>
+        <td>Books, Inventory, Analytics</td>
+        <td>Row density, column sorting UX, and pagination patterns differ significantly</td>
+      </tr>
+      <tr>
+        <td><strong>Empty State Illustrations</strong></td>
+        <td><span class="pill medium">Medium</span></td>
+        <td>CRM, Projects, Bigin</td>
+        <td>Illustrated empty states improve newer products; older apps show plain text messages</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Zoho One Unified Shell:</strong> Zoho's most significant consistency effort is the Zoho One unified app launcher — a persistent dark-themed navigation bar that appears atop all Zoho One subscriber products. This creates a "single OS feel" and dramatically reduces context-switching confusion when users move between CRM, Books, Desk, and other applications within one session.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 8. DESIGN PRINCIPLES -->
+<section class="section" id="principles">
+  <div class="section-label">Section 08</div>
+  <h2 class="section-title">Design Principles Applied</h2>
+  <p class="section-intro">Zoho's interface design is guided by a set of human-computer interaction principles — some explicit in their design documentation, others evident from systematic analysis of the products. These principles explain the "why" behind most UI decisions.</p>
+
+  <div class="principles-grid">
+    <div class="principle-card" style="border-left-color:var(--zoho-blue)">
+      <div class="principle-number" style="color:var(--zoho-blue)">01</div>
+      <h4>Progressive Disclosure</h4>
+      <p>Complex products (CRM, Analytics) reveal advanced options contextually — settings panels, advanced filters, and custom views are hidden until invoked — keeping primary workflows uncluttered for new users.</p>
+    </div>
+    <div class="principle-card" style="border-left-color:var(--zoho-green)">
+      <div class="principle-number" style="color:var(--zoho-green)">02</div>
+      <h4>Recognition Over Recall</h4>
+      <p>Mega menus display product names, icons, and one-line descriptions simultaneously — users recognise the right product visually rather than having to remember the exact name and type it into search.</p>
+    </div>
+    <div class="principle-card" style="border-left-color:var(--zoho-red)">
+      <div class="principle-number" style="color:var(--zoho-red)">03</div>
+      <h4>Flexibility & Efficiency</h4>
+      <p>Power users can customise navigation order (drag-and-drop modules in CRM's new left rail), create saved views, set keyboard shortcuts, and configure dashboards — without disrupting default experiences for casual users.</p>
+    </div>
+    <div class="principle-card" style="border-left-color:#7850C8">
+      <div class="principle-number" style="color:#7850C8">04</div>
+      <h4>Real-World Metaphors</h4>
+      <p>Zoho Inventory deliberately mirrors physical warehouse logic in its digital navigation. Terms like "Purchase Orders," "Stock Adjustments," and "Warehouses" reflect the user's real-world mental models — reducing the learning curve for operations staff.</p>
+    </div>
+    <div class="principle-card" style="border-left-color:var(--zoho-yellow)">
+      <div class="principle-number" style="color:#c9a000">05</div>
+      <h4>Error Prevention First</h4>
+      <p>Zoho Forms' inline validation fires as users leave fields — not on submit — catching errors at the point of entry. Confirmation dialogs appear before destructive actions (delete, deactivate) with explicit consequence description.</p>
+    </div>
+    <div class="principle-card" style="border-left-color:var(--zoho-blue)">
+      <div class="principle-number" style="color:var(--zoho-blue)">06</div>
+      <h4>Visibility of System Status</h4>
+      <p>Progress bars, loading spinners, success toasts, and error banners communicate system state throughout async operations — form submissions, file uploads, integrations — building user trust through transparency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 9. TECH STACK -->
+<section class="section" id="tech">
+  <div class="section-label">Section 09</div>
+  <h2 class="section-title">Front-End Technology Stack</h2>
+  <p class="section-intro">Zoho builds and maintains its own front-end infrastructure rather than relying entirely on open-source frameworks — a deliberate strategy to maximise control, performance, and security across its 55+ products. The stack blends established web standards with proprietary tooling.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <span class="tech-tag html">HTML5</span>
+      <h4>Semantic HTML5</h4>
+      <p>Marketing pages and product UIs use semantic HTML5 elements — <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code> — supporting SEO, accessibility tree construction, and screen reader landmark navigation.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag css">CSS3 / Custom Properties</span>
+      <h4>CSS Modules + Variables</h4>
+      <p>Design tokens are implemented via CSS Custom Properties (variables), enabling consistent theming across products and supporting Zoho Analytics' glassmorphic UI update. Component-level scoping prevents style bleed across the large codebase.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag js">JavaScript</span>
+      <h4>Vanilla JS + Proprietary Framework</h4>
+      <p>Zoho's product UIs are largely built on an in-house JavaScript framework that predates React/Vue's dominance. This proprietary MVC system gives Zoho full control over rendering performance and bundle size — trading ecosystem richness for ownership.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag ts">TypeScript</span>
+      <h4>TypeScript in Newer Products</h4>
+      <p>Newer Zoho products and the Zoho Creator low-code platform's developer SDK adopt TypeScript for type safety — reducing runtime errors in complex state management, API integrations, and the JS-based ZML templating layer.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag build">CSS Grid + Flexbox</span>
+      <h4>Modern Layout APIs</h4>
+      <p>Product pages leverage CSS Grid for two-dimensional layout (dashboard cards, data tables) and Flexbox for one-dimensional alignment (navigation bars, button groups). No CSS frameworks like Bootstrap are used — all layout is custom-built.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag html">Web Components</span>
+      <h4>Zoho Creator Widget SDK</h4>
+      <p>Zoho Creator's extensibility model uses a widget SDK allowing developers to embed custom UI elements built as Web Components — isolating third-party code from the product shell via Shadow DOM encapsulation.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag css">Figma</span>
+      <h4>Design Tooling</h4>
+      <p>Internal design teams use Figma for wireframing, prototyping, and design handoff. Zoho Creator's visual app builder enables non-engineers to produce UI layouts using drag-and-drop tools that generate ZML (Zoho Markup Language) output.</p>
+    </div>
+    <div class="tech-card">
+      <span class="tech-tag js">Lazy Load + Intersection Observer</span>
+      <h4>Performance Optimisations</h4>
+      <p>Below-fold images, secondary scripts, and feature-rich widgets use the Intersection Observer API for lazy loading — keeping initial Time to Interactive (TTI) low. Service Workers cache shell assets in Zoho One's progressive web app layer.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:36px">
+    <strong>Proprietary Advantage & Tradeoff:</strong> Zoho's in-house framework strategy means the company owns its entire rendering pipeline — enabling extremely tight performance budgets and avoiding security vulnerabilities in third-party dependencies. The tradeoff is a slower pace of adopting modern patterns (e.g., React Server Components, Islands Architecture) compared to competitors using standard open-source stacks.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 10. SWOT -->
+<section class="section" id="swot">
+  <div class="section-label">Section 16</div>
+  <h2 class="section-title">Strengths & Areas for Improvement</h2>
+  <p class="section-intro">A balanced assessment of Zoho's UI design decisions — what works well, where friction exists, what opportunities remain, and what external pressures challenge the design system.</p>
+
+  <div class="swot-grid">
+    <div class="swot-cell swot-s">
+      <h3>💪 Strengths</h3>
+      <ul>
+        <li><span>Consistent four-colour brand identity across all marketing properties creates instant recognition.</span></li>
+        <li><span>Mega-menu navigation elegantly handles 55+ products without cognitive overload through intelligent categorisation.</span></li>
+        <li><span>Zoho One unified shell dramatically reduces friction when switching between apps in the ecosystem.</span></li>
+        <li><span>8pt spacing grid and Proxima Nova type system create professional visual rhythm across product interfaces.</span></li>
+        <li><span>WCAG 2.2 AA compliance in flagship products demonstrates serious accessibility commitment.</span></li>
+        <li><span>Native RTL support in Zoho Sites 2.0 serves underserved language markets without plugin overhead.</span></li>
+        <li><span>In-house framework gives full control over performance budgets and security surface area.</span></li>
+        <li><span>Progressive disclosure pattern manages complexity in data-heavy products (CRM, Analytics) admirably.</span></li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-w">
+      <h3>⚠️ Areas for Improvement</h3>
+      <ul>
+        <li><span>Cross-product inconsistency in data table patterns, form field styles, and icon libraries creates friction when users switch between products.</span></li>
+        <li><span>Accessibility compliance is limited to select products — the remaining 45+ products lack published VPATs and full WCAG coverage.</span></li>
+        <li><span>Colour contrast in secondary UI states (disabled inputs, chart palettes) falls below AA standards in some products.</span></li>
+        <li><span>Slower adoption of modern UX patterns (dark mode support, skeleton loading screens) compared to competitors like Salesforce or Monday.com.</span></li>
+        <li><span>Mobile product apps (iOS/Android) sometimes feel like direct web-to-mobile ports rather than native-first experiences.</span></li>
+        <li><span>Legacy products carry visual debt — older icon styles, deprecated UI patterns — that disrupt a consistent ecosystem feel.</span></li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-o">
+      <h3>🚀 Opportunities</h3>
+      <ul>
+        <li><span>Establish a public-facing Zoho Design System (like Salesforce's Lightning, IBM's Carbon) to standardise component libraries and accelerate product consistency.</span></li>
+        <li><span>Introduce system-wide dark mode support — demanded by developers and power users — aligning with Zoho Analytics' glassmorphic UI direction.</span></li>
+        <li><span>Extend WCAG compliance to all 55+ products with a phased roadmap, converting accessibility into a competitive differentiator in enterprise sales.</span></li>
+        <li><span>Leverage AI (Zia) more deeply in the UI — proactive contextual suggestions, intelligent form autofill, and smart navigation shortcuts.</span></li>
+        <li><span>Adopt Islands Architecture for marketing pages to dramatically improve Core Web Vitals and Google search ranking.</span></li>
+      </ul>
+    </div>
+    <div class="swot-cell swot-t">
+      <h3>⚡ Challenges</h3>
+      <ul>
+        <li><span>Competitive pressure from Salesforce, HubSpot, and Microsoft 365 — each with mature, publicly documented design systems — raises user expectations.</span></li>
+        <li><span>The sheer scale of 55+ products creates an immense maintenance burden for any centralised design system team.</span></li>
+        <li><span>Growing user expectation for AI-native UI patterns (inline generative features, conversational interfaces) requires significant paradigm shifts in product design.</span></li>
+        <li><span>Proprietary framework lock-in may slow the ability to adopt emerging browser-native APIs and open-source tooling that competitors freely adopt.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ 11. DARK MODE & THEMING -->
+<div class="container">
+<section class="section" id="darkmode">
+  <div class="section-label">Section 11</div>
+  <h2 class="section-title">Dark Mode & Theming</h2>
+  <p class="section-intro">Dark mode is one of the most requested features across Zoho's product suite. As of 2025–2026, Zoho has a partial and inconsistent dark mode story — some products (Zoho Analytics' glassmorphic UI, Zoho Writer) offer dark themes, while the majority remain light-only. The CSS Custom Properties architecture that underpins Zoho's design system makes a unified dark mode rollout technically feasible but strategically deferred.</p>
+
+  <div class="darkmode-split">
+    <!-- Light Theme Mock -->
+    <div class="theme-card theme-light">
+      <div class="theme-header">
+        <div class="theme-dot"></div>
+        ☀️ Light Mode — Current Default
+      </div>
+      <div class="theme-body">
+        <div class="theme-nav">
+          <div class="theme-nav-pill active"></div>
+          <div class="theme-nav-pill" style="width:40px"></div>
+          <div class="theme-nav-pill" style="width:30px"></div>
+          <div class="theme-nav-pill" style="width:50px;margin-left:auto"></div>
+        </div>
+        <div class="theme-hero">
+          <span>Hero Section — Clean White Surface</span>
+        </div>
+        <div class="theme-cards">
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark Theme Mock -->
+    <div class="theme-card theme-dark">
+      <div class="theme-header">
+        <div class="theme-dot"></div>
+        🌙 Dark Mode — Partially Available
+      </div>
+      <div class="theme-body">
+        <div class="theme-nav">
+          <div class="theme-nav-pill active"></div>
+          <div class="theme-nav-pill" style="width:40px"></div>
+          <div class="theme-nav-pill" style="width:30px"></div>
+          <div class="theme-nav-pill" style="width:50px;margin-left:auto"></div>
+        </div>
+        <div class="theme-hero">
+          <span>Hero Section — Deep Navy Surface</span>
+        </div>
+        <div class="theme-cards">
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+          <div class="theme-card-inner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px">CSS Design Token Strategy for Dark Mode</h3>
+  <div style="margin-bottom:36px;overflow-x:auto">
+    <table class="token-compare">
+      <thead>
+        <tr>
+          <th>Token Name</th>
+          <th>Light Value</th>
+          <th>Dark Value</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="token">--color-surface</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#FFFFFF"></div>#FFFFFF</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#1A1A2E"></div>#1A1A2E</div></td>
+          <td>Page background, card base</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-surface-alt</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#F7F8FD"></div>#F7F8FD</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#12121F"></div>#12121F</div></td>
+          <td>Alternate row, secondary surface</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-text-primary</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#1C1C2E"></div>#1C1C2E</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#F0F0F8;border-color:#ccc"></div>#F0F0F8</div></td>
+          <td>Headings, primary body text</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-text-muted</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#5A5A72"></div>#5A5A72</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#8080A0"></div>#8080A0</div></td>
+          <td>Labels, captions, descriptions</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-border</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#E2E4EF"></div>#E2E4EF</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#2A2A3E"></div>#2A2A3E</div></td>
+          <td>Card borders, dividers, inputs</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-action-primary</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#0974B0"></div>#0974B0</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#1A9AE0"></div>#1A9AE0</div></td>
+          <td>Buttons, links, active states (lightened for dark contrast)</td>
+        </tr>
+        <tr>
+          <td><code class="token">--color-accent</code></td>
+          <td><div class="color-chip"><div class="chip" style="background:#FFE004;border-color:#ccc"></div>#FFE004</div></td>
+          <td><div class="color-chip"><div class="chip" style="background:#FFE004;border-color:#ccc"></div>#FFE004</div></td>
+          <td>Highlights, badges — unchanged across themes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon blue">🎨</div>
+      <h3>Products with Dark Mode (2025)</h3>
+      <p>Zoho Analytics introduced a glassmorphic dark UI for its dashboard shell in 2024. Zoho Writer offers dark editor mode. Zoho Mail has a dark reading pane option. These are opt-in, per-product settings — not driven by <code>prefers-color-scheme</code> system detection.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">🔧</div>
+      <h3>CSS Custom Property Readiness</h3>
+      <p>Zoho's migration to CSS Custom Properties across newer products means dark mode is architecturally feasible — a single <code>[data-theme="dark"]</code> attribute on the root element could cascade value swaps throughout the entire token system without per-component overrides.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon red">⚠️</div>
+      <h3>Image & Icon Adaptation Gap</h3>
+      <p>A key dark mode challenge for Zoho is product illustration and icon adaptation — flat-style icons designed for white backgrounds can appear washed out or invisible on dark surfaces. A proper dark mode rollout requires maintaining two asset variants or using SVG with <code>currentColor</code> throughout.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon yellow">📱</div>
+      <h3>System Preference Detection</h3>
+      <p>Best-practice dark mode implementation would use the CSS <code>prefers-color-scheme: dark</code> media query to auto-detect the user's OS preference and apply the appropriate theme — with a manual override toggle persisted in localStorage. Zoho's current implementations require manual in-app activation.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Strategic Gap:</strong> Competitors like Notion, Linear, and Salesforce CRM all offer system-synced dark mode as a standard feature. For Zoho's developer and technical-user segments — who disproportionately prefer dark environments — this is a meaningful UX gap that affects perceived product modernity.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 12. ONBOARDING & EMPTY STATES -->
+<section class="section" id="onboarding">
+  <div class="section-label">Section 12</div>
+  <h2 class="section-title">Onboarding & Empty States</h2>
+  <p class="section-intro">First-run experiences and empty state design are critical yet often overlooked dimensions of product UI. Zoho has invested significantly in onboarding flows for flagship products (CRM, Desk, Projects) while legacy products still show plain, illustration-free empty states that fail to guide users toward their first meaningful action.</p>
+
+  <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:18px">Zoho CRM — Typical Onboarding Flow</h3>
+  <div class="onboarding-flow">
+    <div class="ob-step">
+      <div class="ob-step-num" style="background:rgba(9,116,176,.15);color:var(--zoho-blue)">1</div>
+      <h4>Welcome Splash</h4>
+      <p>Animated welcome screen with business-type selection — sets personalised defaults for industry-appropriate CRM modules and sample data population.</p>
+      <div class="ob-connector">→</div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num" style="background:rgba(33,158,74,.15);color:var(--zoho-green)">2</div>
+      <h4>Data Import</h4>
+      <p>Guided CSV/Google Contacts import with smart field mapping UI — drag-and-drop column matching to Zoho fields reduces abandonment at the data migration step.</p>
+      <div class="ob-connector">→</div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num" style="background:rgba(206,34,50,.12);color:var(--zoho-red)">3</div>
+      <h4>Team Invite</h4>
+      <p>Role-based team invitation flow with pre-set permission templates (Admin, Sales Rep, Manager) preventing complex permission setup from blocking early adoption.</p>
+      <div class="ob-connector">→</div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num" style="background:rgba(255,224,4,.3);color:#7a6900">4</div>
+      <h4>First Pipeline</h4>
+      <p>Interactive pipeline builder with drag-and-drop stage creation. Sample deal cards populate the view immediately, giving users a spatial understanding of CRM's core value.</p>
+      <div class="ob-connector">→</div>
+    </div>
+    <div class="ob-step">
+      <div class="ob-step-num" style="background:rgba(120,80,200,.12);color:#7850C8">5</div>
+      <h4>Dashboard Tour</h4>
+      <p>Tooltip-driven product tour (powered by Zoho's in-house overlay system) highlights 5 key UI areas — dismissible, re-accessible from Help menu, and skippable for experienced users.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:18px">Empty State Design Patterns</h3>
+  <div class="empty-state-grid">
+    <div class="empty-state-card">
+      <div class="es-illustration" style="background:rgba(9,116,176,.1)">📋</div>
+      <h4>No Deals Yet</h4>
+      <p>CRM pipeline empty state includes an icon, friendly headline, one-sentence explanation, and a direct "Add Your First Deal" CTA button — converting an empty screen into a guided action.</p>
+      <span class="es-cta">+ Add First Deal</span>
+    </div>
+    <div class="empty-state-card">
+      <div class="es-illustration" style="background:rgba(33,158,74,.1)">📊</div>
+      <h4>No Reports Created</h4>
+      <p>Zoho Analytics shows a template gallery in the empty state — turning zero-data screens into discovery moments that showcase product depth before users invest in customisation.</p>
+      <span class="es-cta">Browse Templates</span>
+    </div>
+    <div class="empty-state-card">
+      <div class="es-illustration" style="background:rgba(206,34,50,.1)">🎫</div>
+      <h4>No Tickets (Desk)</h4>
+      <p>Zoho Desk's empty support queue shows a celebratory "All clear!" message with a positive illustration — reframing zero tickets as a success state rather than a setup failure.</p>
+      <span class="es-cta">Set Up Channels</span>
+    </div>
+    <div class="empty-state-card">
+      <div class="es-illustration" style="background:rgba(255,224,4,.25)">📦</div>
+      <h4>No Products (Inventory)</h4>
+      <p>Older products like Zoho Inventory still show minimal text-only empty states — a UX gap that creates a cold-start problem for new users who lack visual context for what actions to take next.</p>
+      <span class="es-cta" style="background:rgba(206,34,50,.1);color:var(--zoho-red)">Needs Update</span>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-icon blue">🎯</div>
+      <h3>Setup Checklist Pattern</h3>
+      <p>Zoho CRM and Zoho Desk use a persistent setup checklist in the dashboard for new accounts — a numbered list of configuration tasks (connect email, add users, set pipeline stages) with progress indicators. This pattern is proven to increase activation rates by giving users a concrete to-do list rather than an open-ended interface.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">💡</div>
+      <h3>Contextual Sample Data</h3>
+      <p>Rather than forcing users to add real data immediately, Zoho CRM populates new accounts with optional sample data (fictional contacts, sample deals, demo reports). This lets users explore and understand the UI within a realistic context before committing their actual data — dramatically reducing time-to-value for new users.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 13. DASHBOARD & DATA VIZ -->
+<section class="section" id="dataviz">
+  <div class="section-label">Section 13</div>
+  <h2 class="section-title">Dashboard & Data Visualisation Design</h2>
+  <p class="section-intro">Zoho Analytics is the centrepiece of Zoho's data visualisation story, but dashboards appear across CRM, Books, Desk, and Inventory. The design challenge is creating charts that communicate data clearly under high information density — a problem Zoho solves with a well-considered visual encoding system and interactive drill-down patterns.</p>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value">$2.4M</div>
+      <div class="kpi-delta up">↑ 18.3% vs last quarter</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Active Deals</div>
+      <div class="kpi-value">847</div>
+      <div class="kpi-delta up">↑ 42 this week</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Win Rate</div>
+      <div class="kpi-value">34%</div>
+      <div class="kpi-delta down">↓ 2.1% vs target</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg. Deal Size</div>
+      <div class="kpi-value">$8.2K</div>
+      <div class="kpi-delta up">↑ 5.7% vs last month</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Open Tickets</div>
+      <div class="kpi-value">128</div>
+      <div class="kpi-delta down">↓ needs attention</div>
+    </div>
+  </div>
+
+  <!-- Bar Chart Demo -->
+  <div class="two-col" style="margin-bottom:40px">
+    <div class="chart-demo">
+      <div class="chart-title-row">
+        <h4>Monthly Revenue by Channel</h4>
+        <div class="chart-filters">
+          <button class="chart-filter-btn active">Q1</button>
+          <button class="chart-filter-btn">Q2</button>
+          <button class="chart-filter-btn">YTD</button>
+        </div>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-wrap">
+          <div class="bar" style="height:60%;background:#0974B0;"><span class="bar-val">$320K</span><span class="bar-label">Jan</span></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="height:80%;background:#0974B0;"><span class="bar-val">$410K</span><span class="bar-label">Feb</span></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="height:95%;background:#0974B0;"><span class="bar-val">$490K</span><span class="bar-label">Mar</span></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="height:50%;background:#219E4A;"><span class="bar-val">$260K</span><span class="bar-label">Jan</span></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="height:65%;background:#219E4A;"><span class="bar-val">$340K</span><span class="bar-label">Feb</span></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar" style="height:72%;background:#219E4A;"><span class="bar-val">$380K</span><span class="bar-label">Mar</span></div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#0974B0"></div>Direct Sales</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#219E4A"></div>Partner Channel</div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px">Data Viz Design Principles</h3>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon blue">🎨</div>
+        <h3>Purposeful Colour Encoding</h3>
+        <p>Zoho Analytics uses the four brand colours as the primary data series palette — blue for primary series, green for secondary, red for alerts/negatives, yellow for highlights. This encoding is consistent across chart types, reducing the cognitive load of reading new chart configurations.</p>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon green">🔍</div>
+        <h3>Interactive Drill-Down</h3>
+        <p>Charts in Zoho Analytics support click-to-drill — clicking a bar opens a subordinate view filtered to that data slice. This progressive disclosure pattern keeps the top-level view clean while making granular exploration one click away, rather than requiring pre-configured sub-reports.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon yellow">📐</div>
+        <h3>Chart Type Recommendations</h3>
+        <p>Zoho Analytics' "Ask Zia" feature recommends appropriate chart types based on the selected data dimensions — automatically suggesting bar charts for comparisons, line charts for trends, and scatter plots for correlations. This reduces data visualisation mistakes by non-analyst users.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Accessibility in Data Viz:</strong> Zoho Analytics' default colour palette presents a challenge for colour-blind users — particularly the red/green pairing used for positive/negative deltas. Best practice recommends pattern fills (hatching) or shape differentiation as supplementary encodings, an area Zoho has yet to address systematically in its charting engine.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 14. FORM UX -->
+<section class="section" id="formux">
+  <div class="section-label">Section 14</div>
+  <h2 class="section-title">Form UX Deep Dive</h2>
+  <p class="section-intro">Forms are the primary data-capture mechanism across Zoho's ecosystem — from CRM lead entry and Zoho Books invoice creation to Zoho Forms public-facing data collection. The quality of form UX directly impacts data quality, task completion rates, and user frustration. Zoho's form design has several excellent patterns and a few persistent weaknesses.</p>
+
+  <div class="two-col">
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:14px">Zoho Forms — Annotated Live Demo</h3>
+      <div class="form-demo">
+        <div class="form-demo-header">
+          <span style="color:rgba(255,255,255,.6);font-size:12px">Step 2 of 3 — Company Details</span>
+          <div class="form-progress-bar">
+            <div class="form-progress-fill" style="width:66%"></div>
+          </div>
+          <span class="form-step-label">66%</span>
+        </div>
+        <div class="form-body">
+          <div class="form-two-col">
+            <div class="form-row">
+              <label class="form-label">First Name <span>*</span></label>
+              <input class="form-input success" type="text" value="Arjun" readonly>
+              <div class="form-hint success-msg">✓ Looks good</div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Last Name <span>*</span></label>
+              <input class="form-input success" type="text" value="Sharma" readonly>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Business Email <span>*</span></label>
+            <input class="form-input error" type="email" value="arjun@company" readonly>
+            <div class="form-hint error-msg">⚠ Please enter a valid email address (e.g. name@company.com)</div>
+          </div>
+          <div class="form-two-col">
+            <div class="form-row">
+              <label class="form-label">Industry</label>
+              <select class="form-select">
+                <option>Technology</option>
+                <option>Finance</option>
+                <option>Healthcare</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Company Size</label>
+              <select class="form-select">
+                <option>1–10</option>
+                <option selected>11–50</option>
+                <option>51–200</option>
+                <option>200+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">How did you hear about us?</label>
+            <input class="form-input" type="text" placeholder="e.g. Google, colleague, LinkedIn…">
+            <div class="form-hint neutral">Optional — helps us improve our reach</div>
+          </div>
+          <div class="form-actions">
+            <button class="form-btn ghost">← Back</button>
+            <button class="form-btn primary">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px">Form UX Patterns Analysis</h3>
+      <div class="a11y-checks">
+        <div class="a11y-item">
+          <div class="a11y-badge pass">✓</div>
+          <div>
+            <h4>Label-Above-Field Layout</h4>
+            <p>Zoho Forms and CRM's newer interfaces place labels above input fields — the pattern proven to have the highest scan and completion rates compared to placeholder-only or inline-left labels, particularly for mobile users and screen reader users.</p>
+          </div>
+        </div>
+        <div class="a11y-item">
+          <div class="a11y-badge pass">✓</div>
+          <div>
+            <h4>Inline Validation on Blur</h4>
+            <p>Error messages appear when the user leaves a field (blur event), not on submit — reducing the frustration of completing a long form only to find multiple errors at the end. Success states (green borders, checkmarks) provide positive reinforcement alongside error states.</p>
+          </div>
+        </div>
+        <div class="a11y-item">
+          <div class="a11y-badge pass">✓</div>
+          <div>
+            <h4>Multi-Step Progress Indication</h4>
+            <p>Zoho Forms' multi-step forms display a progress bar and "Step X of Y" label — anchoring users within the form flow and reducing abandonment caused by uncertainty about remaining effort.</p>
+          </div>
+        </div>
+        <div class="a11y-item">
+          <div class="a11y-badge warn">⚠</div>
+          <div>
+            <h4>Placeholder Text Overuse</h4>
+            <p>Several Zoho product forms — particularly in Zoho Books and Zoho Inventory — use placeholder text as the sole field label, a pattern that fails accessibility standards (placeholders disappear on input) and confuses users who need to re-check what a field is asking for mid-entry.</p>
+          </div>
+        </div>
+        <div class="a11y-item">
+          <div class="a11y-badge pass">✓</div>
+          <div>
+            <h4>Conditional Logic UI (Zoho Forms)</h4>
+            <p>Zoho Forms supports conditional field visibility — showing or hiding fields based on previous answers — reducing form length for each user segment. The visual logic builder uses if/then rule cards that non-technical form creators can configure without code.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 15. MOBILE APP UI -->
+<section class="section" id="mobileapp">
+  <div class="section-label">Section 15</div>
+  <h2 class="section-title">Mobile App UI vs Web UI</h2>
+  <p class="section-intro">Zoho's mobile apps (iOS & Android) serve the same product suite as the web — but the quality of native adaptation varies significantly. Flagship apps like Zoho CRM Mobile and Zoho Desk are purpose-built for touch, while others feel like scaled-down web views. This section compares mobile-specific UI decisions against web counterparts.</p>
+
+  <div class="two-col" style="align-items:center;margin-bottom:40px">
+    <!-- Phone mockup -->
+    <div style="display:flex;justify-content:center">
+      <div class="phone-frame">
+        <div class="phone-notch"><div class="phone-pill"></div></div>
+        <div class="phone-status"><span>9:41</span><span>●●●○ WiFi 🔋</span></div>
+        <div class="phone-nav-bar">
+          <span style="font-size:16px">☰</span>
+          <span class="phone-nav-title">My Deals</span>
+          <div class="phone-nav-icon">🔍</div>
+          <div class="phone-nav-icon">＋</div>
+        </div>
+        <div class="phone-body">
+          <div class="phone-search">
+            <span class="phone-search-icon">🔍</span>
+            <span class="phone-search-text">Search contacts, deals…</span>
+          </div>
+          <!-- Deal Cards -->
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-avatar" style="background:linear-gradient(135deg,#0974B0,#219E4A)"></div>
+              <div>
+                <div class="phone-card-name">Acme Corp — Enterprise Plan</div>
+                <div class="phone-card-sub">Sarah Mitchell · Negotiation Stage</div>
+              </div>
+            </div>
+            <div class="phone-card-meta">
+              <span class="phone-tag hot">🔥 Hot</span>
+              <span class="phone-amount">$48,000</span>
+            </div>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-avatar" style="background:linear-gradient(135deg,#CE2232,#FFE004)"></div>
+              <div>
+                <div class="phone-card-name">Globex Ltd — CRM Bundle</div>
+                <div class="phone-card-sub">Tom Hanson · Proposal Sent</div>
+              </div>
+            </div>
+            <div class="phone-card-meta">
+              <span class="phone-tag warm">⚡ Warm</span>
+              <span class="phone-amount">$22,500</span>
+            </div>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-avatar" style="background:linear-gradient(135deg,#5A5A72,#1A1A2E)"></div>
+              <div>
+                <div class="phone-card-name">Initech — Starter Pack</div>
+                <div class="phone-card-sub">Priya Nair · Qualified</div>
+              </div>
+            </div>
+            <div class="phone-card-meta">
+              <span class="phone-tag cold">❄ Cold</span>
+              <span class="phone-amount">$6,200</span>
+            </div>
+          </div>
+        </div>
+        <div class="phone-bottom-nav">
+          <div class="phone-tab active">
+            <div class="phone-tab-icon">🏠</div>
+            <div class="phone-tab-label">Home</div>
+          </div>
+          <div class="phone-tab">
+            <div class="phone-tab-icon">👤</div>
+            <div class="phone-tab-label">Contacts</div>
+          </div>
+          <div class="phone-tab">
+            <div class="phone-tab-icon">💼</div>
+            <div class="phone-tab-label">Deals</div>
+          </div>
+          <div class="phone-tab">
+            <div class="phone-tab-icon">📊</div>
+            <div class="phone-tab-label">Reports</div>
+          </div>
+          <div class="phone-tab">
+            <div class="phone-tab-icon">⚙️</div>
+            <div class="phone-tab-label">More</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px">Mobile-Specific Design Adaptations</h3>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon blue">👆</div>
+        <h3>Touch-First Interaction Model</h3>
+        <p>Zoho CRM Mobile replaces the web's left-rail navigation with a bottom tab bar — placing the 5 most-used modules within thumb reach. Swipe gestures on deal cards trigger quick actions (call, email, log activity) without entering the detail view, cutting task time on mobile significantly.</p>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-icon green">📴</div>
+        <h3>Offline-First Architecture</h3>
+        <p>Zoho CRM Mobile syncs contact and deal data locally for offline access — field sales reps can view and add notes during client visits without network access. The UI surfaces sync status badges on records to indicate freshness — a critical mobile-specific affordance absent from the web version.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon red">📷</div>
+        <h3>Device-Native Feature Integration</h3>
+        <p>The Zoho CRM Card Scanner (business card OCR) and Zoho Books expense receipt capture use the device camera natively — creating mobile-exclusive workflows with no web equivalent. These integrations represent genuine mobile-first UX thinking rather than feature parity with web.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.05rem;font-weight:600;margin-bottom:16px">Mobile vs Web UX — Feature Comparison</h3>
+  <div style="overflow-x:auto">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>UI Feature</th>
+          <th>Web (Desktop)</th>
+          <th>Mobile App</th>
+          <th>Assessment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Primary Navigation</strong></td>
+          <td>Left rail / Mega-menu</td>
+          <td>Bottom tab bar (5 items)</td>
+          <td><span class="check">✓</span> Mobile is better — thumb-accessible</td>
+        </tr>
+        <tr>
+          <td><strong>Data Tables / Lists</strong></td>
+          <td>Full column grid, sortable</td>
+          <td>Card-based list view</td>
+          <td><span class="check">✓</span> Appropriate adaptation per device</td>
+        </tr>
+        <tr>
+          <td><strong>Report Builder</strong></td>
+          <td>Full drag-and-drop builder</td>
+          <td>View-only reports, no builder</td>
+          <td><span class="cross">✗</span> Mobile severely limited — creation web-only</td>
+        </tr>
+        <tr>
+          <td><strong>Dark Mode</strong></td>
+          <td>Select products only</td>
+          <td>System-synced in CRM app</td>
+          <td><span class="partial">~</span> Mobile ahead of web here</td>
+        </tr>
+        <tr>
+          <td><strong>Offline Access</strong></td>
+          <td>Not available</td>
+          <td>CRM, Notebook support offline</td>
+          <td><span class="check">✓</span> Mobile-exclusive feature</td>
+        </tr>
+        <tr>
+          <td><strong>Form Creation</strong></td>
+          <td>Full drag-and-drop builder</td>
+          <td>Not available</td>
+          <td><span class="cross">✗</span> Significant capability gap</td>
+        </tr>
+        <tr>
+          <td><strong>Business Card Scan</strong></td>
+          <td>Manual entry only</td>
+          <td>OCR camera integration</td>
+          <td><span class="check">✓</span> Mobile-native innovation</td>
+        </tr>
+        <tr>
+          <td><strong>Automation Builder</strong></td>
+          <td>Full workflow editor</td>
+          <td>View/trigger only</td>
+          <td><span class="partial">~</span> Power features remain web-first</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout" style="margin-top:30px">
+    <strong>Key Takeaway:</strong> Zoho's mobile apps are best understood as <em>companion apps</em> rather than full product equivalents. They excel at real-time data access, field activities (calls, notes, expense capture), and notifications — but complex configuration, reporting, and automation remain desktop-first experiences. This is a pragmatic and defensible product strategy given the complexity of the underlying products, though it creates friction for mobile-primary users in developing markets.
+  </div>
+</section>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ CONCLUSION -->
+<section class="conclusion">
+  <div class="conclusion-grid">
+    <div>
+      <h2>Final Assessment &<br>Recommendations</h2>
+      <p>Zoho's web UI represents one of the most ambitious design challenges in the SaaS industry — a single coherent visual language stretched across 55+ products serving 100M+ users. The core design system is solid, professional, and purposeful. The four-colour brand palette, Proxima Nova typography, 8pt spacing grid, and mega-menu navigation collectively create a trustworthy and recognisable identity.</p>
+      <br>
+      <p style="color:rgba(255,255,255,.5)">The primary area demanding strategic investment is cross-product design consistency — particularly in data table patterns, accessibility coverage, and the visual modernisation of legacy products. A publicly documented Zoho Design System would serve as both a product engineering tool and a brand trust signal for enterprise buyers.</p>
+    </div>
+    <div>
+      <h3 style="font-size:1rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:20px">Priority Recommendations</h3>
+      <ul class="rec-list">
+        <li><div class="rec-num">1</div>Publish a unified Zoho Design System with documented component tokens, usage guidelines, and code references — enabling all 55+ product teams to self-serve consistent UI.</li>
+        <li><div class="rec-num">2</div>Implement system-wide dark mode via CSS Custom Property theming — applicable across all products through a single token layer switch.</li>
+        <li><div class="rec-num">3</div>Extend WCAG 2.2 AA certification roadmap to all products, prioritising those with enterprise customer bases where compliance is a procurement requirement.</li>
+        <li><div class="rec-num">4</div>Standardise data table UX — sorting, filtering, pagination, bulk actions — across Books, Inventory, Analytics, and CRM to reduce the learning curve for multi-product users.</li>
+        <li><div class="rec-num">5</div>Adopt skeleton loading screens system-wide to improve perceived performance on data-heavy dashboards without requiring actual speed improvements.</li>
+        <li><div class="rec-num">6</div>Invest in native mobile app UX to deliver platform-appropriate interaction patterns (iOS/Android) rather than web-viewport adaptations on small screens.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Zoho UI Case Study · Prepared February 2026 · Analysis covers zoho.com and key product interfaces including Zoho CRM, Zoho Books, Zoho Desk, Zoho Forms, Zoho Analytics, and Zoho One.</p>
+  <p style="margin-top:6px">This document is an independent UI/UX analysis. Zoho, Zoho One, and all product names are trademarks of Zoho Corporation Pvt. Ltd.</p>
+</footer>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoho · canvas & workflow · deep UX case study</title>
+  <!-- fresh, minimal, modern design system — far from conventional case study styling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- minimal, airy, research‑grade design ---------- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #F3F5F9;
+      font-family: 'Instrument Sans', sans-serif;
+      color: #17212D;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    /* ---------- design tokens — zoho inspired but fresh ---------- */
+    :root {
+      --bg-main: #F3F5F9;
+      --bg-panel: #FFFFFF;
+      --bg-subtle: #ECEEF2;
+      --accent-red: #DA2A3A;
+      --accent-green: #1B8C4A;
+      --accent-blue: #0968B0;
+      --accent-gold: #F2C94C;
+      --text-primary: #141F2F;
+      --text-secondary: #4A5A72;
+      --text-tertiary: #7C889E;
+      --border-light: #DCE2EA;
+      --border-strong: #BCC4D4;
+      --card-shadow: 0 10px 25px -10px rgba(0,0,0,0.08);
+      --card-shadow-hover: 0 20px 35px -12px rgba(9,104,176,0.12);
+      --grid-size: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 26px;
+    }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 5vw;
+    }
+
+    /* ---------- typography — clean, spacious ---------- */
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    h1 { font-size: clamp(2.8rem, 6vw, 4.2rem); font-weight: 700; }
+    h2 { font-size: 2.2rem; margin-bottom: 1rem; font-weight: 600; letter-spacing: -0.02em; }
+    h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .label-lg {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-blue);
+    }
+
+    /* ---------- hero — minimal, with drag&drop abstraction ---------- */
+    .hero {
+      background-color: var(--bg-panel);
+      padding: 4rem 5vw 5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .hero-tagline {
+      display: inline-block;
+      background: rgba(9,104,176,0.08);
+      border-radius: 60px;
+      padding: 0.25rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-bottom: 1.5rem;
+    }
+    .hero p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 540px;
+      margin: 1.5rem 0 2rem;
+    }
+    /* canvas mini representation */
+    .hero-canvas {
+      background: #F1F4FA;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--card-shadow);
+    }
+    .canvas-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .canvas-node {
+      background: white;
+      border: 1px solid var(--border-light);
+      border-radius: 30px;
+      padding: 0.7rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .canvas-node.blue { border-left: 4px solid var(--accent-blue); }
+    .canvas-node.green { border-left: 4px solid var(--accent-green); }
+    .canvas-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--text-tertiary);
+      font-size: 1.2rem;
+    }
+    .stats-mini {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.8rem;
+    }
+    .stat-item .stat-num {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .stat-item .stat-label {
+      color: var(--text-tertiary);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    /* ---------- sticky nav — minimal, border only ---------- */
+    .nav {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 100;
+    }
+    .nav-inner {
+      display: flex;
+      gap: 0.2rem;
+      overflow-x: auto;
+      padding: 0 5vw;
+      align-items: center;
+      height: 56px;
+      scrollbar-width: none;
+    }
+    .nav-inner a {
+      flex-shrink: 0;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+      transition: all 0.1s;
+    }
+    .nav-inner a:hover {
+      background: var(--bg-subtle);
+      color: var(--accent-blue);
+    }
+
+    /* ---------- section structure ---------- */
+    .section {
+      padding: 5rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .section:last-of-type { border-bottom: none; }
+    .section-header {
+      max-width: 700px;
+      margin-bottom: 3rem;
+    }
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    /* ---------- cards — extremely light, border only ---------- */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.8rem;
+    }
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      transition: all 0.2s;
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--card-shadow-hover);
+    }
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- tables for consistency audit ---------- */
+    .table-wrapper {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #F0F3F9;
+      font-weight: 600;
+      padding: 1rem 1.2rem;
+      text-align: left;
+      color: var(--text-primary);
+    }
+    td {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(27,140,74,0.1);
+      color: var(--accent-green);
+      border-radius: 40px;
+      padding: 0.2rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge.warning {
+      background: rgba(218,42,58,0.1);
+      color: var(--accent-red);
+    }
+    .badge.neutral {
+      background: rgba(9,104,176,0.08);
+      color: var(--accent-blue);
+    }
+
+    /* ---------- swot grid — fresh ---------- */
+    .swot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border-light);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .swot-item {
+      background: white;
+      padding: 2rem;
+    }
+    .swot-item h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .swot-item ul {
+      list-style: none;
+    }
+    .swot-item li {
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+      font-size: 0.9rem;
+      padding-left: 1.4rem;
+      position: relative;
+    }
+    .swot-item li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--text-tertiary);
+    }
+
+    /* ---------- footer minimal ---------- */
+    .footer {
+      background: #E9ECF2;
+      padding: 3rem 5vw;
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 800px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .swot { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO — drag&drop canvas preview, research vibe -->
+<div class="hero">
+  <div class="hero-grid container" style="max-width:1400px;">
+    <div>
+      <span class="hero-tagline">Zoho ecosystem · deep UX research</span>
+      <h1>Canvas, drag‑and‑drop<br>& visual workflow engines</h1>
+      <p>A systematic audit of interaction design across Zoho CRM, Creator, Forms, Desk & Analytics — with focus on direct manipulation, grid systems, and cross‑product consistency.</p>
+      <div class="stats-mini">
+        <div class="stat-item"><span class="stat-num">12</span> <span class="stat-label">drag contexts</span></div>
+        <div class="stat-item"><span class="stat-num">55+</span> <span class="stat-label">products</span></div>
+        <div class="stat-item"><span class="stat-num">2026</span> <span class="stat-label">analysis</span></div>
+      </div>
+    </div>
+    <div class="hero-canvas">
+      <div class="canvas-row">
+        <div class="canvas-node blue">📋 form submit</div>
+        <div class="canvas-arrow">→</div>
+        <div class="canvas-node green">✉️ send email</div>
+        <div class="canvas-arrow">→</div>
+        <div class="canvas-node blue">📝 create task</div>
+      </div>
+      <div class="canvas-row">
+        <div class="canvas-node green">📅 scheduled</div>
+        <div class="canvas-arrow">→</div>
+        <div class="canvas-node blue">🔀 condition</div>
+        <div class="canvas-arrow">→</div>
+        <div class="canvas-node green">✅ update record</div>
+      </div>
+      <div style="margin-top:1rem; font-size:0.7rem; color:var(--text-tertiary); display:flex; gap:1rem;">
+        <span>⚡️ 4‑color system</span>
+        <span>🖱️ 8pt grid</span>
+        <span>🧩 web components</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY NAV — minimal, functional -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#canvas">canvas</a>
+    <a href="#workflow">workflow</a>
+    <a href="#dragdrop">drag&drop</a>
+    <a href="#hierarchy">hierarchy</a>
+    <a href="#visual">visual</a>
+    <a href="#consistency">consistency</a>
+    <a href="#tech">tech</a>
+    <a href="#access">a11y</a>
+    <a href="#dark">dark mode</a>
+    <a href="#swot">swot</a>
+  </div>
+</nav>
+
+<main class="container">
+  <!-- 1. CANVAS-BASED UI (ZOHO CREATOR, ANALYTICS) -->
+  <section class="section" id="canvas">
+    <div class="section-header">
+      <div class="label-lg">01 · canvas systems</div>
+      <h2>Infinite canvas, visual programming</h2>
+      <p>Zoho Creator, Forms, and Analytics all rely on canvas metaphors with pan, zoom, and snap‑to‑grid. We analysed node‑link diagrams, toolbar density, and scalability.</p>
+    </div>
+    <div class="grid-2col">
+      <div class="card">
+        <div class="card-icon">🖼️</div>
+        <h3>pan & zoom</h3>
+        <p>Creator canvas supports 20‑200% zoom with inertial pan. Grid snaps at 24px intervals. Implementation uses CSS transforms with throttle, but large workflows (>100 nodes) show frame drops.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <h3>node types</h3>
+        <p>Trigger, action, condition, loop, delay. Each node has semantic colour (blue trigger, green action, amber condition). Consistent across CRM blueprints and Creator.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <h3>connection language</h3>
+        <p>Drag from node handle to another creates bezier curves. Valid connections light up green, invalid red. Connection routing uses orthogonal lines in newer products.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧮</div>
+        <h3>analytics canvas</h3>
+        <p>Data prep canvas uses node‑based transforms (filter, join, aggregate). Preview pane updates on node selection — direct manipulation done right.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. VISUAL WORKFLOW ENGINES (CRM, DESK, CREATOR) -->
+  <section class="section" id="workflow">
+    <div class="section-header">
+      <div class="label-lg">02 · workflow engines</div>
+      <h2>State machines & automation design</h2>
+      <p>Zoho CRM's Blueprint, Desk's approval maps, and Creator's workflow editor share common DNA but diverge in affordances.</p>
+    </div>
+    <div class="grid-2col">
+      <div class="card"><h3>🔷 CRM blueprint</h3><p>Stage‑based workflows with transitions guarded by rules. UI uses left palette, drop‑to‑canvas. Each stage shows pending approvals count — good visibility.</p></div>
+      <div class="card"><h3>✅ Desk approvals</h3><p>Swimlane‑style for parallel approval chains. Visual clarity degrades with >5 lanes, but hierarchy manageable.</p></div>
+      <div class="card"><h3>⚙️ Creator advanced</h3><p>Supports loops, functions, webhooks. Canvas includes minimap for navigation — essential for large automations.</p></div>
+      <div class="card"><h3>📊 analytics workflow</h3><p>Data pipelines as DAG. Users can pause at any node to preview data — strong feedback.</p></div>
+    </div>
+  </section>
+
+  <!-- 3. DRAG-AND-DROP DEEP DIVE -->
+  <section class="section" id="dragdrop">
+    <div class="section-header">
+      <div class="label-lg">03 · drag‑and‑drop interaction</div>
+      <h2>Kanban, form builder, columns</h2>
+      <p>At least 12 distinct drag contexts in Zoho products. We catalogued feedback patterns and inconsistencies.</p>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <tr><th>context</th><th>drag affordance</th><th>drop target feedback</th><th>consistency</th></tr>
+        <tr><td>kanban (CRM)</td><td>card shrinks + shadow</td><td>column border blue</td><td><span class="badge">good</span></td></tr>
+        <tr><td>form builder (Creator)</td><td>ghost element, 0.6 opacity</td><td>green insertion line</td><td><span class="badge">good</span></td></tr>
+        <tr><td>dashboard widget</td><td>semi‑transparent clone</td><td>cell highlight</td><td><span class="badge neutral">grid snap</span></td></tr>
+        <tr><td>list columns (Desk)</td><td>drag handle only (⋮⋮)</td><td>row move indicator</td><td><span class="badge warning">mixed</span></td></tr>
+        <tr><td>file upload (Mail)</td><td>no ghost, native OS</td><td>dashed zone</td><td><span class="badge warning">native</span></td></tr>
+      </table>
+    </div>
+    <p style="margin-top:1.5rem; color:var(--text-secondary);">Most modern Zoho apps use <code>setDragImage</code> with custom ghost; older products rely on mouse events. Long‑press for touch supported in mobile apps.</p>
+  </section>
+
+  <!-- 4. INFORMATION HIERARCHY -->
+  <section class="section" id="hierarchy">
+    <div class="section-header">
+      <div class="label-lg">04 · hierarchy & weight</div>
+      <h2>Size, colour, spacing</h2>
+      <p>Zoho uses a consistent scale across products — derived from 8pt grid and four brand colours.</p>
+    </div>
+    <div style="background:white; border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:2rem;">
+      <div style="display:flex; flex-wrap:wrap; gap:2.5rem; align-items:baseline;">
+        <div><span style="font-size:2.2rem; font-weight:700;">H0</span> <span style="color:var(--text-tertiary);">2.2rem</span></div>
+        <div><span style="font-size:1.8rem; font-weight:600;">H1</span> <span style="color:var(--text-tertiary);">1.8rem</span></div>
+        <div><span style="font-size:1.3rem; font-weight:600;">H2</span> <span style="color:var(--text-tertiary);">1.3rem</span></div>
+        <div><span style="font-size:1rem; font-weight:500;">body</span> <span style="color:var(--text-tertiary);">1rem</span></div>
+        <div><span style="font-size:0.7rem; font-weight:600; text-transform:uppercase;">label</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. VISUAL LANGUAGE -->
+  <section class="section" id="visual">
+    <div class="section-header">
+      <div class="label-lg">05 · visual system</div>
+      <h2>Four colours extended</h2>
+    </div>
+    <div style="display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:2rem;">
+      <div style="background:#DA2A3A; width:100px; height:100px; border-radius:16px; display:flex; align-items:end; padding:8px; color:white;">red</div>
+      <div style="background:#1B8C4A; width:100px; height:100px; border-radius:16px; display:flex; align-items:end; padding:8px; color:white;">green</div>
+      <div style="background:#0968B0; width:100px; height:100px; border-radius:16px; display:flex; align-items:end; padding:8px; color:white;">blue</div>
+      <div style="background:#F2C94C; width:100px; height:100px; border-radius:16px; display:flex; align-items:end; padding:8px; color:#141F2F;">gold</div>
+    </div>
+    <p>Products use these primaries, but also generate tints for surfaces. Analytics adds diverging palettes (green‑red) which sometimes miss contrast ratios.</p>
+  </section>
+
+  <!-- 6. CROSS-PRODUCT CONSISTENCY -->
+  <section class="section" id="consistency">
+    <div class="section-header">
+      <div class="label-lg">06 · consistency audit</div>
+      <h2>55+ products, one family?</h2>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <tr><th>component</th><th>CRM</th><th>Books</th><th>Creator</th><th>Desk</th><th>rating</th></tr>
+        <tr><td>primary button</td><td>blue fill, 8px radius</td><td>blue fill, 6px radius</td><td>blue fill, 8px radius</td><td>green fill</td><td class="badge warning">medium</td></tr>
+        <tr><td>icon set</td><td>feather‑like</td><td>legacy font icons</td><td>custom outline</td><td>feather</td><td class="badge warning">mixed</td></tr>
+        <tr><td>form label</td><td>top (new), left (old)</td><td>left</td><td>top</td><td>top</td><td class="badge neutral">evolving</td></tr>
+        <tr><td>drag handle</td><td>⋮⋮ 6 dots</td><td>⠿</td><td>⠿⠿</td><td>⋮⋮</td><td class="badge warning">fragmented</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 7. TECHNOLOGY STACK -->
+  <section class="section" id="tech">
+    <div class="section-header">
+      <div class="label-lg">07 · front‑end stack</div>
+      <h2>Proprietary core, modern layers</h2>
+    </div>
+    <div class="grid-2col">
+      <div class="card"><h3>⚛️ ZUI framework</h3><p>In‑house MVC, custom virtual DOM. Gives full control but slower to adopt new patterns.</p></div>
+      <div class="card"><h3>🎨 CSS custom properties</h3><p>Design tokens now exposed as <code>--accent-blue</code>, used across newer products — dark mode ready.</p></div>
+      <div class="card"><h3>🧩 Web Components (Creator)</h3><p>Third‑party widgets isolated via Shadow DOM, safe inside canvas.</p></div>
+      <div class="card"><h3>📐 12‑col grid</h3><p>Implemented with <code>display:grid</code> and <code>gap</code> — consistent across products.</p></div>
+    </div>
+  </section>
+
+  <!-- 8. ACCESSIBILITY -->
+  <section class="section" id="access">
+    <div class="section-header">
+      <div class="label-lg">08 · accessibility</div>
+      <h2>WCAG 2.2 partial coverage</h2>
+      <p>Zoho CRM, Forms, Desk have VPATs; others lag. Drag‑and‑drop keyboard alternatives exist but focus management incomplete.</p>
+    </div>
+    <div class="grid-2col">
+      <div class="card"><h3>✓ screen reader</h3><p>Forms have ARIA live regions; canvas nodes announce role, but connection status not always read.</p></div>
+      <div class="card"><h3>⚠ keyboard</h3><p>In CRM blueprint, nodes can be moved via arrow keys (with modifier), but discovery is low.</p></div>
+      <div class="card"><h3>⚡ colour contrast</h3><p>Primary colours meet 4.5:1, but some data viz (Analytics) uses green/red that fail for deuteranopia.</p></div>
+      <div class="card"><h3>📱 touch</h3><p>Long‑press simulates drag on mobile apps; haptic feedback added in 2025.</p></div>
+    </div>
+  </section>
+
+  <!-- 9. DARK MODE -->
+  <section class="section" id="dark">
+    <div class="section-header">
+      <div class="label-lg">09 · dark mode</div>
+      <h2>Partial, mostly Analytics</h2>
+    </div>
+    <p>Zoho Analytics has a glass‑dark UI; Writer dark editor; others light. CSS vars ready, but product‑by‑product rollout continues. System‑sync not yet implemented.</p>
+  </section>
+
+  <!-- 10. SWOT -->
+  <section class="section" id="swot">
+    <div class="section-header">
+      <div class="label-lg">10 · synthesis</div>
+      <h2>strengths · weaknesses · opportunities · threats</h2>
+    </div>
+    <div class="swot">
+      <div class="swot-item"><h4>✓ strengths</h4><ul><li>unified 4‑color identity</li><li>canvas depth (zoom/pan)</li><li>creator low‑code adoption</li></ul></div>
+      <div class="swot-item"><h4>⚠ weaknesses</h4><ul><li>cross‑product inconsistency</li><li>keyboard a11y gaps</li><li>legacy icon debt</li></ul></div>
+      <div class="swot-item"><h4>🚀 opportunities</h4><ul><li>system‑wide dark mode</li><li>web components everywhere</li><li>AI‑powered workflow suggestions</li></ul></div>
+      <div class="swot-item"><h4>⚡ threats</h4><ul><li>competitors' mature design systems</li><li>enterprise a11y requirements</li></ul></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Zoho UI/UX deep research · independent analysis · reference to Zoho™ products for educational case study</p>
+  <p style="margin-top:0.5rem;">canvas · drag‑and‑drop · workflow engines · 2026</p>
+</footer>
+
+</body>
+</html>

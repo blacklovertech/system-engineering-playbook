@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayPay — UI/UX Design Evolution · Case Study 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#FF0033;--red-d:#C8002A;--red-s:#FF3355;--red-p:#FFF0F3;
+  --ink:#0D0D0D;--slate:#3A3A4A;--muted:#7A7A8A;--stone:#BDBDCD;
+  --cloud:#F5F5F8;--white:#FFFFFF;
+  --border:rgba(0,0,0,0.08);--bdark:rgba(255,255,255,0.08);
+  --sha:0 2px 12px rgba(0,0,0,0.06);--shb:0 8px 32px rgba(0,0,0,0.10);
+  --shr:0 8px 32px rgba(255,0,51,0.18);
+  --r8:8px;--r16:16px;--r24:24px;--r32:32px;
+  --jp:'Noto Sans JP',sans-serif;
+  --se:'Noto Serif JP',serif;
+  --mo:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--jp);background:var(--white);color:var(--ink);overflow-x:hidden;line-height:1.7;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+/* PROGRESS */
+#pg{position:fixed;top:0;left:0;height:3px;z-index:9999;background:linear-gradient(90deg,var(--red),#FF6060);width:0;transition:width .12s linear;box-shadow:0 0 8px rgba(255,0,51,.5)}
+
+/* NAV */
+nav{top:3px;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border)}
+.nb{display:flex;align-items:center;gap:12px}
+.nl{width:34px;height:34px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.nl svg{width:20px;height:20px;fill:white}
+.nbr{font-family:var(--jp);font-weight:900;font-size:.95rem;letter-spacing:-.01em}
+.nbr span{color:var(--red)}
+.sep{width:1px;height:18px;background:var(--border);margin:0 2px}
+.ns{font-size:.68rem;color:var(--muted);letter-spacing:.06em}
+.nr{display:flex;align-items:center;gap:20px}
+.nli{display:flex;gap:20px;list-style:none}
+.nli a{font-size:.75rem;font-weight:500;color:var(--slate);letter-spacing:.03em;transition:color .2s}
+.nli a:hover{color:var(--red)}
+.nc{font-size:.68rem;font-weight:700;background:var(--red);color:white;padding:7px 15px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
+.nc-new{font-size:.62rem;font-weight:700;background:var(--ink);color:white;padding:5px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
+
+/* HERO */
+.hero{min-height:100vh;padding:120px 48px 80px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;overflow:hidden}
+.hbg{position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-family:var(--jp);font-weight:900;font-size:22vw;color:rgba(255,0,51,.03);line-height:1;pointer-events:none;white-space:nowrap;z-index:0;letter-spacing:-.05em}
+.hc{position:relative;z-index:1}
+.ey{display:inline-flex;align-items:center;gap:10px;font-family:var(--mo);font-size:.63rem;color:var(--red);letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px}
+.ey::after{content:'';width:20px;height:1px;background:var(--red);flex-shrink:0}
+.ey.lt{color:rgba(255,255,255,.5)}
+.ey.lt::after{background:rgba(255,255,255,.3)}
+.kana{font-family:var(--se);font-size:.88rem;color:var(--muted);margin-bottom:9px;letter-spacing:.12em}
+.hero h1{font-family:var(--jp);font-weight:900;font-size:clamp(2.5rem,4.5vw,4rem);line-height:1.05;letter-spacing:-.04em;margin-bottom:20px}
+.hero h1 .r{color:var(--red)}
+.hero h1 .bl{display:block}
+.hd{font-size:.97rem;font-weight:300;color:var(--slate);line-height:1.85;max-width:500px;margin-bottom:32px;letter-spacing:.01em}
+/* IPO BADGE */
+.ipo-badge{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:white;padding:8px 16px;border-radius:20px;font-family:var(--mo);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px}
+.ipo-dot{width:7px;height:7px;background:var(--red);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.hmeta{display:flex;border:1px solid var(--border);border-radius:var(--r16);overflow:hidden;max-width:430px}
+.hmi{flex:1;padding:14px 18px;border-right:1px solid var(--border)}
+.hmi:last-child{border-right:none}
+.hmi label{font-family:var(--mo);font-size:.56rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:block;margin-bottom:4px}
+.hmi value{font-family:var(--jp);font-weight:700;font-size:.87rem;display:block}
+.hv{position:relative;z-index:1;display:flex;justify-content:center}
+.hcard{border-radius:var(--r32);overflow:hidden;box-shadow:var(--shr),0 0 0 1px rgba(255,0,51,.1);width:100%;max-width:500px;position:relative}
+.hcard img{width:100%;display:block;background:var(--cloud)}
+.hov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(13,13,13,.9),transparent);padding:28px;color:white}
+.hov h3{font-family:var(--jp);font-weight:700;font-size:.93rem;margin-bottom:4px}
+.hov p{font-size:.73rem;color:rgba(255,255,255,.55);font-weight:300}
+.ftag{position:absolute;top:18px;right:18px;background:var(--red);color:white;font-family:var(--mo);font-size:.56rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border-radius:20px}
+
+/* LIVE DATA BANNER */
+.live-banner{background:var(--ink);padding:14px 48px;display:flex;align-items:center;gap:24px;overflow:hidden;position:relative}
+.live-banner::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+.lb-tag{font-family:var(--mo);font-size:.6rem;color:var(--red);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.lb-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 1.5s infinite}
+.lb-items{display:flex;gap:32px;flex-wrap:wrap}
+.lb-item{display:flex;flex-direction:column;gap:2px}
+.lb-num{font-family:var(--jp);font-weight:900;font-size:.95rem;color:white;line-height:1}
+.lb-lbl{font-family:var(--mo);font-size:.56rem;color:rgba(255,255,255,.38);letter-spacing:.08em;text-transform:uppercase}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)}
+.sc{padding:34px 24px;border-right:1px solid var(--border);text-align:center}
+.sc:last-child{border-right:none}
+.sn{font-family:var(--jp);font-weight:900;font-size:2rem;line-height:1;color:var(--red);display:block}
+.sl{font-family:var(--mo);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-top:6px;display:block;line-height:1.5}
+
+/* SECTIONS */
+.sec{padding:96px 48px}
+.sec.dk{background:var(--ink);color:white}
+.sec.cl{background:var(--cloud)}
+.sec.rr{background:var(--red);color:white}
+.sh{font-family:var(--jp);font-weight:900;font-size:clamp(1.9rem,3vw,2.8rem);line-height:1.1;letter-spacing:-.035em;margin-bottom:16px}
+.sh .r{color:var(--red)}
+.sh .wr{color:#FF6070}
+.sb{font-size:.93rem;font-weight:300;color:var(--slate);line-height:1.85;max-width:660px}
+.sb.lt{color:rgba(255,255,255,.5)}
+.shd{margin-bottom:52px}
+.hr{height:1px;background:var(--border);margin:0 48px}
+.hr.rf{background:linear-gradient(90deg,transparent,rgba(255,0,51,.2) 40%,rgba(255,0,51,.2) 60%,transparent)}
+
+/* ALERT BOX — IPO NEWS */
+.alert-box{background:var(--ink);border:1px solid rgba(255,0,51,.3);border-radius:var(--r16);padding:28px 32px;display:flex;gap:20px;align-items:flex-start;margin-top:32px}
+.alert-icon{width:40px;height:40px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem}
+.alert-content h4{font-family:var(--jp);font-weight:700;font-size:1rem;color:white;margin-bottom:6px}
+.alert-content p{font-size:.84rem;color:rgba(255,255,255,.5);line-height:1.75}
+.alert-content a{color:var(--red);font-family:var(--mo);font-size:.7rem}
+
+/* OVERVIEW */
+.ovg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.ovc{background:rgba(255,255,255,.04);border:1px solid var(--bdark);padding:38px 30px;transition:background .3s,border-color .3s}
+.ovc:hover{background:rgba(255,0,51,.08);border-color:rgba(255,0,51,.3)}
+.ovn{font-family:var(--mo);font-size:.58rem;color:var(--red);letter-spacing:.15em;display:block;margin-bottom:16px}
+.ovc h3{font-family:var(--jp);font-size:1.03rem;font-weight:700;color:white;margin-bottom:10px}
+.ovc p{font-size:.84rem;color:rgba(255,255,255,.42);line-height:1.8}
+
+/* TIMELINE */
+.tlw{position:relative}
+.tls{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--stone) 8%,var(--stone) 92%,transparent);transform:translateX(-50%)}
+.tli{display:grid;grid-template-columns:1fr 56px 1fr;gap:36px;align-items:start;margin-bottom:64px;position:relative}
+.tli:last-child{margin-bottom:0}
+.tlL{text-align:right;padding-top:6px}
+.tlR{padding-top:6px}
+.tln{width:56px;height:56px;border-radius:50%;background:white;border:2px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--mo);font-size:.56rem;font-weight:700;color:var(--red);flex-shrink:0;box-shadow:0 0 0 6px rgba(255,0,51,.07),var(--sha);z-index:2;position:relative}
+.tln.act{background:var(--red);color:white;border-color:var(--red)}
+.tly{font-family:var(--mo);font-size:.61rem;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.tlt{font-family:var(--jp);font-size:1.15rem;font-weight:700;margin-bottom:8px;line-height:1.3;letter-spacing:-.02em}
+.tlb{font-size:.86rem;color:var(--slate);line-height:1.82;font-weight:300;margin-bottom:11px}
+.tlp{display:inline-block;font-family:var(--mo);font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 11px;border-radius:20px;border:1px solid var(--red);color:var(--red)}
+
+/* OFFICIAL IMAGES */
+.imgf{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px}
+.ib{position:relative;overflow:hidden;background:var(--cloud)}
+.ib img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .5s;display:block}
+.ib:hover img{transform:scale(1.04)}
+.ic{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(13,13,13,.9),transparent);padding:20px 16px 12px;color:white}
+.ict{font-family:var(--mo);font-size:.54rem;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:3px}
+.icm{font-family:var(--jp);font-size:.84rem;font-weight:700}
+.ics{font-size:.62rem;color:rgba(255,255,255,.32);margin-top:2px;font-family:var(--mo)}
+.srcbar{padding:11px 18px;background:var(--cloud);display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
+.srct{font-family:var(--mo);font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.srca{font-family:var(--mo);font-size:.6rem;color:var(--red)}
+
+/* VERSION CARDS */
+.vg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:48px}
+.vc{border-radius:var(--r16);overflow:hidden;border:1px solid var(--border);background:white;transition:box-shadow .3s,transform .3s}
+.vc:hover{box-shadow:var(--shr);transform:translateY(-6px)}
+.vi{aspect-ratio:9/16;overflow:hidden;background:var(--cloud);position:relative}
+.vi img{width:100%;height:100%;object-fit:cover;object-position:top}
+.vip{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--jp);font-size:.72rem;color:var(--stone);text-align:center;padding:14px}
+.vinfo{padding:16px}
+.vd{font-family:var(--mo);font-size:.58rem;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.vname{font-family:var(--jp);font-size:.86rem;font-weight:700;margin-bottom:6px}
+.vdesc{font-size:.74rem;color:var(--muted);line-height:1.65}
+
+/* CHALLENGES */
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.chc{border:1px solid var(--border);border-radius:var(--r24);padding:36px;position:relative;overflow:hidden;background:white;transition:border-color .3s,box-shadow .3s}
+.chc:hover{border-color:var(--red);box-shadow:var(--shr)}
+.chn{position:absolute;right:18px;top:14px;font-family:var(--jp);font-size:5rem;font-weight:900;color:rgba(255,0,51,.05);line-height:1;letter-spacing:-.05em}
+.chi{width:44px;height:44px;border-radius:11px;background:var(--red-p);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:16px}
+.chc h3{font-family:var(--jp);font-size:1rem;font-weight:700;margin-bottom:9px}
+.chc p{font-size:.85rem;color:var(--slate);line-height:1.8;font-weight:300}
+.chs{margin-top:14px;padding-top:13px;border-top:1px solid var(--border);font-family:var(--mo);font-size:.6rem;color:var(--red);letter-spacing:.08em;text-transform:uppercase}
+
+/* PRINCIPLES */
+.prg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.prc{border:1px solid var(--bdark);border-radius:var(--r16);padding:32px 24px;transition:background .3s,border-color .3s}
+.prc:hover{background:rgba(255,0,51,.07);border-color:rgba(255,0,51,.25)}
+.prn{font-family:var(--mo);font-size:.56rem;color:var(--red);letter-spacing:.15em;display:block;margin-bottom:14px}
+.prc h3{font-family:var(--jp);font-size:.98rem;font-weight:700;color:white;margin-bottom:9px;line-height:1.3}
+.prc p{font-size:.83rem;color:rgba(255,255,255,.42);line-height:1.8}
+
+/* STYLE GUIDE */
+.sgg{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px}
+.sgp{border-radius:var(--r24);padding:32px}
+.sg1{background:white;border:1px solid var(--border)}
+.sg2{background:var(--ink);color:white}
+.sg3{background:var(--red);color:white}
+.sgl{font-family:var(--mo);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:18px;display:block}
+.swrow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.sw{width:40px;height:40px;border-radius:9px;flex-shrink:0}
+.swi{font-size:.64rem;color:var(--muted);margin-top:3px}
+.tph{font-family:var(--se);font-size:3rem;font-weight:700;color:white;line-height:1;letter-spacing:-.03em}
+.tps{font-size:.7rem;color:rgba(255,255,255,.36);margin-top:8px;font-family:var(--mo);line-height:1.55}
+.ci{display:flex;flex-direction:column;gap:7px;margin-top:3px}
+.cit{font-size:.8rem;display:flex;align-items:center;gap:7px;line-height:1.4}
+.cd{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);flex-shrink:0}
+
+/* BEFORE/AFTER */
+.bag{display:grid;grid-template-columns:1fr 48px 1fr;gap:24px;align-items:start}
+.bah{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.bab{font-family:var(--mo);font-size:.58rem;font-weight:700;padding:4px 11px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase}
+.bo{background:var(--cloud);color:var(--muted)}
+.bn{background:var(--red);color:white}
+.bai{padding:12px 14px;border-radius:var(--r8);font-size:.85rem;line-height:1.6;display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.bai.oi{background:var(--cloud)}
+.bai.ni{background:var(--red-p);border-left:3px solid var(--red)}
+.bd{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.bd.o{background:var(--stone)}
+.bd.n{background:var(--red)}
+.baa{display:flex;align-items:center;justify-content:center;padding-top:52px}
+.bai2{width:40px;height:40px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* OUTCOMES */
+.outg{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.outc{padding:40px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.15)}
+.outc:last-child{border-right:none}
+.outn{font-family:var(--jp);font-weight:900;font-size:2.6rem;color:white;line-height:1;display:block}
+.outl{font-size:.76rem;color:rgba(255,255,255,.62);margin-top:7px;font-weight:300;line-height:1.5}
+
+/* PROCESS */
+.procs{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+.procs::before{content:'';position:absolute;top:27px;left:calc(10% + 16px);right:calc(10% + 16px);height:1px;background:linear-gradient(90deg,var(--red),#E8A020);opacity:.22;z-index:0}
+.prst{text-align:center;padding:0 8px;position:relative;z-index:1}
+.prnw{width:54px;height:54px;border-radius:50%;background:white;border:1.5px solid var(--red);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:var(--mo);font-weight:700;font-size:.86rem;color:var(--red);box-shadow:0 4px 14px rgba(255,0,51,.12)}
+.prst h4{font-family:var(--jp);font-size:.82rem;font-weight:700;margin-bottom:6px}
+.prst p{font-size:.72rem;color:var(--muted);line-height:1.6}
+
+/* QUOTES */
+.ql{display:grid;grid-template-columns:1.4fr 1fr;gap:22px}
+.qm{background:var(--ink);border-radius:var(--r32);padding:44px}
+.qm h3{font-family:var(--jp);font-size:1.4rem;font-weight:700;color:white;line-height:1.3;margin-bottom:16px;letter-spacing:-.02em}
+.qm p{font-size:.87rem;color:rgba(255,255,255,.46);line-height:1.85;margin-bottom:11px;font-weight:300}
+.qst{display:flex;flex-direction:column;gap:13px}
+.qc{background:white;border-radius:var(--r16);padding:20px;border-left:3px solid var(--red);box-shadow:var(--sha)}
+.qt{font-family:var(--se);font-size:.85rem;color:var(--ink);line-height:1.75;font-style:italic;margin-bottom:11px}
+.qwho{display:flex;align-items:center;gap:9px}
+.qav{width:30px;height:30px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--jp);font-weight:700;font-size:.76rem;color:white;flex-shrink:0}
+.qname{font-family:var(--mo);font-size:.58rem;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.qrole{font-size:.68rem;color:var(--muted)}
+
+/* TEAM */
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tc{border:1px solid var(--border);border-radius:var(--r24);padding:32px;background:white;transition:box-shadow .3s,border-color .3s}
+.tc:hover{box-shadow:var(--shr);border-color:rgba(255,0,51,.2)}
+.tar{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.tav{width:48px;height:48px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--jp);font-weight:900;font-size:1rem;color:white;flex-shrink:0}
+.tn{font-family:var(--jp);font-weight:700;font-size:.9rem}
+.tr{font-family:var(--mo);font-size:.58rem;color:var(--red);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.tc p{font-size:.83rem;color:var(--slate);line-height:1.8;font-weight:300}
+.torg{font-family:var(--mo);font-size:.58rem;color:var(--muted);margin-top:11px;padding-top:11px;border-top:1px solid var(--border);letter-spacing:.04em}
+
+/* LESSONS */
+.ll{display:flex;flex-direction:column;gap:16px}
+.lr{display:grid;grid-template-columns:64px 1fr 1fr;gap:28px;align-items:start;background:white;border-radius:var(--r24);padding:32px;border:1px solid var(--border);transition:box-shadow .3s,border-color .3s}
+.lr:hover{box-shadow:var(--shb);border-color:rgba(255,0,51,.15)}
+.lrn{font-family:var(--jp);font-weight:900;font-size:2.5rem;color:var(--red);line-height:1;letter-spacing:-.05em}
+.lc label{font-family:var(--mo);font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);display:block;margin-bottom:6px}
+.lc h3{font-family:var(--jp);font-size:.96rem;font-weight:700;margin-bottom:6px;line-height:1.3}
+.lc p{font-size:.83rem;color:var(--slate);line-height:1.8;font-weight:300}
+
+/* REFS */
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:40px}
+.rc{border:1px solid var(--bdark);border-radius:var(--r16);padding:20px;transition:border-color .3s,background .3s}
+.rc:hover{border-color:rgba(255,0,51,.4);background:rgba(255,0,51,.06)}
+.rt{font-family:var(--mo);font-size:.54rem;color:var(--red);text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;display:block}
+.rc h4{font-family:var(--jp);font-size:.84rem;font-weight:700;color:white;margin-bottom:6px;line-height:1.4}
+.ru{font-family:var(--mo);font-size:.56rem;color:rgba(255,255,255,.22);margin-top:8px;word-break:break-all}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid rgba(255,255,255,.06);padding:48px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:end}
+.fl .flogo{font-family:var(--jp);font-weight:900;font-size:1.1rem;color:white;margin-bottom:8px}
+.fl .flogo span{color:var(--red)}
+.fl p{font-size:.74rem;color:rgba(255,255,255,.26);max-width:400px;line-height:1.7;font-weight:300}
+.fr{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.flinks{display:flex;gap:20px}
+.flinks a{font-size:.7rem;color:rgba(255,255,255,.3);transition:color .2s;font-family:var(--mo);letter-spacing:.04em}
+.flinks a:hover{color:var(--red)}
+.fcopy{font-family:var(--mo);font-size:.58rem;color:rgba(255,255,255,.17);letter-spacing:.08em}
+
+/* FADE */
+.fade{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.fade.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .hero,.bag,.ql,.sgg{grid-template-columns:1fr}
+  .stats,.ovg,.vg,.chg,.prg,.outg,.procs,.tg,.rg{grid-template-columns:1fr 1fr}
+  footer{grid-template-columns:1fr}
+  nav{padding:0 20px}
+  .nli{display:none}
+  .sec{padding:60px 24px}
+  .hr{margin:0}
+  .live-banner{padding:14px 24px}
+}
+@media(max-width:600px){
+  .stats,.outg,.vg,.chg,.prg,.procs,.tg,.rg{grid-template-columns:1fr}
+  .bag,.lr{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="pg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nb">
+    <div class="nl"><svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
+    <div><div class="nbr"><span>Pay</span>Pay</div></div>
+    <div class="sep"></div>
+    <div class="ns">UI/UX Case Study · 2026</div>
+  </div>
+  <div class="nr">
+    <ul class="nli">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#evolution">Evolution</a></li>
+      <li><a href="#challenges">Challenges</a></li>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#outcomes">Outcomes</a></li>
+      <li><a href="#lessons">Lessons</a></li>
+    </ul>
+    <span class="nc-new">NASDAQ: PAYP</span>
+    <a class="nc" href="https://insideout.paypay.ne.jp/en/tag/ui-design/" target="_blank">Source ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hbg">ペイペイ</div>
+  <div class="hc fade">
+    <div class="ey">UI / UX Design Evolution · 2018 – 2026</div>
+    <div class="kana">ペイペイ デザイン ケーススタディ</div>
+    <h1>
+      <span class="bl">Designing Japan's</span>
+      <span class="bl r">Super App</span>
+      <span class="bl">from Zero</span>
+    </h1>
+    <div class="ipo-badge">
+      <span class="ipo-dot"></span>
+      BREAKING: PayPay files US IPO · Nasdaq: PAYP · Feb 2026
+    </div>
+    <p class="hd">How PayPay's multinational design team evolved a bare-bones barcode screen into Japan's dominant super app — now with 72 million users, 7.46 billion annual transactions, and a landmark US IPO filing. A deep dive into the design decisions, systems thinking, and principles behind one of the world's most remarkable fintech products.</p>
+    <div class="hmeta">
+      <div class="hmi"><label>Period</label><value>2018 – 2026</value></div>
+      <div class="hmi"><label>Platform</label><value>iOS & Android</value></div>
+      <div class="hmi"><label>Version</label><value>V1.0 → V3.0+</value></div>
+    </div>
+  </div>
+  <div class="hv fade d2">
+    <div class="hcard">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/professionals-vol14-eyecatch-1.png"
+        alt="PayPay App Design Evolution — official image from PayPay Inside-Out"
+        onerror="this.src='https://insideout.paypay.ne.jp/wp-content/uploads/2021/10/chitchat_vol02-main-2.jpg';this.onerror=null">
+      <div class="hov">
+        <h3>The PayPay Design Team</h3>
+        <p>Source: PayPay Inside-Out — insideout.paypay.ne.jp</p>
+      </div>
+      <span class="ftag">Case Study 2026</span>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DATA BANNER -->
+<div class="live-banner">
+  <div class="lb-tag"><span class="lb-dot"></span>LIVE DATA · Feb 2026</div>
+  <div class="lb-items">
+    <div class="lb-item"><div class="lb-num">72M+</div><div class="lb-lbl">Registered Users (Dec 2025)</div></div>
+    <div class="lb-item"><div class="lb-num">75%</div><div class="lb-lbl">Japan Smartphone Penetration</div></div>
+    <div class="lb-item"><div class="lb-num">7.46B</div><div class="lb-lbl">Annual Transactions (2024)</div></div>
+    <div class="lb-item"><div class="lb-num">~20%</div><div class="lb-lbl">All Japan Cashless Payments</div></div>
+    <div class="lb-item"><div class="lb-num">PAYP</div><div class="lb-lbl">Nasdaq IPO Filed Feb 2026</div></div>
+    <div class="lb-item"><div class="lb-num">$2B</div><div class="lb-lbl">Estimated IPO Valuation</div></div>
+  </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats">
+  <div class="sc fade"><span class="sn">72M+</span><span class="sl">Registered Users<br>as of Dec 2025</span></div>
+  <div class="sc fade d1"><span class="sn">75%</span><span class="sl">Japan Smartphone<br>Penetration</span></div>
+  <div class="sc fade d2"><span class="sn">7.46B</span><span class="sl">Annual Transactions<br>in 2024</span></div>
+  <div class="sc fade d3"><span class="sn">40M</span><span class="sl">Monthly Active<br>Users</span></div>
+  <div class="sc fade d4"><span class="sn">PAYP</span><span class="sl">Nasdaq IPO<br>Filed Feb 12 2026</span></div>
+</div>
+<div class="hr rf"></div>
+
+<!-- OVERVIEW -->
+<section class="sec dk" id="overview">
+  <div class="shd">
+    <div class="ey lt">00 — Overview</div>
+    <h2 class="sh"><span class="wr">Payment app</span> to<br>digital lifestyle platform</h2>
+    <p class="sb lt">PayPay launched October 2018 with one purpose: make QR-code payments easy in Japan. By February 2026, it handles payments, insurance, investing, banking — with 72 million users and a landmark US IPO filing. The design team had to evolve the interface every step without losing those users.</p>
+  </div>
+
+  <!-- IPO ALERT -->
+  <div class="alert-box fade">
+    <div class="alert-icon">🚀</div>
+    <div class="alert-content">
+      <h4>BREAKING — February 12, 2026: PayPay Files US IPO on Nasdaq</h4>
+      <p>PayPay Corporation filed its F-1 prospectus with the SEC for listing on the Nasdaq Global Select Market under ticker symbol "PAYP." The filing revealed 72 million registered users as of December 31, 2025 — representing 75% penetration among Japan's 96 million smartphone users. Estimated IPO valuation: ~$2 billion. PayPay also announced a Visa partnership for global expansion. This IPO makes PayPay's UI/UX design story even more significant — great design was central to dominating Japan's cashless payment market.</p>
+      <a href="https://about.paypay.ne.jp/en/pr/20250715/01/" target="_blank">Official PayPay PR: 70M Users Milestone ↗</a>
+    </div>
+  </div>
+
+  <div class="ovg" style="margin-top:28px">
+    <div class="ovc fade"><span class="ovn">01 — THE CHALLENGE</span><h3>A Home Screen at Breaking Point</h3><p>Mini apps, loyalty programs, insurance, and fintech services were colliding on a single screen. Feature growth made the product less usable — discoverability collapsed, and users stopped scrolling to find new capabilities.</p></div>
+    <div class="ovc fade d1"><span class="ovn">02 — THE APPROACH</span><h3>Design-Led Redesign + System</h3><p>A user-first, research-grounded redesign led — unusually — by the Design Team rather than a PM. Simultaneously, a company-wide Style Guide was built from scratch to ensure quality at scale across 14+ designers from 10+ countries.</p></div>
+    <div class="ovc fade d2"><span class="ovn">03 — THE RESULT</span><h3>72M Users, US IPO, Global Ambition</h3><p>V3.0 in 2021 was the design inflection point. By 2025 PayPay had 72 million users, 7.46 billion annual transactions — 20% of all cashless payments in Japan — and a Nasdaq IPO filing. The design system built in 2021 is the foundation of that scale.</p></div>
+  </div>
+</section>
+
+<!-- EVOLUTION TIMELINE -->
+<section class="sec" id="evolution">
+  <div class="shd">
+    <div class="ey">01 — Design Evolution</div>
+    <h2 class="sh">Four years,<br>four <span class="r">paradigm shifts</span></h2>
+    <p class="sb">PayPay updates its app every single week — a pace unheard of in Japan. Each major version reflected a fundamental rethink of what the app was for. The result: from zero to 72 million users in 7 years.</p>
+  </div>
+
+  <!-- OFFICIAL EVOLUTION IMAGE -->
+  <div style="border-radius:var(--r32);overflow:hidden;box-shadow:var(--shb);margin-bottom:52px;border:1px solid var(--border)" class="fade">
+    <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/professionals-vol14-p05-3.jpg"
+      alt="PayPay App Evolution 2018-2021 — official image from PayPay Inside-Out professionals-vol14"
+      style="width:100%;display:block;background:var(--cloud)"
+      onerror="this.style.minHeight='160px'">
+    <div class="srcbar">
+      <span class="srct">Official Image — PayPay App Evolution 2018–2021 ·</span>
+      <a class="srca" href="https://insideout.paypay.ne.jp/en/2021/09/01/professionals-vol14-en/" target="_blank">insideout.paypay.ne.jp/professionals-vol14-en ↗</a>
+    </div>
+  </div>
+
+  <div class="tlw">
+    <div class="tls"></div>
+    <div class="tli fade">
+      <div class="tlL">
+        <div class="tly">October 2018</div>
+        <div class="tlt">V1.0 — The Payment Screen</div>
+        <p class="tlb">Launched three months after PayPay Corporation was founded — an extraordinary pace. The interface was entirely built around one action: displaying a barcode. Five designers, no rules, no style guide. The "10 Billion Yen Giveaway Campaign" created overnight brand recognition. Speed over consistency, existence over perfection.</p>
+        <span class="tlp">Launch</span>
+      </div>
+      <div class="tln">V1</div>
+      <div></div>
+    </div>
+    <div class="tli fade">
+      <div></div>
+      <div class="tln">V1.5</div>
+      <div class="tlR">
+        <div class="tly">April 2019</div>
+        <div class="tlt">V1.5 — Core Utility Emerges</div>
+        <p class="tlb">A 4-icon action row appeared for the first time: Scan, Send, Receive, Charge. Bank account registration added. The app stopped being just a display and started being a financial tool. Users were beginning to think of PayPay as something they could rely on — and the design started to reflect that shift in trust.</p>
+        <span class="tlp">Feature Expansion</span>
+      </div>
+    </div>
+    <div class="tli fade">
+      <div class="tlL">
+        <div class="tly">April 2020</div>
+        <div class="tlt">V2.0 — The Super App Pivot</div>
+        <p class="tlb">Mini apps arrived en masse. PayPay Mall, PayPay Flea Market, bonus point management, Mobile Charge, PCR test kits. The QR code joined the barcode. The home screen became a launchpad. User research soon revealed the crisis: users weren't scrolling, features were invisible, campaigns were buried. V2 demonstrated the fundamental limits of additive design — building the case for a systematic rethink.</p>
+        <span class="tlp">Platform Transformation</span>
+      </div>
+      <div class="tln">V2</div>
+      <div></div>
+    </div>
+    <div class="tli fade">
+      <div></div>
+      <div class="tln act">V3</div>
+      <div class="tlR">
+        <div class="tly">June 2021</div>
+        <div class="tlt">V3.0 — The Systematic Redesign</div>
+        <p class="tlb">The most intentional redesign in PayPay's history. Led by designer Hong Du — who had joined only four months earlier — and PM Sunna Mo. White canvas home screen, visually distinct red action bar separating payment from discovery, restructured 4-column icon grid. The first release fully powered by the PayPay Style Guide. Received widespread positive user reactions on Twitter on launch day. This design system is what scaled PayPay to 72M users by 2025.</p>
+        <span class="tlp">Design System Era</span>
+      </div>
+    </div>
+    <div class="tli fade">
+      <div class="tlL">
+        <div class="tly">2022 – 2025</div>
+        <div class="tlt">V3.x — Scaling to Dominance</div>
+        <p class="tlb">With the Style Guide as infrastructure, PayPay accelerated to 68M+ users by end of 2024 and 72M by December 2025. 7.46 billion transactions in 2024 alone. PayPay Bank became a consolidated subsidiary in April 2025. New PayPay Card designs launched February 2025. WeChat integration enabled 26 cashless payment services from 14 countries to use PayPay merchants. PayPay now processes ~20% of all cashless payments in Japan.</p>
+        <span class="tlp">Market Dominance</span>
+      </div>
+      <div class="tln">V3.x</div>
+      <div></div>
+    </div>
+    <div class="tli fade">
+      <div></div>
+      <div class="tln" style="background:var(--ink);color:white;border-color:var(--ink)">IPO</div>
+      <div class="tlR">
+        <div class="tly">February 12, 2026</div>
+        <div class="tlt">US IPO Filing — Nasdaq: PAYP</div>
+        <p class="tlb">PayPay filed its F-1 prospectus with the SEC on February 12, 2026, targeting the Nasdaq Global Select Market under ticker "PAYP." With ~$2 billion estimated valuation, the filing represents the ultimate validation of PayPay's design-driven approach to building a super app. A Visa partnership for US and global expansion was announced simultaneously. 75% of Japan's smartphone users are now PayPay users. The design foundation laid in 2021 made this IPO possible.</p>
+        <span class="tlp" style="border-color:var(--ink);color:var(--ink)">Breaking News</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFICIAL IMAGES -->
+<section class="sec cl" style="padding-top:0">
+  <div class="shd">
+    <div class="ey">01b — Official Images</div>
+    <h2 class="sh">Directly from<br><span class="r">PayPay Inside-Out</span></h2>
+    <p class="sb">All images sourced from PayPay's official design blog. Click any image to read the full original article.</p>
+  </div>
+
+  <div class="imgf">
+    <a href="https://insideout.paypay.ne.jp/en/2021/09/01/professionals-vol14-en/" target="_blank" class="ib fade" style="aspect-ratio:4/3">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/professionals-vol14-eyecatch-1.png"
+        alt="The Challenges of Creating a New App Design — official PayPay Inside-Out image, Professionals Vol.14"
+        onerror="this.style.minHeight='240px'">
+      <div class="ic"><span class="ict">Professionals Vol.14 · Sep 2021</span><div class="icm">The Challenges of Creating a New App Design for the Ever-Evolving PayPay</div><div class="ics">insideout.paypay.ne.jp ↗</div></div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/" target="_blank" class="ib fade d1" style="aspect-ratio:4/3">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/08/yagi_p3.jpg"
+        alt="Creating the PayPay Style Guide — YAGI-san, official PayPay Inside-Out image, Professionals Vol.13"
+        onerror="this.src='https://insideout.paypay.ne.jp/wp-content/uploads/2021/08/yagi_p4.jpg';this.onerror=null">
+      <div class="ic"><span class="ict">Professionals Vol.13 · Aug 2021</span><div class="icm">Creating the PayPay Style Guide — Maki Aoyagi (YAGI-san)</div><div class="ics">insideout.paypay.ne.jp ↗</div></div>
+    </a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:2px">
+    <a href="https://insideout.paypay.ne.jp/en/2021/10/26/chitchat_vol02-en/" target="_blank" class="ib fade" style="aspect-ratio:4/3">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/10/chitchat_vol02-main-2.jpg"
+        alt="Design Chit-Chat Vol.2 Hong Du — 2 Principles PayPay UI Designers Value, official PayPay Inside-Out image"
+        onerror="this.style.minHeight='180px'">
+      <div class="ic"><span class="ict">Design Chit-Chat Vol.2</span><div class="icm">2 Principles PayPay UI Designers Value — Hong Du</div><div class="ics">insideout.paypay.ne.jp ↗</div></div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/" target="_blank" class="ib fade d1" style="aspect-ratio:4/3">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/08/yagi_p5.jpg"
+        alt="PayPay app launch era 2018 — official PayPay Inside-Out image from Style Guide article"
+        onerror="this.style.minHeight='180px'">
+      <div class="ic"><span class="ict">Style Guide Origins</span><div class="icm">Early PayPay — zero rules, maximum speed, five designers</div><div class="ics">insideout.paypay.ne.jp ↗</div></div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/2021/09/01/professionals-vol14-en/" target="_blank" class="ib fade d2" style="aspect-ratio:4/3">
+      <img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/professionals-vol14-p04.jpg"
+        alt="Hong Du and Sunna Mo V3.0 design team — official PayPay Inside-Out image from Professionals Vol.14"
+        onerror="this.style.minHeight='180px'">
+      <div class="ic"><span class="ict">The V3.0 Team</span><div class="icm">Hong Du & Sunna Mo — the partnership behind V3.0</div><div class="ics">insideout.paypay.ne.jp ↗</div></div>
+    </a>
+  </div>
+  <div class="srcbar"><span class="srct">All images © PayPay Corporation · Source:</span><a class="srca" href="https://insideout.paypay.ne.jp/en/" target="_blank">insideout.paypay.ne.jp/en/ ↗</a></div>
+
+  <!-- VERSION CARDS -->
+  <div style="margin-top:48px" class="shd">
+    <div class="ey">01c — Version Progression</div>
+    <h2 class="sh">The screen,<br><span class="r">version by version</span></h2>
+  </div>
+  <div class="vg">
+    <div class="vc fade">
+      <div class="vi"><img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/professionals-vol14-p05-3.jpg" alt="PayPay V1.0 2018" onerror="this.parentNode.innerHTML='<div class=vip>2018<br>V1.0</div>'"></div>
+      <div class="vinfo"><div class="vd">Oct 2018 · V1.0</div><div class="vname">Payment First</div><div class="vdesc">Barcode only. No rules. Launched 3 months after company founding.</div></div>
+    </div>
+    <div class="vc fade d1">
+      <div class="vi"><img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/design-vol2-image01.jpg" alt="PayPay V1.5 2019 — official Design Chit-Chat Vol.2 image" onerror="this.parentNode.innerHTML='<div class=vip>2019<br>V1.5</div>'"></div>
+      <div class="vinfo"><div class="vd">Apr 2019 · V1.5</div><div class="vname">Core Actions</div><div class="vdesc">Scan, Send, Receive, Charge. Bank registration. Utility begins.</div></div>
+    </div>
+    <div class="vc fade d2">
+      <div class="vi"><img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/09/design-vol2-image02.jpg" alt="PayPay V2.0 2020 — official Design Chit-Chat Vol.2 image" onerror="this.parentNode.innerHTML='<div class=vip>2020<br>V2.0</div>'"></div>
+      <div class="vinfo"><div class="vd">Apr 2020 · V2.0</div><div class="vname">Super App Begins</div><div class="vdesc">Mini apps proliferate. QR joins barcode. IA starts to strain.</div></div>
+    </div>
+    <div class="vc fade d3">
+      <div class="vi"><img src="https://insideout.paypay.ne.jp/wp-content/uploads/2021/10/chitchat_vol02-main-2.jpg" alt="PayPay V3.0 2021 — official Design Chit-Chat Vol.2 image" onerror="this.parentNode.innerHTML='<div class=vip>2021<br>V3.0</div>'"></div>
+      <div class="vinfo"><div class="vd">Jun 2021 · V3.0</div><div class="vname">Design System Era</div><div class="vdesc">White canvas, red bar, restructured grid. First Style Guide release.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="hr"></div>
+
+<!-- CHALLENGES -->
+<section class="sec" id="challenges">
+  <div class="shd">
+    <div class="ey">03 — Design Challenges</div>
+    <h2 class="sh">Four problems that<br><span class="r">forced the redesign</span></h2>
+    <p class="sb">Before V3.0, the design team audited V2.x and identified four critical UX failures — supported by behavioral data, not just intuition. These problems, if unsolved, would have capped PayPay's growth well before 72 million users.</p>
+  </div>
+  <div class="chg">
+    <div class="chc fade"><span class="chn">01</span><div class="chi">🗺️</div><h3>Mini App Discoverability Crisis</h3><p>As PayPay added mini apps rapidly — Mobile Charge, PCR Test Kits, insurance products, investments — the growing icon grid became impossible to navigate. Users couldn't find new services. Partner integrations were being built and effectively lost. This directly threatened PayPay's super app ambitions.</p><div class="chs">→ Restructured 4-column grid with priority ordering above fold</div></div>
+    <div class="chc fade d1"><span class="chn">02</span><div class="chi">📜</div><h3>Scroll Engagement Drop-off</h3><p>User behavior data: users were not scrolling below the visible fold. Critical information positioned lower was effectively unseen. The longer the screen grew with each release, the worse this became — a compounding failure invisible to the team until data surfaced it. This wasted enormous investment in features nobody found.</p><div class="chs">→ Content density rebalancing, visual hierarchy restructure</div></div>
+    <div class="chc fade d2"><span class="chn">03</span><div class="chi">📣</div><h3>Campaign Visibility Failure</h3><p>PayPay's massive campaigns — the engine of its growth — were buried in banners at the bottom. The "10 Billion Yen Giveaway Campaign" proved what was possible when users saw promotions. Every subsequent campaign was running at reduced effectiveness due to a design architecture that hid it.</p><div class="chs">→ Above-the-fold promotional real estate</div></div>
+    <div class="chc fade d3"><span class="chn">04</span><div class="chi">🧩</div><h3>Design Inconsistency at Scale</h3><p>Five designers in 2018, fourteen by 2021, from 10+ countries. No shared rules meant different aesthetics across features. As mini apps multiplied and third-party partners integrated their services, consistency became impossible without a formal system. This threatened PayPay's brand as it approached the scale of national infrastructure.</p><div class="chs">→ The PayPay Style Guide — built parallel to weekly releases</div></div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section class="sec dk" id="principles">
+  <div class="shd">
+    <div class="ey lt">04 — Design Principles</div>
+    <h2 class="sh" style="color:white">The philosophy behind<br><span class="wr">PayPay's design system</span></h2>
+    <p class="sb lt">When Maki Aoyagi (YAGI-san) led creation of the PayPay Style Guide, she distilled the design philosophy into six principles guiding every decision — from icon sizes to campaign layouts to research culture. These principles are what enabled 72 million users.</p>
+  </div>
+  <div class="prg">
+    <div class="prc fade"><span class="prn">PRINCIPLE 01</span><h3>Payment First, Always</h3><p>However many features PayPay adds, barcode/QR payment must remain instantly accessible. A user approaching checkout should never hunt. This is a trust requirement — not a design constraint. It's why PayPay survived while 7Pay and others failed.</p></div>
+    <div class="prc fade d1"><span class="prn">PRINCIPLE 02</span><h3>Consistent Across the Ecosystem</h3><p>The Style Guide applies to PayPay, PayPay Bank, PayPay Securities, PayPay Card, and all partner mini apps. Users moving between services feel continuity. Consistency reduces cognitive load and increases perceived reliability — critical when you're processing ¥15.39 trillion in annual GMV.</p></div>
+    <div class="prc fade d2"><span class="prn">PRINCIPLE 03</span><h3>No Unpleasant Surprises</h3><p>Payments are high-stakes moments. Design changes must never create confusion during a transaction. Gradual rollouts, A/B testing, and careful change management are non-negotiable. Good design that creates a bad experience is not good design — and in fintech, a bad experience loses a user permanently.</p></div>
+    <div class="prc fade"><span class="prn">PRINCIPLE 04</span><h3>Users First · Speed Second</h3><p>Two values coexist: Users First (is this worthwhile? listen, analyze data, research, iterate) and Speed (deliver ASAP, trial-and-error over perfection, weekly improvement cycles). PayPay updates every week without exception. This cadence is only possible because the Style Guide makes quality systematic.</p></div>
+    <div class="prc fade d1"><span class="prn">PRINCIPLE 05</span><h3>Design System as Velocity Infrastructure</h3><p>The Style Guide enables speed without sacrificing quality. 14+ designers can build new features weekly without relitigating fundamental decisions every sprint. At 72 million users in 2025, the design system that seemed unnecessary at 5 designers is now the foundation of national financial infrastructure.</p></div>
+    <div class="prc fade d2"><span class="prn">PRINCIPLE 06</span><h3>"PayPayness" — Brand Distinctiveness</h3><p>The long-term vision includes a PayPay-original typeface. Every design decision cultivates a distinctive brand character — a visual language as distinctive as PayPay's red. With an IPO on Nasdaq as ticker "PAYP," this brand identity now has global significance.</p></div>
+  </div>
+</section>
+
+<!-- STYLE GUIDE -->
+<section class="sec" id="style-guide">
+  <div class="shd">
+    <div class="ey">05 — Design System</div>
+    <h2 class="sh">The PayPay<br><span class="r">Style Guide</span></h2>
+    <p class="sb">Built by 3–4 designers working alongside weekly release schedules, the Style Guide became PayPay's most valuable design asset. Unusual for a Japanese company in 2021 — now the foundation of a ¥15.39 trillion annual GMV platform.</p>
+  </div>
+
+  <!-- OFFICIAL STYLE GUIDE IMAGES -->
+  <div style="border-radius:var(--r24);overflow:hidden;border:1px solid var(--border);margin-bottom:22px" class="fade">
+    <img src="https://i0.wp.com/insideout.paypay.ne.jp/wp-content/uploads/2021/08/pppr13_p02_en.png?ssl=1"
+      alt="PayPay Design Philosophy — official style guide image from PayPay Inside-Out Professionals Vol.13"
+      style="width:100%;display:block;background:var(--cloud)"
+      onerror="this.style.display='none'">
+    <div class="srcbar"><span class="srct">Official PayPay Design Philosophy ·</span><a class="srca" href="https://insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/" target="_blank">professionals-vol13-en ↗</a></div>
+  </div>
+  <div style="border-radius:var(--r24);overflow:hidden;border:1px solid var(--border);margin-bottom:22px" class="fade d1">
+    <img src="https://i0.wp.com/insideout.paypay.ne.jp/wp-content/uploads/2021/08/pppr13_p01_en.png?ssl=1"
+      alt="PayPay Style Guide document — official image from PayPay Inside-Out Professionals Vol.13"
+      style="width:100%;display:block;background:var(--cloud)"
+      onerror="this.style.display='none'">
+    <div class="srcbar"><span class="srct">Official PayPay Style Guide ·</span><a class="srca" href="https://insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/" target="_blank">professionals-vol13-en ↗</a></div>
+  </div>
+
+  <div class="sgg">
+    <div class="sgp sg1 fade">
+      <span class="sgl">Color System</span>
+      <div class="swrow">
+        <div class="sw" style="background:#FF0033"></div>
+        <div class="sw" style="background:#C8002A"></div>
+        <div class="sw" style="background:#FF3355"></div>
+        <div class="sw" style="background:#0D0D0D"></div>
+        <div class="sw" style="background:#F5F5F8;border:1px solid #eee"></div>
+        <div class="sw" style="background:#FFFFFF;border:1px solid #eee"></div>
+      </div>
+      <div class="swi" style="margin-bottom:12px">PayPay Red (#FF0033) — the immovable brand anchor. All other colors support it.</div>
+      <div style="height:1px;background:var(--border);margin:12px 0"></div>
+      <p style="font-size:.78rem;color:var(--muted);line-height:1.75">The color rules are "emotional" — YAGI-san's word. Red/white is non-negotiable for accessibility and brand clarity across all PayPay group products. In 2025, new PayPay Card colors (lavender, blue, pink) were added — each now reflecting dynamically in the app UI.</p>
+    </div>
+    <div class="sgp sg2 fade d1">
+      <span class="sgl">Typography</span>
+      <div class="tph">Aa<br>あア</div>
+      <div class="tps">Display: Noto Sans JP<br>Body: Noto Sans JP Regular<br>Mono: System/Code Labels<br>Aspiration: PayPay Original Font</div>
+      <div style="height:1px;background:rgba(255,255,255,.1);margin:14px 0"></div>
+      <p style="font-size:.76rem;color:rgba(255,255,255,.36);line-height:1.75">Team aspires to a PayPay-original typeface to cement brand distinctiveness. Currently Noto Sans JP handles multilingual needs across a 35+ nationality team. Weight hierarchy: 900 for balances, 700 for labels, 300 for body.</p>
+    </div>
+    <div class="sgp sg3 fade d2">
+      <span class="sgl">Component Library</span>
+      <div class="ci">
+        <div class="cit"><span class="cd"></span>Payment Card (barcode + QR)</div>
+        <div class="cit"><span class="cd"></span>Red Action Bar (4 primary icons)</div>
+        <div class="cit"><span class="cd"></span>Mini App Icon Grid (4-column)</div>
+        <div class="cit"><span class="cd"></span>Campaign Banner Slots</div>
+        <div class="cit"><span class="cd"></span>Transaction List Items</div>
+        <div class="cit"><span class="cd"></span>Coach Mark Overlays</div>
+        <div class="cit"><span class="cd"></span>Bottom Navigation Tab Bar</div>
+        <div class="cit"><span class="cd"></span>Balance Display States</div>
+        <div class="cit"><span class="cd"></span>Dynamic Card Icons (2025)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="sec cl" id="compare">
+  <div class="shd">
+    <div class="ey">06 — Before &amp; After</div>
+    <h2 class="sh">V2.x <span class="r">→</span> V3.0</h2>
+    <p class="sb">Not a visual refresh — a fundamental rethink of information architecture, interaction model, and what the home screen actually is. The design system that powered Japan's dominant payment app.</p>
+  </div>
+  <div class="bag">
+    <div class="fade">
+      <div class="bah"><span class="bab bo">Version 2.x</span><span style="font-size:.74rem;color:var(--muted)">The Growing Pains Era</span></div>
+      <div class="bai oi"><span class="bd o"></span><div>Full red gradient header dominates viewport — content area is significantly reduced</div></div>
+      <div class="bai oi"><span class="bd o"></span><div>Mini app grid grows vertically with each release — no architectural rethinking, just adding rows</div></div>
+      <div class="bai oi"><span class="bd o"></span><div>Key services require scrolling — users abandon after 2–3 icons, missing critical features entirely</div></div>
+      <div class="bai oi"><span class="bd o"></span><div>Campaign banners buried at bottom — major growth driver effectively hidden</div></div>
+      <div class="bai oi"><span class="bd o"></span><div>No formal design system — 14+ designers producing inconsistent aesthetics across features</div></div>
+      <div class="bai oi"><span class="bd o"></span><div>Payment card and action icons merged visually — no hierarchy between pay vs. discover tasks</div></div>
+    </div>
+    <div class="baa fade d1">
+      <div class="bai2">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </div>
+    </div>
+    <div class="fade d2">
+      <div class="bah"><span class="bab bn">Version 3.0</span><span style="font-size:.74rem;color:var(--muted)">The Design System Era</span></div>
+      <div class="bai ni"><span class="bd n"></span><div>White canvas home screen — payment card on light background, more content visible above fold</div></div>
+      <div class="bai ni"><span class="bd n"></span><div>Detached red action bar creates clear visual separation between payment and service discovery</div></div>
+      <div class="bai ni"><span class="bd n"></span><div>Restructured 4-column grid with priority placement — top services always visible without scrolling</div></div>
+      <div class="bai ni"><span class="bd n"></span><div>Promotional content repositioned above fold — campaign visibility dramatically improved</div></div>
+      <div class="bai ni"><span class="bd n"></span><div>Fully backed by PayPay Style Guide — consistent spacing, iconography, type across all 14+ designers</div></div>
+      <div class="bai ni"><span class="bd n"></span><div>Clear hierarchy: payment card → action bar → mini apps → campaigns — scannable top to bottom</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES — UPDATED 2026 DATA -->
+<div class="sec rr" id="outcomes" style="padding:72px 48px">
+  <div class="shd">
+    <div class="ey" style="color:rgba(255,255,255,.55)">07 — Outcomes · Updated February 2026</div>
+    <h2 class="sh" style="color:white">The numbers that<br>tell the design story</h2>
+    <p class="sb" style="color:rgba(255,255,255,.7)">All figures sourced from official PayPay Corporation press releases and SEC IPO filing (February 2026).</p>
+  </div>
+  <div class="outg">
+    <div class="outc fade"><span class="outn">72M+</span><div class="outl">Registered Users<br>as of Dec 31, 2025</div></div>
+    <div class="outc fade d1"><span class="outn">75%</span><div class="outl">Japan Smartphone<br>Penetration Rate</div></div>
+    <div class="outc fade d2"><span class="outn">7.46B</span><div class="outl">Annual Transactions<br>in 2024</div></div>
+    <div class="outc fade d3"><span class="outn">~20%</span><div class="outl">All Japan Cashless<br>Payments Share</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:2px">
+    <div class="outc fade"><span class="outn">40M</span><div class="outl">Monthly Active Users<br>(55% of registered)</div></div>
+    <div class="outc fade d1"><span class="outn">380M+</span><div class="outl">Remittances processed<br>in 2024</div></div>
+    <div class="outc fade d2"><span class="outn">$2B</span><div class="outl">Estimated IPO Valuation<br>Nasdaq: PAYP</div></div>
+    <div class="outc fade d3"><span class="outn">20%+</span><div class="outl">Annual GMV growth<br>every year since 2019</div></div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<section class="sec" id="process">
+  <div class="shd">
+    <div class="ey">08 — Design Process</div>
+    <h2 class="sh">How V3.0<br><span class="r">actually happened</span></h2>
+    <p class="sb">Design led this project — not PM. Hong Du, 4 months into his tenure, spearheaded design. Sunna Mo handled internal coordination across 20+ engineering teams. This is the process that built the foundation for 72 million users.</p>
+  </div>
+  <div class="procs">
+    <div class="prst fade"><div class="prnw">1</div><h4>Problem Audit</h4><p>Four data-backed UX failures identified. Problems defined before solutions explored. User research team embedded in design.</p></div>
+    <div class="prst fade d1"><div class="prnw">2</div><h4>Constraint Mapping</h4><p>Hong mapped all existing specs, undocumented constraints, and cross-team dependencies while simultaneously learning the company structure.</p></div>
+    <div class="prst fade d2"><div class="prnw">3</div><h4>Concept Iteration</h4><p>Multiple IA and layout directions explored. Style Guide provided guardrails. Team workshops. Engineering consulted on feasibility each cycle.</p></div>
+    <div class="prst fade d3"><div class="prnw">4</div><h4>Stakeholder Alignment</h4><p>Every engineering team received specs. Sunna coordinated all departments. Trust built through transparent progress sharing with Product leadership.</p></div>
+    <div class="prst fade d4"><div class="prnw">5</div><h4>Launch + Scale</h4><p>June 2021 launch. Twitter praise confirmed direction. This V3.0 design foundation then scaled PayPay from 42M to 72M users by December 2025.</p></div>
+  </div>
+</section>
+
+<!-- QUOTES -->
+<section class="sec cl" id="insights">
+  <div class="shd">
+    <div class="ey">09 — Team Insights</div>
+    <h2 class="sh">Voice of the<br><span class="r">design team</span></h2>
+  </div>
+  <div class="ql">
+    <div class="qm fade">
+      <h3>Building Design Culture at Startup Speed — That Scaled to an IPO</h3>
+      <p>PayPay launched three months after founding. There were no design rules — five designers, five aesthetics. Maki Aoyagi recognized this worked at 5 but would fail at 14. She built the Style Guide while shipping weekly updates, building the runway while the plane was flying.</p>
+      <p>Hong Du was handed one of PayPay's most visible projects within weeks of joining. He simultaneously learned the company, mapped undocumented specifications, and handled inquiries from practically every engineer. The output — V3.0 — earned widespread Twitter praise the day it launched.</p>
+      <p>Fast-forward to 2026: that same design system is now the foundation of a company serving 72 million users — 75% of Japan's smartphone users — and filing a ~$2 billion IPO on Nasdaq. The design decisions made in 2021 directly enabled that scale.</p>
+      <p>PayPay's culture of flat hierarchy, global diversity (35+ countries), and design ownership — giving designers decision-making authority rather than just Figma files — is what made this possible.</p>
+    </div>
+    <div class="qst fade d1">
+      <div class="qc">
+        <div class="qt">"I was surprised to be allowed to spearhead this project right after joining. I didn't expect to be entrusted with such a huge task immediately — but the team helped me out so much."</div>
+        <div class="qwho"><div class="qav">H</div><div><div class="qname">Hong Du</div><div class="qrole">Product Designer · Design1 Team · Vietnam → Japan</div></div></div>
+      </div>
+      <div class="qc">
+        <div class="qt">"If the design completely changes when a user is about to make a payment, it will be an unpleasant surprise. Even if the design may be good, we don't want UX to go south from a sudden change."</div>
+        <div class="qwho"><div class="qav">S</div><div><div class="qname">Sunna Mo</div><div class="qrole">PM · Growth Team · US / Korea → Japan</div></div></div>
+      </div>
+      <div class="qc">
+        <div class="qt">"Having a Style Guide is common overseas but rare for a Japanese company. It ensures quality, provides consistent experience, and improves operational efficiency across the team."</div>
+        <div class="qwho"><div class="qav">Y</div><div><div class="qname">Maki Aoyagi (YAGI-san)</div><div class="qrole">Senior Manager · Design Dept. · Yahoo Japan → PayPay</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="sec" id="team">
+  <div class="shd">
+    <div class="ey">10 — Key People</div>
+    <h2 class="sh">The designers who<br><span class="r">shaped the evolution</span></h2>
+  </div>
+  <div class="tg">
+    <div class="tc fade">
+      <div class="tar"><div class="tav">M</div><div><div class="tn">Maki Aoyagi (YAGI-san)</div><div class="tr">Senior Manager, Design</div></div></div>
+      <p>The architect of PayPay's design culture. Former Yahoo Japan "black belt" visual designer (2014). Built the Style Guide from scratch. Grew the design team from 5 to 14+. The Style Guide now governs all PayPay-branded services — PayPay, PayPay Bank, PayPay Securities, PayPay Card — across the group. Holds the vision for PayPay's original typeface. Her work is now part of a company filing for a Nasdaq IPO.</p>
+      <div class="torg">🇯🇵 Yahoo Japan 2008 → PayPay Corp April 2020 · Promoted Senior Manager May 2021</div>
+    </div>
+    <div class="tc fade d1">
+      <div class="tar"><div class="tav">H</div><div><div class="tn">Hong Du</div><div class="tr">Product Designer, Design1</div></div></div>
+      <p>Originally from Vietnam. Led the V3.0 home screen redesign within months of joining PayPay — while simultaneously leading the design system project and PayPay UX Lab (internal UX research and promotion). The V3.0 design he created is the foundation that scaled PayPay from 42M to 72M users. His two core principles: Users First and Speed.</p>
+      <div class="torg">🇻🇳 Vietnam → Japan 2015 · Joined PayPay February 2021</div>
+    </div>
+    <div class="tc fade d2">
+      <div class="tar"><div class="tav">S</div><div><div class="tn">Sunna Mo</div><div class="tr">PM, Growth Team</div></div></div>
+      <p>Trilingual (English/Korean/Japanese) PM who managed internal coordination for V3.0. Taught Hong the organizational landscape, aligned 20+ engineering teams, and enabled Design to lead a major project end-to-end for the first time in PayPay's history. Previously at LINE Corporation and a US OTT media company's Japanese subsidiary.</p>
+      <div class="torg">🇺🇸🇰🇷 Raised US/Korea · Japan since 2016 · Joined PayPay July 2020</div>
+    </div>
+  </div>
+</section>
+
+<!-- LESSONS -->
+<section class="sec cl" id="lessons">
+  <div class="shd">
+    <div class="ey">11 — Key Lessons</div>
+    <h2 class="sh">What PayPay's journey<br><span class="r">teaches product designers</span></h2>
+    <p class="sb">Four lessons — now validated by 72 million users, 7.46 billion annual transactions, and a US IPO filing in February 2026.</p>
+  </div>
+  <div class="ll">
+    <div class="lr fade">
+      <div class="lrn">01</div>
+      <div class="lc"><label>The Challenge</label><h3>Design systems are growth infrastructure</h3><p>PayPay went from 5 to 14+ designers across 10+ nationalities. Without the Style Guide, quality degrades as headcount scales.</p></div>
+      <div class="lc"><label>The 2026 Validation</label><p>The Style Guide built in 2021 is now the foundation of a company processing ¥15.39 trillion in annual GMV and filing a $2B Nasdaq IPO. At 5 designers it felt unnecessary. At 14, essential. At 72M users, it's national-scale infrastructure. Build your design system before you think you need it.</p></div>
+    </div>
+    <div class="lr fade d1">
+      <div class="lrn">02</div>
+      <div class="lc"><label>The Challenge</label><h3>Payment UX demands continuity over novelty</h3><p>Changing a payment interface creates user anxiety — especially establishing trust in digital payments in a market still adapting to cashless behavior.</p></div>
+      <div class="lc"><label>The 2026 Validation</label><p>PayPay is now designated by Japan's Financial Services Agency as a Specified Essential Infrastructure Service Provider. The trust built through consistent, non-surprising UX decisions over 7 years is what earned that designation — and the 40 million monthly active users who transact on it every month.</p></div>
+    </div>
+    <div class="lr fade d2">
+      <div class="lrn">03</div>
+      <div class="lc"><label>The Challenge</label><h3>Feature growth ≠ screen growth</h3><p>V2 tried to surface everything on one screen. The result: nothing was discoverable. More features made the app less useful.</p></div>
+      <div class="lc"><label>The 2026 Validation</label><p>PayPay now handles payments, banking, investing, insurance, remittances, and shopping — all from one app. This is only possible because V3.0 established an IA that could scale. Structural audits and priority-based information architecture — not just visual polish — are what made PayPay a true super app at scale.</p></div>
+    </div>
+    <div class="lr fade d3">
+      <div class="lrn">04</div>
+      <div class="lc"><label>The Challenge</label><h3>Design leadership requires organizational trust</h3><p>V3.0 was led by Design, not PM — unusual, requiring leadership to trust a designer 4 months into their tenure with a project affecting 42 million users.</p></div>
+      <div class="lc"><label>The 2026 Validation</label><p>PayPay's willingness to give designers decision-making authority — not just Figma files — created an environment where design quality compounded over 7 years into a product now seeking a $2 billion IPO. The flat hierarchy and global culture that enabled this is a competitive advantage as real as any technology.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section class="sec dk" id="references">
+  <div class="shd">
+    <div class="ey lt">12 — Sources</div>
+    <h2 class="sh" style="color:white">All research from<br><span class="wr">official PayPay sources</span></h2>
+    <p class="sb lt">Every insight, quote, image, and data point in this case study is sourced from PayPay's official communications — design blog, press releases, and SEC filings.</p>
+  </div>
+  <div class="rg">
+    <a href="https://insideout.paypay.ne.jp/en/2021/09/01/professionals-vol14-en/" target="_blank" class="rc fade">
+      <span class="rt">Design Blog · Sep 2021</span>
+      <h4>The Challenges of Creating a New App Design for the Ever-Evolving PayPay</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">Interview with Hong Du & Sunna Mo on the V3.0 redesign process, challenges, and philosophy.</p>
+      <div class="ru">insideout.paypay.ne.jp/en/2021/09/01/professionals-vol14-en/</div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/" target="_blank" class="rc fade d1">
+      <span class="rt">Design Blog · Aug 2021</span>
+      <h4>Creating the PayPay Style Guide — Maki Aoyagi (YAGI-san)</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">How PayPay's design system was built from scratch and why it was unusual for Japan.</p>
+      <div class="ru">insideout.paypay.ne.jp/en/2021/08/03/professionals-vol13-en/</div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/2021/10/26/chitchat_vol02-en/" target="_blank" class="rc fade d2">
+      <span class="rt">Design Blog · Oct 2021</span>
+      <h4>2 Principles PayPay UI Designers Value — Hong Du</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">Hong Du on Users First and Speed. Daily workflow and PayPay design culture.</p>
+      <div class="ru">insideout.paypay.ne.jp/en/2021/10/26/chitchat_vol02-en/</div>
+    </a>
+    <a href="https://about.paypay.ne.jp/en/pr/20250715/01/" target="_blank" class="rc fade">
+      <span class="rt">Official PR · Jul 2025</span>
+      <h4>PayPay Reaches 70 Million Registered Users</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">Official PayPay press release announcing 70M users milestone in July 2025.</p>
+      <div class="ru">about.paypay.ne.jp/en/pr/20250715/01/</div>
+    </a>
+    <a href="https://about.paypay.ne.jp/en/pr/20250331/01/" target="_blank" class="rc fade d1">
+      <span class="rt">Official PR · Mar 2025</span>
+      <h4>PayPay Transactions Exceeded 7.46 Billion in 2024 — ~20% of All Cashless</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">Official press release on 2024 annual transaction data and cashless payment share.</p>
+      <div class="ru">about.paypay.ne.jp/en/pr/20250331/01/</div>
+    </a>
+    <a href="https://insideout.paypay.ne.jp/en/tag/ui-design/" target="_blank" class="rc fade d2">
+      <span class="rt">All UI Design Articles</span>
+      <h4>PayPay Inside-Out — UI Design Tag Archive</h4>
+      <p style="font-size:.74rem;color:rgba(255,255,255,.3);line-height:1.7;margin-top:6px">Complete archive of all UI design articles including Design Chit-Chat series and Professionals interviews.</p>
+      <div class="ru">insideout.paypay.ne.jp/en/tag/ui-design/</div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fl">
+    <div class="flogo"><span>Pay</span>Pay UI/UX Design Case Study · 2026</div>
+    <p>All content, quotes, images, and data sourced from PayPay Corporation official communications — PayPay Inside-Out design blog, official press releases, and SEC IPO filing (February 2026). Educational case study only. All intellectual property © PayPay Corporation. Statistics current as of February 2026.</p>
+  </div>
+  <div class="fr">
+    <div class="flinks">
+      <a href="https://insideout.paypay.ne.jp/en/" target="_blank">Inside-Out Blog</a>
+      <a href="https://about.paypay.ne.jp/en/pr/20250715/01/" target="_blank">70M PR</a>
+      <a href="https://about.paypay.ne.jp/career/en/" target="_blank">Careers</a>
+    </div>
+    <div class="fcopy">Data current · February 2026 · Nasdaq filing: PAYP · Sources: PayPay Corporation</div>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const p=window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100;
+  document.getElementById('pg').style.width=p+'%';
+});
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')}),{threshold:.1});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
