@@ -4,170 +4,446 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System Engineering Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-* { padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0f0f0f;
+    --text: #ffffff;
+    --accent: #8b5cf6;
+    --accent-hover: #00ff00;
+    --subtle: #333333;
+    --border: #1a1a1a;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #0a0e27;
-    color: #e8ecf1;
-    line-height: 1.6;
-    padding: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    padding: 3rem 2rem;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
 }
-.container { max-width: 1200px; margin: 0 auto; }
-h1 { font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600; }
-.subtitle { color: #a8b0c2; margin-bottom: 2rem; }
-h2 {
-    font-size: 1.2rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--bg);
+    letter-spacing: 0.5px;
+}
+
+.header-text h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+    font-family: 'Courier Prime', monospace;
+}
+
+.header-text .tagline {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
     font-weight: 600;
-    border-bottom: 1px solid #2d3654;
-    padding-bottom: 0.5rem;
 }
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 0.75rem;
 }
-.case-study {
-    background: #1a1f3a;
-    border: 1px solid #2d3654;
-    padding: 1.5rem;
-    border-radius: 4px;
+
+.nav-links a {
+    color: var(--subtle);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+    text-transform: uppercase;
 }
-.case-study h3 { font-size: 1rem; margin-bottom: 0.75rem; font-weight: 600; }
-.case-study ul { list-style: none; }
-.case-study li {
-    margin-bottom: 0.5rem;
-    padding-left: 1rem;
-    position: relative;
+
+.nav-links a:hover {
+    color: var(--accent);
+}
+
+.nav-links .cta {
+    border: 1px solid var(--text);
+    padding: 0.4rem 0.9rem;
+    border-radius: 3px;
+    color: var(--text);
+}
+
+.nav-links .cta:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+}
+
+section {
+    margin-bottom: 2.5rem;
+}
+
+h2 {
     font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    color: var(--accent);
+    font-family: 'Courier Prime', monospace;
 }
-.case-study li:before {
-    content: "→";
+
+.list {
+    list-style: none;
+    border-left: 1px solid var(--border);
+    padding-left: 1.5rem;
+    margin-left: 0;
+}
+
+.list li {
+    margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 1rem;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+/* Default pending items - purple color */
+.list li {
+    color: var(--subtle);
+}
+
+/* Linked items - white by default */
+.list li a {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.list li::before {
+    content: '→';
     position: absolute;
-    left: 0;
-    color: #00d9ff;
+    left: -1.5rem;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
-a { color: #00d9ff; text-decoration: none; }
-a:hover { color: #00f5a0; text-decoration: underline; }
-.status { font-size: 0.8rem; color: #a8b0c2; }
-.done { color: #00f5a0; }
+
+/* Show arrow and turn green on hover for linked items only */
+.list li a:hover {
+    color: var(--accent-hover);
+}
+
+.list li a:hover::before {
+    opacity: 1;
+    color: var(--accent-hover);
+}
+
+.status {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+}
+
+.status:hover {
+    color: var(--accent-hover);
+}
+
 footer {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid #2d3654;
-    font-size: 0.9rem;
-    color: #a8b0c2;
+    border-top: 1px solid var(--border);
     text-align: center;
+    font-size: 0.8rem;
+    color: var(--subtle);
+    letter-spacing: 1px;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.footer-logo-text h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.1rem;
+    text-transform: uppercase;
+}
+
+.footer-logo-text p {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.footer-info {
+    font-size: 0.75rem;
+    color: var(--text);
+    letter-spacing: 0.5px;
+}
+
+.footer-info p {
+    margin: 0.25rem 0;
+}
+
+.footer-info p.highlight {
+    color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1.5rem 1rem;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        font-size: 0.7rem;
+        gap: 0.75rem;
+    }
+
+    h1 {
+        font-size: 0.9rem;
+    }
+
+    section {
+        margin-bottom: 2rem;
+    }
+
+    .list li {
+        font-size: 0.85rem;
+    }
 }
 </style>
 </head>
 <body>
+
 <div class="container">
 
-<h1>🧠 System Engineering Playbook</h1>
-<p class="subtitle">
-Deep technical case studies analyzing modern system architecture, distributed systems, cloud infrastructure, AI platforms, fintech systems, automotive engineering, critical infrastructure, and real-time platforms.
-</p>
+<header>
+    <div class="logo-section">
+        <div class="header-text">
+            <h1>System Engineering</h1>
+            <p class="tagline">Playbook</p>
+        </div>
+    </div>
+</header>
 
-<h2>📱 Mobile & UI/UX</h2>
-<div class="grid">
-<div class="case-study">
-<h3>E-Commerce</h3>
-<ul>
-<li><a href="./case-studies/checkout-flow-ecommerce/">Checkout Flow Case Study</a> <span class="status done">✓</span></li>
-</ul>
-</div>
+<section>
+    <h2>→ Mobile & UI/UX</h2>
+    <ul class="list">
+        <li>Mobile-First vs. Desktop-First — Revolut / Cash App</li>
+        <li>Figma Plugin Architecture & Real-Time Collaboration</li>
+        <li><a href="./case-studies/checkout-flow-ecommerce/">Checkout Flow E-Commerce</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/paypay/">PayPay System</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/zoho-web-interface-design/">Zoho Web Interface</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/apple-liquid-glass/">Apple Liquid Glass</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/canvas-drag-drop-workflow/">Canvas & Drag-Drop</a> <span class="status">✓</span></li>
+    </ul>
+</section>
 
-<div class="case-study">
-<h3>Payment Systems</h3>
-<ul>
-<li><a href="./case-studies/paypay/">PayPay Case Study</a> <span class="status done">✓</span></li>
-</ul>
-</div>
+<section>
+    <h2>→ AI & Search Systems</h2>
+    <ul class="list">
+        <li><a href="./case-studies/perplexity-answer-engine/">Perplexity Answer Engine</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/zoho-zia/">Zoho ZIA</a> <span class="status">✓</span></li>
+    </ul>
+</section>
 
-<div class="case-study">
-<h3>Web Interface Design</h3>
-<ul>
-<li><a href="./case-studies/zoho-web-interface-design/">Zoho Web Interface Analysis</a> <span class="status done">✓</span></li>
-</ul>
-</div>
+<section>
+    <h2>→ Cloud & Infrastructure</h2>
+    <ul class="list">
+        <li>Neocloud Performance Benchmark</li>
+        <li>AI Agent Identity & Security</li>
+        <li>Sovereign AI Cloud — NIS2, GDPR</li>
+        <li><a href="./case-studies/cloudflare-go/">Cloudflare GO</a> <span class="status">✓</span></li>
+    </ul>
+</section>
 
-<div class="case-study">
-<h3>Material & Design</h3>
-<ul>
-<li><a href="./case-studies/apple-liquid-glass/">Apple Liquid Glass</a> <span class="status done">✓</span></li>
-</ul>
-</div>
+<section>
+    <h2>→ Platform Engineering</h2>
+    <ul class="list">
+        <li>Vercel Microfrontend Migration</li>
+        <li>Coolify — Open-Source PaaS</li>
+        <li>Ataccama — Docker-Driven AI</li>
+        <li>Warehouse Group VM to Container</li>
+        <li><a href="./case-studies/systems-engineering-general/">Systems Engineering General</a> <span class="status">✓</span></li>
+    </ul>
+</section>
 
-<div class="case-study">
-<h3>Interaction Design</h3>
-<ul>
-<li><a href="./case-studies/canvas-drag-drop-workflow/">Canvas, Drag-and-Drop & Workflow Engines</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-</div>
+<section>
+    <h2>→ Satellite & Space Engineering</h2>
+    <ul class="list">
+        <li>Starlink Space Infrastructure</li>
+        <li>LEO Capacity Modeling</li>
+    </ul>
+</section>
 
-<h2>🔍 AI & Search Systems</h2>
-<div class="grid">
-<div class="case-study">
-<h3>Answer Engines</h3>
-<ul>
-<li><a href="./case-studies/perplexity-answer-engine/">Perplexity Answer Engine</a> <span class="status done">✓</span></li>
-</ul>
-</div>
+<section>
+    <h2>→ Tesla Engineering</h2>
+    <ul class="list">
+        <li><a href="./case-studies/tesla-unified-vehicle-command/">Unified Vehicle Command</a> <span class="status">✓</span></li>
+        <li><a href="./case-studies/tesla-battery-systems/">Battery Systems</a> <span class="status">✓</span></li>
+    </ul>
+</section>
 
-<div class="case-study">
-<h3>AI Assistants</h3>
-<ul>
-<li><a href="./case-studies/zoho-zia/">Zoho ZIA</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-</div>
+<section>
+    <h2>→ Critical Infrastructure & Hidden Systems</h2>
+    <ul class="list">
+        <li>SWIFT Global Financial Messaging</li>
+        <li>Svalbard Global Seed Vault</li>
+        <li>North Atlantic Air Traffic Control</li>
+        <li>Submarine Fiber Cable Infrastructure</li>
+        <li>Cheyenne Mountain Defense</li>
+        <li>Power Grid Black Start Systems</li>
+        <li>Library of Congress Digital Preservation</li>
+        <li>GPS Ground Segment & Time Correction</li>
+        <li>Chicago Board of Trade Open-Outcry</li>
+        <li>CERN LHC Real-Time Trigger</li>
+    </ul>
+</section>
 
-<h2>☁️ Cloud & Infrastructure</h2>
-<div class="grid">
-<div class="case-study">
-<h3>Edge Networking</h3>
-<ul>
-<li><a href="./case-studies/cloudflare-go/">Cloudflare GO</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-</div>
+<section>
+    <h2>→ Public Systems & National Platforms</h2>
+    <ul class="list">
+        <li>911 Emergency Response Network</li>
+        <li>India GST Digital Tax Infrastructure</li>
+        <li>Aadhaar Biometric Identity</li>
+        <li>YouTube View Validation & Anti-Bot</li>
+        <li>National Disaster Early Warning</li>
+    </ul>
+</section>
 
-<h2>🚀 Platform Engineering</h2>
-<div class="grid">
-<div class="case-study">
-<h3>Systems Engineering</h3>
-<ul>
-<li><a href="./case-studies/systems-engineering-general/">General Case Study</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-</div>
+<section>
+    <h2>→ Global Scale Infrastructure & Distributed Systems</h2>
+    <ul class="list">
+        <li>Cloudflare Zero Trust Architecture</li>
+        <li>Stripe Payment Reliability</li>
+        <li>Netflix Chaos Engineering</li>
+        <li>Uber Real-Time Dispatch</li>
+        <li>Amazon Fulfillment Robotics</li>
+        <li>Ethereum Layer 2 Scaling</li>
+        <li>OpenAI Model Deployment</li>
+        <li>SpaceX Falcon 9 Autonomous Landing</li>
+        <li>Kubernetes Control Plane</li>
+        <li>Signal End-to-End Encryption</li>
+        <li>Bloomberg Terminal Infrastructure</li>
+        <li>Visa Global Transaction Processing</li>
+        <li>Interpol Criminal Database</li>
+        <li>ByteDance TikTok Recommendation</li>
+        <li>ICANN DNS Root Server</li>
+        <li>NASA Deep Space Network</li>
+        <li>Linux Foundation Governance</li>
+        <li>Interpol Biometric Border Control</li>
+        <li>World Bank Digital Infrastructure</li>
+        <li>WHO Global Pandemic Data</li>
+    </ul>
+</section>
 
-<h2>⚡ Tesla Engineering</h2>
-<div class="grid">
-<div class="case-study">
-<h3>Vehicle Systems</h3>
-<ul>
-<li><a href="./case-studies/tesla-unified-vehicle-command/">Unified Vehicle Command System</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-
-<div class="case-study">
-<h3>Energy Systems</h3>
-<ul>
-<li><a href="./case-studies/tesla-battery-systems/">Battery Systems</a> <span class="status done">✓</span></li>
-</ul>
-</div>
-</div>
+<section>
+    <h2>→ Game & Real-Time Systems</h2>
+    <ul class="list">
+        <li>Unity DOTS & ECS Architecture</li>
+        <li>Unity Addressables System</li>
+        <li>Unity Netcode for GameObjects</li>
+        <li>Unreal Engine Blueprint vs C++</li>
+        <li>Godot Scene Tree & Node System</li>
+        <li>Photon Engine Multiplayer</li>
+        <li>Mirror Networking Layer</li>
+        <li>PlayFab Backend Architecture</li>
+        <li>Firebase Realtime Database</li>
+        <li>Steamworks Leaderboard Systems</li>
+        <li>Unity Cloud Build CI/CD</li>
+        <li>Unity Analytics Telemetry</li>
+        <li>Unity Shader Graph & Rendering</li>
+        <li>Godot Multiplayer API</li>
+        <li>Epic Online Services Matchmaking</li>
+        <li>Redis Real-Time Leaderboard</li>
+        <li>Unity ScriptableObject Patterns</li>
+        <li>Docker Game Server Containerization</li>
+        <li>Kubernetes Auto-Scaling</li>
+        <li>Open Match Scalable Matchmaking</li>
+    </ul>
+</section>
 
 <footer>
-<p>System Engineering Playbook by BlackLoverTech</p>
+    <div class="footer-content">
+        <div class="footer-info">
+            <p>Engineering Excellence Since 2023</p>
+            <p>Deploying Solutions for India & Asia Clients</p>
+            <p class="highlight">77 Case Studies | Last updated: Feb 19, 2025</p>
+        </div>
+    </div>
 </footer>
 
 </div>
+
 </body>
 </html>
