@@ -18,6 +18,7 @@ Deep technical case studies analyzing modern system architecture, distributed sy
 * [Tesla Engineering](#-tesla-engineering)
 * [Critical Infrastructure & Hidden Systems](#-critical-infrastructure--hidden-systems)
 * [Public Systems & National Platforms](#-public-systems--national-platforms)
+* [Aadhaar & National Identity Systems](#-aadhaar--national-identity-systems)
 * [Global Scale Infrastructure & Distributed Systems](#-global-scale-infrastructure--distributed-systems)
 * [Game & Real-Time Systems Engineering](#-game--real-time-systems-engineering)
 
@@ -94,58 +95,113 @@ Deep technical case studies analyzing modern system architecture, distributed sy
 
 * [ ] 33. 911 Emergency Response Network Architecture
 * [ ] 34. India GST Digital Tax Infrastructure
-* [ ] 35. Aadhaar Biometric Identity Authentication System
+* [x] 35. [Aadhaar Biometric Identity Authentication System](./case-studies/aadhaar-biometric-identity/)
 * [ ] 36. YouTube View Validation & Anti-Bot Detection
 * [ ] 37. National Disaster Early Warning Sensor Networks
 
 ---
 
+## 🔐 Aadhaar & National Identity Systems
+
+* [x] 38. [Aadhaar OVSE Offline Verification Framework](./case-studies/aadhaar-ovse-offline-verification/)
+* [x] 39. [UIDAI Digital Signature Validation & Cryptography](./case-studies/uidai-digital-signature-validation/)
+* [x] 40. [Aadhaar Consent Framework (Section 8A)](./case-studies/aadhaar-consent-framework/)
+* [x] 41. [Aadhaar Act 2019 & DPDP Compliance Mapping](./case-studies/aadhaar-compliance-mapping/)
+* [x] 42. [UIDAI Sandbox API Architecture & Webhooks](./case-studies/aadhaar-sandbox-api/)
+* [ ] 43. Privacy-Preserving Aadhaar Storage (Last 4 Digits Strategy)
+* [ ] 44. National Biometric Database at 140+ Cr Scale
+* [ ] 45. Aadhaar Breach Reporting & 72-Hour Incident Response
+
+---
+
 ## 🌐 Global Scale Infrastructure & Distributed Systems
 
-* [ ] 38. Cloudflare Zero Trust Architecture
-* [ ] 39. Stripe Payment Reliability Engineering
-* [ ] 40. Netflix Chaos Engineering Platform
-* [ ] 41. Uber Real-Time Dispatch & Surge Algorithms
-* [ ] 42. Amazon Fulfillment Robotics & Optimization
-* [ ] 43. Ethereum Layer 2 Scaling Architecture
-* [ ] 44. OpenAI Model Deployment & Inference Infrastructure
-* [ ] 45. SpaceX Falcon 9 Autonomous Landing System
-* [ ] 46. Kubernetes Control Plane Architecture
-* [ ] 47. Signal End-to-End Encryption Protocol
-* [ ] 48. Bloomberg Terminal Infrastructure
-* [ ] 49. Visa Global Transaction Processing Network
-* [ ] 50. Interpol Secure Criminal Database Systems
-* [ ] 51. ByteDance TikTok Recommendation System
-* [ ] 52. ICANN DNS Root Server Infrastructure
-* [ ] 53. NASA Deep Space Network Architecture
-* [ ] 54. Linux Foundation Open Source Governance
-* [ ] 55. Interpol Biometric Border Control Systems
-* [ ] 56. World Bank Digital Public Infrastructure
-* [ ] 57. WHO Global Pandemic Data Infrastructure
+* [ ] 46. Cloudflare Zero Trust Architecture
+* [ ] 47. Stripe Payment Reliability Engineering
+* [ ] 48. Netflix Chaos Engineering Platform
+* [ ] 49. Uber Real-Time Dispatch & Surge Algorithms
+* [ ] 50. Amazon Fulfillment Robotics & Optimization
+* [ ] 51. Ethereum Layer 2 Scaling Architecture
+* [ ] 52. OpenAI Model Deployment & Inference Infrastructure
+* [ ] 53. SpaceX Falcon 9 Autonomous Landing System
+* [ ] 54. Kubernetes Control Plane Architecture
+* [ ] 55. Signal End-to-End Encryption Protocol
+* [ ] 56. Bloomberg Terminal Infrastructure
+* [ ] 57. Visa Global Transaction Processing Network
+* [ ] 58. Interpol Secure Criminal Database Systems
+* [ ] 59. ByteDance TikTok Recommendation System
+* [ ] 60. ICANN DNS Root Server Infrastructure
+* [ ] 61. NASA Deep Space Network Architecture
+* [ ] 62. Linux Foundation Open Source Governance
+* [ ] 63. Interpol Biometric Border Control Systems
+* [ ] 64. World Bank Digital Public Infrastructure
+* [ ] 65. WHO Global Pandemic Data Infrastructure
 
 ---
 
 ## 🎮 Game & Real-Time Systems Engineering
 
-* [ ] 58. Unity DOTS & ECS Architecture
-* [ ] 59. Unity Addressables System
-* [ ] 60. Unity Netcode for GameObjects
-* [ ] 61. Unreal Engine Blueprint vs C++ Architecture
-* [ ] 62. Godot Scene Tree & Node System
-* [ ] 63. Photon Engine Multiplayer Infrastructure
-* [ ] 64. Mirror Networking Layer
-* [ ] 65. PlayFab Backend Architecture
-* [ ] 66. Firebase Realtime Database for Games
-* [ ] 67. Steamworks Leaderboard Systems
-* [ ] 68. Unity Cloud Build CI/CD
-* [ ] 69. Unity Analytics Telemetry Systems
-* [ ] 70. Unity Shader Graph & Rendering Pipelines
-* [ ] 71. Godot Multiplayer API
-* [ ] 72. Epic Online Services Identity & Matchmaking
-* [ ] 73. Redis Real-Time Leaderboard Design
-* [ ] 74. Unity ScriptableObject Architecture Patterns
-* [ ] 75. Docker Game Server Containerization
-* [ ] 76. Kubernetes Auto-Scaling Game Servers
-* [ ] 77. Open Match Scalable Matchmaking Sys
+* [ ] 66. Unity DOTS & ECS Architecture
+* [ ] 67. Unity Addressables System
+* [ ] 68. Unity Netcode for GameObjects
+* [ ] 69. Unreal Engine Blueprint vs C++ Architecture
+* [ ] 70. Godot Scene Tree & Node System
+* [ ] 71. Photon Engine Multiplayer Infrastructure
+* [ ] 72. Mirror Networking Layer
+* [ ] 73. PlayFab Backend Architecture
+* [ ] 74. Firebase Realtime Database for Games
+* [ ] 75. Steamworks Leaderboard Systems
+* [ ] 76. Unity Cloud Build CI/CD
+* [ ] 77. Unity Analytics Telemetry Systems
+* [ ] 78. Unity Shader Graph & Rendering Pipelines
+* [ ] 79. Godot Multiplayer API
+* [ ] 80. Epic Online Services Identity & Matchmaking
+* [ ] 81. Redis Real-Time Leaderboard Design
+* [ ] 82. Unity ScriptableObject Architecture Patterns
+* [ ] 83. Docker Game Server Containerization
+* [ ] 84. Kubernetes Auto-Scaling Game Servers
+* [ ] 85. Open Match Scalable Matchmaking System
 
 ---
+
+## 📊 Summary Statistics
+
+| Category | Completed | Upcoming | Total |
+|----------|-----------|----------|-------|
+| Mobile & UI/UX | 5 | 2 | 7 |
+| AI & Search Systems | 2 | 0 | 2 |
+| Cloud & Infrastructure | 1 | 3 | 4 |
+| Platform Engineering | 1 | 4 | 5 |
+| Satellite & Space | 0 | 2 | 2 |
+| Tesla Engineering | 2 | 0 | 2 |
+| Critical Infrastructure | 0 | 10 | 10 |
+| Public Systems | 1 | 4 | 5 |
+| **Aadhaar & Identity** | **5** | **3** | **8** |
+| Global Scale Systems | 0 | 20 | 20 |
+| Game & Real-Time | 0 | 20 | 20 |
+| **TOTAL** | **17** | **68** | **85** |
+
+---
+
+
+## 📈 Growth Trajectory
+
+- **Version 1.0:** 77 case studies across 9 categories
+- **Version 2.0:** 85 case studies with new Aadhaar & National Identity Systems category
+- **Version 2.1:** Added 5 Aadhaar-specific case studies, 3 coming soon
+- **Goal:** Comprehensive coverage of Indian government systems architecture
+
+---
+
+## 🔗 Navigation
+
+Use the Table of Contents above to jump to any section. Each completed case study is linked and ready to explore.
+
+For more information about BlackLoverTech's system engineering expertise, visit [blacklovertech.in](https://blacklovertech.in)
+
+---
+
+**Last Updated:** February 19, 2025
+**Total Case Studies:** 85 (17 Completed, 68 Upcoming)
+**Version:** 2.1
+**Status:** Active Development
