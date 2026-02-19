@@ -1,602 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Engineering Playbook</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0a0e27;
-            color: #e8ecf1;
-            line-height: 1.6;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .subtitle {
-            color: #a8b0c2;
-            margin-bottom: 2rem;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            border-bottom: 1px solid #2d3654;
-            padding-bottom: 0.5rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .case-study {
-            background: #1a1f3a;
-            border: 1px solid #2d3654;
-            padding: 1.5rem;
-            border-radius: 4px;
-        }
-
-        .case-study h3 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .case-study ul {
-            list-style: none;
-        }
-
-        .case-study li {
-            margin-bottom: 0.5rem;
-            padding-left: 1rem;
-            position: relative;
-            font-size: 0.95rem;
-        }
-
-        .case-study li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #00d9ff;
-        }
-
-        a {
-            color: #00d9ff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: #00f5a0;
-            text-decoration: underline;
-        }
-
-        .status {
-            font-size: 0.8rem;
-            color: #a8b0c2;
-            font-weight: 400;
-        }
-
-        .done {
-            color: #00f5a0;
-        }
-
-        footer {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #2d3654;
-            font-size: 0.9rem;
-            color: #a8b0c2;
-            text-align: center;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Engineering Playbook</title>
+<style>
+* { padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #0a0e27;
+    color: #e8ecf1;
+    line-height: 1.6;
+    padding: 2rem;
+}
+.container { max-width: 1200px; margin: 0 auto; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; font-weight: 600; }
+.subtitle { color: #a8b0c2; margin-bottom: 2rem; }
+h2 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #2d3654;
+    padding-bottom: 0.5rem;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.case-study {
+    background: #1a1f3a;
+    border: 1px solid #2d3654;
+    padding: 1.5rem;
+    border-radius: 4px;
+}
+.case-study h3 { font-size: 1rem; margin-bottom: 0.75rem; font-weight: 600; }
+.case-study ul { list-style: none; }
+.case-study li {
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    position: relative;
+    font-size: 0.95rem;
+}
+.case-study li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #00d9ff;
+}
+a { color: #00d9ff; text-decoration: none; }
+a:hover { color: #00f5a0; text-decoration: underline; }
+.status { font-size: 0.8rem; color: #a8b0c2; }
+.done { color: #00f5a0; }
+footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #2d3654;
+    font-size: 0.9rem;
+    color: #a8b0c2;
+    text-align: center;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧠 System Engineering Playbook</h1>
-        <p class="subtitle">Deep technical case studies analyzing modern system architecture, distributed systems, cloud infrastructure, AI platforms, fintech systems, automotive engineering, critical infrastructure, and real-time platforms.</p>
+<div class="container">
 
-        <!-- Mobile & UI/UX -->
-        <h2>📱 Mobile & UI/UX</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Mobile-First vs Desktop-First</h3>
-                <ul>
-                    <li>Revolut / Cash App Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Figma Plugin Architecture</h3>
-                <ul>
-                    <li>Real-Time Collaboration</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>E-Commerce</h3>
-                <ul>
-                    <li><a href="#">Checkout Flow Case Study</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Payment Systems</h3>
-                <ul>
-                    <li><a href="#">PayPay Case Study</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Web Interface Design</h3>
-                <ul>
-                    <li><a href="#">Zoho Web Interface Analysis</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Material & Design</h3>
-                <ul>
-                    <li><a href="#">Apple Liquid Glass</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Interaction Design</h3>
-                <ul>
-                    <li><a href="#">Canvas, Drag-and-Drop & Workflow Engines</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-        </div>
+<h1>🧠 System Engineering Playbook</h1>
+<p class="subtitle">
+Deep technical case studies analyzing modern system architecture, distributed systems, cloud infrastructure, AI platforms, fintech systems, automotive engineering, critical infrastructure, and real-time platforms.
+</p>
 
-        <!-- AI & Search Systems -->
-        <h2>🔍 AI & Search Systems</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Answer Engines</h3>
-                <ul>
-                    <li><a href="#">Perplexity Answer Engine</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>AI Assistants</h3>
-                <ul>
-                    <li><a href="#">Zoho ZIA</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-        </div>
+<h2>📱 Mobile & UI/UX</h2>
+<div class="grid">
+<div class="case-study">
+<h3>E-Commerce</h3>
+<ul>
+<li><a href="./case-studies/checkout-flow-ecommerce/">Checkout Flow Case Study</a> <span class="status done">✓</span></li>
+</ul>
+</div>
 
-        <!-- Cloud & Infrastructure -->
-        <h2>☁️ Cloud & Infrastructure</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Cloud Performance</h3>
-                <ul>
-                    <li>Neocloud Benchmarks - CoreWeave, Together AI, Fireworks AI vs AWS/Azure</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>AI Agent Security</h3>
-                <ul>
-                    <li>Identity & Security - OAuth + MCP Patterns</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Sovereign Cloud</h3>
-                <ul>
-                    <li>NIS2, GDPR, EU Data Act Mapping</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Edge Networking</h3>
-                <ul>
-                    <li><a href="#">Cloudflare GO</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-        </div>
+<div class="case-study">
+<h3>Payment Systems</h3>
+<ul>
+<li><a href="./case-studies/paypay/">PayPay Case Study</a> <span class="status done">✓</span></li>
+</ul>
+</div>
 
-        <!-- Platform Engineering -->
-        <h2>🚀 Platform Engineering</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Frontend Architecture</h3>
-                <ul>
-                    <li>Vercel Microfrontend Migration</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Open-Source PaaS</h3>
-                <ul>
-                    <li>Coolify Alternative</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>AI Transformation</h3>
-                <ul>
-                    <li>Ataccama - Docker-Driven</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Container Migration</h3>
-                <ul>
-                    <li>The Warehouse Group - VM to Container</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Systems Engineering</h3>
-                <ul>
-                    <li><a href="#">General Case Study</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-        </div>
+<div class="case-study">
+<h3>Web Interface Design</h3>
+<ul>
+<li><a href="./case-studies/zoho-web-interface-design/">Zoho Web Interface Analysis</a> <span class="status done">✓</span></li>
+</ul>
+</div>
 
-        <!-- Satellite & Space -->
-        <h2>🛰 Satellite & Space Engineering</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Space Infrastructure</h3>
-                <ul>
-                    <li>Starlink Infrastructure</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Orbital Networks</h3>
-                <ul>
-                    <li>LEO Capacity Modeling</li>
-                </ul>
-            </div>
-        </div>
+<div class="case-study">
+<h3>Material & Design</h3>
+<ul>
+<li><a href="./case-studies/apple-liquid-glass/">Apple Liquid Glass</a> <span class="status done">✓</span></li>
+</ul>
+</div>
 
-        <!-- Tesla Engineering -->
-        <h2>⚡ Tesla Engineering</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Vehicle Systems</h3>
-                <ul>
-                    <li><a href="#">Unified Vehicle Command System</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Energy Systems</h3>
-                <ul>
-                    <li><a href="#">Battery Systems</a> <span class="status done">✓</span></li>
-                </ul>
-            </div>
-        </div>
+<div class="case-study">
+<h3>Interaction Design</h3>
+<ul>
+<li><a href="./case-studies/canvas-drag-drop-workflow/">Canvas, Drag-and-Drop & Workflow Engines</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+</div>
 
-        <!-- Critical Infrastructure -->
-        <h2>🌍 Critical Infrastructure & Hidden Systems</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Financial Networks</h3>
-                <ul>
-                    <li>SWIFT Global Financial Messaging</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Preservation Systems</h3>
-                <ul>
-                    <li>Svalbard Global Seed Vault</li>
-                    <li>Library of Congress Digital Preservation</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Air Traffic Control</h3>
-                <ul>
-                    <li>North Atlantic Procedural ATC</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Network Infrastructure</h3>
-                <ul>
-                    <li>Global Submarine Fiber Cables</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Defense Systems</h3>
-                <ul>
-                    <li>Cheyenne Mountain Hardened Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Power Systems</h3>
-                <ul>
-                    <li>Power Grid Black Start & Islanding</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Navigation Systems</h3>
-                <ul>
-                    <li>GPS Ground Segment & Relativistic Time</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Trading Systems</h3>
-                <ul>
-                    <li>Chicago Board of Trade Open-Outcry</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Scientific Infrastructure</h3>
-                <ul>
-                    <li>CERN LHC Real-Time Trigger & Filtering</li>
-                </ul>
-            </div>
-        </div>
+<h2>🔍 AI & Search Systems</h2>
+<div class="grid">
+<div class="case-study">
+<h3>Answer Engines</h3>
+<ul>
+<li><a href="./case-studies/perplexity-answer-engine/">Perplexity Answer Engine</a> <span class="status done">✓</span></li>
+</ul>
+</div>
 
-        <!-- Public Systems -->
-        <h2>🚨 Public Systems & National Platforms</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Emergency Response</h3>
-                <ul>
-                    <li>911 Response Network Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Tax Infrastructure</h3>
-                <ul>
-                    <li>India GST Digital Tax System</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Identity Systems</h3>
-                <ul>
-                    <li>Aadhaar Biometric Authentication</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Content Validation</h3>
-                <ul>
-                    <li>YouTube View Validation & Anti-Bot</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Early Warning</h3>
-                <ul>
-                    <li>National Disaster Sensor Networks</li>
-                </ul>
-            </div>
-        </div>
+<div class="case-study">
+<h3>AI Assistants</h3>
+<ul>
+<li><a href="./case-studies/zoho-zia/">Zoho ZIA</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+</div>
 
-        <!-- Global Scale Infrastructure -->
-        <h2>🌐 Global Scale Infrastructure & Distributed Systems</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Zero Trust Security</h3>
-                <ul>
-                    <li>Cloudflare Zero Trust Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Payments</h3>
-                <ul>
-                    <li>Stripe Payment Reliability</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Chaos Engineering</h3>
-                <ul>
-                    <li>Netflix Chaos Platform</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Real-Time Dispatch</h3>
-                <ul>
-                    <li>Uber Dispatch & Surge Algorithms</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Robotics & Logistics</h3>
-                <ul>
-                    <li>Amazon Fulfillment Robotics</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Blockchain Scaling</h3>
-                <ul>
-                    <li>Ethereum Layer 2 Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>AI Inference</h3>
-                <ul>
-                    <li>OpenAI Model Deployment & Inference</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Autonomous Systems</h3>
-                <ul>
-                    <li>SpaceX Falcon 9 Landing System</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Orchestration</h3>
-                <ul>
-                    <li>Kubernetes Control Plane</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Encryption</h3>
-                <ul>
-                    <li>Signal E2E Protocol</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Financial Terminals</h3>
-                <ul>
-                    <li>Bloomberg Terminal Infrastructure</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Transaction Processing</h3>
-                <ul>
-                    <li>Visa Global Transaction Network</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Criminal Database</h3>
-                <ul>
-                    <li>Interpol Secure Systems</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Recommendation Systems</h3>
-                <ul>
-                    <li>ByteDance TikTok Recommendation</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>DNS Infrastructure</h3>
-                <ul>
-                    <li>ICANN DNS Root Servers</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Space Networks</h3>
-                <ul>
-                    <li>NASA Deep Space Network</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Open Source</h3>
-                <ul>
-                    <li>Linux Foundation Governance</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Border Control</h3>
-                <ul>
-                    <li>Interpol Biometric Systems</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Digital Infrastructure</h3>
-                <ul>
-                    <li>World Bank Digital Public Infrastructure</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Pandemic Response</h3>
-                <ul>
-                    <li>WHO Global Pandemic Data</li>
-                </ul>
-            </div>
-        </div>
+<h2>☁️ Cloud & Infrastructure</h2>
+<div class="grid">
+<div class="case-study">
+<h3>Edge Networking</h3>
+<ul>
+<li><a href="./case-studies/cloudflare-go/">Cloudflare GO</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+</div>
 
-        <!-- Game & Real-Time -->
-        <h2>🎮 Game & Real-Time Systems Engineering</h2>
-        <div class="grid">
-            <div class="case-study">
-                <h3>Unity ECS</h3>
-                <ul>
-                    <li>DOTS & ECS Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Asset Management</h3>
-                <ul>
-                    <li>Unity Addressables System</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Multiplayer Networking</h3>
-                <ul>
-                    <li>Unity Netcode for GameObjects</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Unreal Engine</h3>
-                <ul>
-                    <li>Blueprint vs C++ Architecture</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Godot Engine</h3>
-                <ul>
-                    <li>Scene Tree & Node System</li>
-                    <li>Multiplayer API</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Third-Party Networking</h3>
-                <ul>
-                    <li>Photon Engine Multiplayer</li>
-                    <li>Mirror Networking Layer</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Backend Services</h3>
-                <ul>
-                    <li>PlayFab Backend Architecture</li>
-                    <li>Firebase Realtime Database</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Leaderboards</h3>
-                <ul>
-                    <li>Steamworks Leaderboards</li>
-                    <li>Redis Real-Time Leaderboard</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>CI/CD & Analytics</h3>
-                <ul>
-                    <li>Unity Cloud Build CI/CD</li>
-                    <li>Unity Analytics Telemetry</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Graphics</h3>
-                <ul>
-                    <li>Unity Shader Graph & Pipelines</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Epic Online Services</h3>
-                <ul>
-                    <li>Identity & Matchmaking</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Architecture Patterns</h3>
-                <ul>
-                    <li>Unity ScriptableObject Patterns</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Infrastructure</h3>
-                <ul>
-                    <li>Docker Game Server Containerization</li>
-                    <li>Kubernetes Auto-Scaling</li>
-                </ul>
-            </div>
-            <div class="case-study">
-                <h3>Matchmaking</h3>
-                <ul>
-                    <li>Open Match Scalable System</li>
-                </ul>
-            </div>
-        </div>
+<h2>🚀 Platform Engineering</h2>
+<div class="grid">
+<div class="case-study">
+<h3>Systems Engineering</h3>
+<ul>
+<li><a href="./case-studies/systems-engineering-general/">General Case Study</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+</div>
 
-        <footer>
-            <p>System Engineering Playbook by BlackLoverTech</p>
-        </footer>
-    </div>
+<h2>⚡ Tesla Engineering</h2>
+<div class="grid">
+<div class="case-study">
+<h3>Vehicle Systems</h3>
+<ul>
+<li><a href="./case-studies/tesla-unified-vehicle-command/">Unified Vehicle Command System</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+
+<div class="case-study">
+<h3>Energy Systems</h3>
+<ul>
+<li><a href="./case-studies/tesla-battery-systems/">Battery Systems</a> <span class="status done">✓</span></li>
+</ul>
+</div>
+</div>
+
+<footer>
+<p>System Engineering Playbook by BlackLoverTech</p>
+</footer>
+
+</div>
 </body>
 </html>
