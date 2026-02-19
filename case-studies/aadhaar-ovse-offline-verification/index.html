@@ -1,1159 +1,1202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aadhaar OVSE Offline Verification - Case Study 2026</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aadhaar OVSE Case Study 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --blue: #1a4a8a;
+    --accent: #f0a500;
+    --accent-light: #ffc946;
+    --teal: #0e7c7b;
+    --light: #f5f3ee;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #5a6478;
+    --border: rgba(10,22,40,0.12);
+  }
 
-        html {
-            background: #f5f5f5;
-            padding: 20px;
-        }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #1a1a1a;
-            background: white;
-            max-width: 210mm;
-            height: auto;
-            margin: 0 auto;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
 
-        /* A4 Page Structure */
-        .page {
-            width: 210mm;
-            height: auto;
-            padding: 20mm;
-            background: white;
-            margin: 10px auto;
-            color: #1a1a1a;
-            page-break-after: always;
-            box-sizing: border-box;
-        }
+  /* ─── COVER ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    padding: 60px;
+  }
 
-        /* Header styling */
-        header {
-            border-bottom: 3px solid #1a472a;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,165,0,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-        .logo-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,124,123,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1a472a;
-            letter-spacing: 2px;
-        }
+  .cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: auto;
+  }
 
-        .document-info {
-            text-align: right;
-            font-size: 10px;
-            color: #666;
-        }
+  .lock-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(240,165,0,0.15);
+    border: 1px solid rgba(240,165,0,0.4);
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent-light);
+  }
 
-        .document-info p {
-            margin: 2px 0;
-        }
+  .version-tag {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    font-family: 'DM Mono', monospace;
+  }
 
-        /* Title Page */
-        .title-page {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            min-height: 270mm;
-            padding: 40mm 20mm;
-        }
+  .cover-main {
+    padding: 80px 0 40px;
+    position: relative;
+    z-index: 1;
+  }
 
-        .title-page h1 {
-            font-size: 42px;
-            color: #1a472a;
-            margin-bottom: 20px;
-            font-weight: 900;
-            line-height: 1.3;
-        }
+  .cover-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
 
-        .title-page .subtitle {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 40px;
-            font-weight: normal;
-        }
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 7vw, 90px);
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
 
-        .title-page .publication-info {
-            margin-top: 60px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-            font-size: 12px;
-            color: #666;
-        }
+  .cover-title .highlight {
+    color: var(--accent);
+    display: block;
+  }
 
-        /* Headings */
-        h1 {
-            font-size: 28px;
-            color: #1a472a;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-weight: 900;
-            border-bottom: 2px solid #ff6b35;
-            padding-bottom: 10px;
-        }
+  .cover-subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    max-width: 480px;
+    margin-top: 24px;
+    line-height: 1.6;
+  }
 
-        h2 {
-            font-size: 18px;
-            color: #1a472a;
-            margin-top: 25px;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    margin: 28px 0;
+  }
 
-        h3 {
-            font-size: 14px;
-            color: #2d5a3d;
-            margin-top: 18px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 40px;
+    margin-top: 60px;
+    position: relative;
+    z-index: 1;
+  }
 
-        p {
-            margin-bottom: 12px;
-            text-align: justify;
-            font-size: 11px;
-            line-height: 1.7;
-        }
+  .meta-item label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 6px;
+  }
 
-        /* Content sections */
-        .section {
-            margin-bottom: 30px;
-        }
+  .meta-item span {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
 
-        .subsection {
-            margin-left: 20px;
-            margin-bottom: 20px;
-        }
+  /* ─── NAVIGATION / TOC ──────────────────────────────────── */
+  .toc-section {
+    background: var(--navy-mid);
+    color: var(--white);
+    padding: 80px 60px;
+  }
 
-        /* Lists */
-        ul, ol {
-            margin-left: 30px;
-            margin-bottom: 12px;
-        }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
 
-        li {
-            margin-bottom: 8px;
-            font-size: 11px;
-            line-height: 1.6;
-            text-align: justify;
-        }
+  .toc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 48px;
+    color: var(--white);
+  }
 
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 10px;
-        }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
 
-        th {
-            background-color: #1a472a;
-            color: white;
-            padding: 10px;
-            text-align: left;
-            font-weight: 700;
-            border: 1px solid #ccc;
-        }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    text-decoration: none;
+    color: rgba(255,255,255,0.7);
+    transition: color 0.2s;
+  }
 
-        td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            vertical-align: top;
-        }
+  .toc-item:hover { color: var(--accent-light); }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+  .toc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 28px;
+  }
 
-        /* Statistics boxes */
-        .stats-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
+  .toc-text {
+    font-size: 14px;
+    font-weight: 400;
+  }
 
-        .stat-box {
-            border: 1px solid #ddd;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-left: 4px solid #ff6b35;
-        }
+  /* ─── MAIN CONTENT ──────────────────────────────────────── */
+  .content-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
 
-        .stat-number {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1a472a;
-            margin-bottom: 5px;
-        }
+  .section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+  }
 
-        .stat-label {
-            font-size: 10px;
-            color: #666;
-        }
+  .section:last-child { border-bottom: none; }
 
-        /* Timeline */
-        .timeline {
-            margin: 20px 0;
-        }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
 
-        .timeline-item {
-            border-left: 3px solid #ff6b35;
-            padding-left: 20px;
-            margin-bottom: 15px;
-            position: relative;
-        }
+  .section-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: rgba(10,22,40,0.06);
+    line-height: 1;
+    min-width: 80px;
+  }
 
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -10px;
-            top: 0;
-            width: 14px;
-            height: 14px;
-            background: white;
-            border: 3px solid #ff6b35;
-            border-radius: 50%;
-        }
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.2;
+    padding-top: 8px;
+  }
 
-        .timeline-date {
-            font-weight: bold;
-            color: #ff6b35;
-            font-size: 11px;
-        }
+  .section-heading::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--accent);
+    margin-top: 12px;
+  }
 
-        .timeline-title {
-            font-weight: bold;
-            color: #1a472a;
-            font-size: 11px;
-            margin-top: 3px;
-        }
+  p { margin-bottom: 16px; color: var(--muted); }
 
-        .timeline-description {
-            font-size: 10px;
-            color: #666;
-            margin-top: 5px;
-        }
+  strong { color: var(--text); font-weight: 600; }
 
-        /* Feature boxes */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
+  /* ─── STAT CARDS ─────────────────────────────────────────── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 20px;
+    margin: 40px 0;
+  }
 
-        .feature-box {
-            border: 1px solid #ddd;
-            padding: 12px;
-            background: white;
-        }
+  .stat-card {
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-        .feature-box h4 {
-            color: #1a472a;
-            font-size: 11px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(240,165,0,0.12);
+  }
 
-        .feature-box p {
-            font-size: 10px;
-            color: #666;
-            margin: 0;
-        }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
 
-        /* Challenge-Solution boxes */
-        .challenge-solution {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
+  .stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.4;
+  }
 
-        .challenge-box {
-            border-left: 4px solid #ef4444;
-            padding: 12px;
-            background: #fff5f5;
-        }
+  /* ─── PRINCIPLES / FEATURE GRID ─────────────────────────── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 32px 0;
+  }
 
-        .solution-box {
-            border-left: 4px solid #22c55e;
-            padding: 12px;
-            background: #f0fdf4;
-        }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
 
-        .challenge-box h4, .solution-box h4 {
-            font-size: 11px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
+  .card:hover {
+    box-shadow: 0 8px 32px rgba(10,22,40,0.1);
+    transform: translateY(-2px);
+  }
 
-        .challenge-box h4 {
-            color: #ef4444;
-        }
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
 
-        .solution-box h4 {
-            color: #22c55e;
-        }
+  .card-title {
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
 
-        .challenge-box p, .solution-box p {
-            font-size: 10px;
-            color: #666;
-            margin: 0;
-        }
+  .card p {
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.6;
+  }
 
-        /* Page break */
-        .page-break {
-            page-break-after: always;
-            clear: both;
-        }
+  /* ─── HIGHLIGHT BOX ─────────────────────────────────────── */
+  .highlight-box {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a4a8a 100%);
+    border-radius: 16px;
+    padding: 40px;
+    color: var(--white);
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
 
-        /* Footer */
-        footer {
-            border-top: 1px solid #ccc;
-            padding-top: 15px;
-            margin-top: 30px;
-            font-size: 9px;
-            color: #999;
-            text-align: center;
-        }
+  .highlight-box::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(240,165,0,0.12);
+  }
 
-        .page-number {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 10px;
-            color: #999;
-        }
+  .highlight-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+    color: var(--accent-light);
+  }
 
-        /* Highlight text */
-        .highlight {
-            background-color: #fff3cd;
-            padding: 2px 4px;
-            border-radius: 2px;
-        }
+  .highlight-box p { color: rgba(255,255,255,0.75); margin: 0; }
 
-        /* Print styles */
-        @media print {
-            html {
-                background: white;
-                padding: 0;
-            }
-            
-            body {
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .page {
-                margin: 0;
-                box-shadow: none;
-                page-break-after: always;
-            }
-        }
+  /* ─── TABLE ──────────────────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 32px 0;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
 
-        /* Table of Contents */
-        .toc {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-        }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    font-size: 13.5px;
+  }
 
-        .toc h2 {
-            margin-top: 0;
-        }
+  thead {
+    background: var(--navy);
+    color: var(--white);
+  }
 
-        .toc ul {
-            list-style: none;
-            margin-left: 0;
-        }
+  thead th {
+    padding: 16px 18px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
 
-        .toc li {
-            padding: 5px 0;
-            font-size: 11px;
-            border-bottom: 1px dotted #ddd;
-            display: flex;
-            justify-content: space-between;
-        }
+  tbody tr:nth-child(even) { background: #f9f8f5; }
+  tbody tr:hover { background: rgba(240,165,0,0.06); }
 
-        .toc-page {
-            font-weight: bold;
-            color: #1a472a;
-        }
-    </style>
+  td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+
+  .check { color: #22c55e; font-size: 16px; }
+  .cross { color: #ef4444; font-size: 16px; }
+  .mid { color: var(--accent); font-size: 16px; }
+
+  /* ─── PROCESS STEPS ─────────────────────────────────────── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 32px 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 32px;
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 44px;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), rgba(240,165,0,0.1));
+  }
+
+  .step:last-child::before { display: none; }
+  .step:last-child { padding-bottom: 0; }
+
+  .step-num {
+    min-width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    font-family: 'Playfair Display', serif;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-body h4 {
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+    font-size: 15px;
+    padding-top: 8px;
+  }
+
+  .step-body p { font-size: 13.5px; margin: 0; }
+
+  /* ─── CHALLENGE SOLUTION ────────────────────────────────── */
+  .chal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+
+  .chal-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .chal-head {
+    padding: 16px 22px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .chal-head.problem {
+    background: #fff1f1;
+    color: #c0392b;
+    border-bottom: 1px solid #ffd6d6;
+  }
+
+  .chal-head.solution {
+    background: #f0fff4;
+    color: #155724;
+    border-bottom: 1px solid #c3e6cb;
+  }
+
+  .chal-body {
+    padding: 18px 22px;
+    background: var(--white);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  /* ─── ACHIEVEMENT TABLE ─────────────────────────────────── */
+  .ach-table {
+    margin: 32px 0;
+  }
+
+  .ach-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ach-row:last-child { border-bottom: none; }
+
+  .ach-metric {
+    min-width: 220px;
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+  }
+
+  .ach-value {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  /* ─── BENEFITS ───────────────────────────────────────────── */
+  .benefit-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 32px 0;
+  }
+
+  .benefit-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+  }
+
+  .benefit-dot {
+    min-width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 7px;
+  }
+
+  .benefit-text {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .benefit-text strong { display: block; margin-bottom: 2px; }
+
+  /* ─── FUTURE CARDS ───────────────────────────────────────── */
+  .future-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+
+  .future-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--teal);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+
+  .future-card h4 {
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .future-card p { font-size: 13px; margin: 0; }
+
+  /* ─── APPENDIX ───────────────────────────────────────────── */
+  .appendix {
+    background: var(--navy);
+    color: var(--white);
+    padding: 80px 60px;
+  }
+
+  .appendix .section-label { color: var(--accent); }
+  .appendix .toc-title { color: var(--white); }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+  }
+
+  .resource-group h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-light);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .resource-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .resource-bullet {
+    color: var(--accent);
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .resource-item p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+
+  .resource-item strong {
+    color: rgba(255,255,255,0.9);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 13px;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  .footer {
+    background: #06101f;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    padding: 28px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ─── INLINE CODE BITS ──────────────────────────────────── */
+  code {
+    font-family: 'DM Mono', monospace;
+    background: rgba(240,165,0,0.1);
+    border: 1px solid rgba(240,165,0,0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12.5px;
+    color: #a0620a;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .cover { padding: 36px 24px; }
+    .cover-meta { grid-template-columns: 1fr 1fr; }
+    .toc-section, .appendix { padding: 60px 24px; }
+    .content-wrap { padding: 0 24px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .chal-grid { grid-template-columns: 1fr; }
+    .benefit-list { grid-template-columns: 1fr; }
+    .future-grid { grid-template-columns: 1fr; }
+    .resource-grid { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .ach-row { flex-direction: column; gap: 6px; }
+    .ach-metric { min-width: auto; }
+  }
+
+  /* ─── PAGE SCROLL ANIMATION ─────────────────────────────── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section { animation: fadeUp 0.5s ease both; }
+</style>
 </head>
 <body>
 
-    <!-- TITLE PAGE -->
-    <div class="page title-page">
-        <div class="logo">🔐 AADHAAR OVSE</div>
-        
-        <h1>Offline Verification Seeking Entity</h1>
-        <p class="subtitle">Comprehensive Case Study on Digital Identity Verification</p>
-        
-        <div class="title-page publication-info">
-            <p><strong>Report Title:</strong> Aadhaar OVSE Offline Verification - Implementation & Impact Analysis</p>
-            <p><strong>Version:</strong> 2.0 (2026 Update)</p>
-            <p><strong>Publication Date:</strong> February 2026</p>
-            <p><strong>Based On:</strong> UIDAI Official Framework & Regulatory Guidelines</p>
-        </div>
+<!-- ════════════════════════════════════ COVER ══════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="lock-badge">🔐 UIDAI · OVSE Framework</div>
+    <span class="version-tag">Version 2.0 · Feb 2026</span>
+  </div>
+
+  <div class="cover-main">
+    <div class="cover-eyebrow">Comprehensive Case Study · Digital Identity Verification</div>
+    <h1 class="cover-title">
+      Aadhaar
+      <span class="highlight">OVSE</span>
+    </h1>
+    <div class="cover-divider"></div>
+    <p class="cover-subtitle">Offline Verification Seeking Entity — Implementation &amp; Impact Analysis. A complete reference for organizations navigating India's most exclusive digital identity certification framework.</p>
+  </div>
+
+  <div class="cover-meta">
+    <div class="meta-item"><label>Report Title</label><span>Aadhaar OVSE Analysis</span></div>
+    <div class="meta-item"><label>Published</label><span>February 2026</span></div>
+    <div class="meta-item"><label>Based On</label><span>UIDAI Official Framework</span></div>
+    <div class="meta-item"><label>Pages</label><span>14 · Version 2.0</span></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ TOC ════════════════════════════════════ -->
+<div class="toc-section">
+  <div class="section-label">Contents</div>
+  <h2 class="toc-title">Table of Contents</h2>
+  <div class="toc-grid">
+    <a href="#s1" class="toc-item"><span class="toc-num">01</span><span class="toc-text">Executive Summary</span></a>
+    <a href="#s2" class="toc-item"><span class="toc-num">02</span><span class="toc-text">Understanding Aadhaar OVSE</span></a>
+    <a href="#s3" class="toc-item"><span class="toc-num">03</span><span class="toc-text">Market Overview &amp; Statistics</span></a>
+    <a href="#s4" class="toc-item"><span class="toc-num">04</span><span class="toc-text">Core Features &amp; Capabilities</span></a>
+    <a href="#s5" class="toc-item"><span class="toc-num">05</span><span class="toc-text">Technical Process Flow</span></a>
+    <a href="#s6" class="toc-item"><span class="toc-num">06</span><span class="toc-text">Use Cases Across Sectors</span></a>
+    <a href="#s7" class="toc-item"><span class="toc-num">07</span><span class="toc-text">Regulatory Framework &amp; Requirements</span></a>
+    <a href="#s8" class="toc-item"><span class="toc-num">08</span><span class="toc-text">Comparative Analysis</span></a>
+    <a href="#s9" class="toc-item"><span class="toc-num">09</span><span class="toc-text">Challenges &amp; Solutions</span></a>
+    <a href="#s10" class="toc-item"><span class="toc-num">10</span><span class="toc-text">Case Study: Perfios.ai</span></a>
+    <a href="#s11" class="toc-item"><span class="toc-num">11</span><span class="toc-text">Benefits &amp; Future Outlook</span></a>
+    <a href="#appendix" class="toc-item"><span class="toc-num">→</span><span class="toc-text">Appendix &amp; Resources</span></a>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ SECTIONS ═══════════════════════════════ -->
+<div class="content-wrap">
+
+  <!-- § 1 Executive Summary -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-heading">Executive Summary</h2>
+    </div>
+    <p>Aadhaar Offline Verification Seeking Entity (OVSE) represents a paradigm shift in how organizations conduct identity verification in India. As of February 2026, the framework has matured significantly with the introduction of advanced features including face verification, selective credential sharing, and the new Aadhaar App, which now operates independently without requiring constant connectivity to UIDAI's central servers.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-value">17</span><span class="stat-label">Certified OVSE companies in India<br>(Feb 2026)</span></div>
+      <div class="stat-card"><span class="stat-value">1.4B+</span><span class="stat-label">Eligible Aadhaar holders worldwide</span></div>
+      <div class="stat-card"><span class="stat-value">99.8%</span><span class="stat-label">Offline verification success rate</span></div>
+      <div class="stat-card"><span class="stat-value">5+</span><span class="stat-label">Active sectors using OVSE</span></div>
     </div>
 
-    <div class="page-break"></div>
+    <div class="highlight-box">
+      <h3>Key Highlights</h3>
+      <p>Only 17 companies in India are certified as OVSEs as of February 2026, making this an exclusive and highly regulated space with significant competitive advantage. The December 2025 amendments introduced face verification and Aadhaar Verifiable Credentials (AVC), enhancing security and enabling proof-of-presence verification. Fintech companies like Perfios secured OVSE certification in February 2026, pioneering offline KYC solutions that eliminate traditional documentation requirements.</p>
+    </div>
+  </div>
 
-    <!-- TABLE OF CONTENTS -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 2</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>Table of Contents</h1>
-        
-        <div class="toc">
-            <ul>
-                <li><span>1. Executive Summary</span><span class="toc-page">3</span></li>
-                <li><span>2. Understanding Aadhaar OVSE</span><span class="toc-page">4</span></li>
-                <li><span>3. Market Overview & Statistics (2026)</span><span class="toc-page">5</span></li>
-                <li><span>4. Core Features & Capabilities</span><span class="toc-page">6</span></li>
-                <li><span>5. Technical Process Flow</span><span class="toc-page">7</span></li>
-                <li><span>6. Use Cases Across Sectors</span><span class="toc-page">8</span></li>
-                <li><span>7. Regulatory Framework & Requirements</span><span class="toc-page">9</span></li>
-                <li><span>8. Comparative Analysis</span><span class="toc-page">10</span></li>
-                <li><span>9. Challenges & Solutions</span><span class="toc-page">11</span></li>
-                <li><span>10. Case Study: Perfios.ai Implementation</span><span class="toc-page">12</span></li>
-                <li><span>11. Benefits & Future Outlook</span><span class="toc-page">13</span></li>
-            </ul>
-        </div>
-
-        <footer>
-            This document contains information about Aadhaar OVSE framework as of February 2026
-        </footer>
+  <!-- § 2 Understanding OVSE -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-heading">Understanding Aadhaar OVSE</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>Aadhaar OVSE (Offline Verification Seeking Entity) is a certification granted by the Unique Identification Authority of India (UIDAI) to organizations that wish to verify Aadhaar numbers and associated identity credentials <strong>without connecting to the Central Identity Data Repository (CIDR).</strong> This framework enables consent-based, secure offline verification through digitally signed credentials.</p>
 
-    <!-- EXECUTIVE SUMMARY -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 3</p>
-                </div>
-            </div>
-        </header>
+    <p><strong>Definition &amp; Framework:</strong> The OVSE framework is built on four fundamental principles that guide its implementation and regulatory compliance.</p>
 
-        <h1>1. Executive Summary</h1>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🛡️</span>
+        <div class="card-title">Privacy by Design</div>
+        <p>Users maintain control over what personal data is shared through selective credential sharing mechanisms.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📡</span>
+        <div class="card-title">Offline Capability</div>
+        <p>Verification occurs without real-time internet connectivity to UIDAI servers, enabling service delivery in remote areas.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔐</span>
+        <div class="card-title">Security &amp; Authenticity</div>
+        <p>All shared credentials are cryptographically signed, ensuring data integrity and preventing forgery or manipulation.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📋</span>
+        <div class="card-title">Regulatory Compliance</div>
+        <p>Full adherence to DPDP (Digital Personal Data Protection) Act and government directives on identity management.</p>
+      </div>
+      <div class="card" style="grid-column: 2;">
+        <span class="card-icon">🕐</span>
+        <div class="card-title">Regulatory Evolution</div>
+        <p>The December 2025 amendments introduced transformative changes including mandatory face verification options, Aadhaar Verifiable Credentials (AVC), and enhanced security protocols.</p>
+      </div>
+    </div>
+  </div>
 
-        <div class="section">
-            <p>Aadhaar Offline Verification Seeking Entity (OVSE) represents a paradigm shift in how organizations conduct identity verification in India. As of February 2026, the framework has matured significantly with the introduction of advanced features including face verification, selective credential sharing, and the new Aadhaar App, which now operates independently without requiring constant connectivity to UIDAI's central servers.</p>
-
-            <h2>Key Highlights</h2>
-            <ul>
-                <li>Only 17 companies in India are certified as OVSEs as of February 2026, making this an exclusive and highly regulated space with significant competitive advantage for certified organizations.</li>
-                <li>The December 2025 amendments to OVSE regulations introduced face verification and Aadhaar Verifiable Credentials (AVC), enhancing security and enabling proof-of-presence verification.</li>
-                <li>The new Aadhaar App features QR scanning, biometric lock/unlock, multiple Aadhaar profile management, and secure offline credential sharing without internet connectivity.</li>
-                <li>Current adoption spans hospitality, fintech, education, healthcare, and government service sectors, with verification success rates exceeding 99.8%.</li>
-                <li>Fintech companies like Perfios secured OVSE certification in February 2026, pioneering offline KYC solutions that eliminate traditional documentation requirements.</li>
-            </ul>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 3</div>
-        </footer>
+  <!-- § 3 Market Overview -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-heading">Market Overview &amp; Statistics (2026)</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>The OVSE ecosystem has reached a critical inflection point in 2026 with significant maturation in both technological capabilities and market adoption. The following statistics reflect the current state of the market as of February 2026.</p>
 
-    <!-- UNDERSTANDING OVSE -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 4</p>
-                </div>
-            </div>
-        </header>
+    <p><strong>Adoption Trajectory:</strong> From 2021 to 2026, OVSE adoption followed a careful, regulated path. Initial certifications were limited to government departments and large financial institutions. By 2023–2024, the first wave of fintech companies and hospitality operators received certification. The 2025 regulatory amendments opened the pathway for educational institutions and healthcare providers, leading to the current diverse ecosystem of 17 certified entities spanning multiple sectors.</p>
 
-        <h1>2. Understanding Aadhaar OVSE</h1>
+    <p><strong>Geographic Distribution:</strong> While exact geographic data varies, OVSE certifications are concentrated among companies with national presence and technical infrastructure to support offline verification workflows. The regulatory framework does not restrict geographic location of OVSEs, enabling both metropolitan and tier-2/tier-3 city companies to obtain certification if they meet technical and compliance requirements.</p>
+  </div>
 
-        <div class="section">
-            <h2>Definition & Framework</h2>
-            <p>Aadhaar OVSE (Offline Verification Seeking Entity) is a certification granted by the Unique Identification Authority of India (UIDAI) to organizations that wish to verify Aadhaar numbers and associated identity credentials without connecting to the Central Identity Data Repository (CIDR). This framework enables consent-based, secure offline verification through digitally signed credentials.</p>
-
-            <h2>Core Principles</h2>
-            <p>The OVSE framework is built on four fundamental principles that guide its implementation and regulatory compliance:</p>
-            
-            <ul>
-                <li><strong>Privacy by Design:</strong> Users maintain control over what personal data is shared through selective credential sharing mechanisms.</li>
-                <li><strong>Offline Capability:</strong> Verification occurs without real-time internet connectivity to UIDAI servers, enabling service delivery in remote and connectivity-challenged areas.</li>
-                <li><strong>Security & Authenticity:</strong> All shared credentials are cryptographically signed, ensuring data integrity and preventing forgery or manipulation.</li>
-                <li><strong>Regulatory Compliance:</strong> Full adherence to DPDP (Digital Personal Data Protection) Act and government directives on identity management.</li>
-            </ul>
-
-            <h2>Regulatory Evolution</h2>
-            <p>The OVSE framework has undergone significant evolution since its initial introduction in 2021. The December 2025 amendments introduced transformative changes including mandatory face verification options, Aadhaar Verifiable Credentials (AVC), and enhanced security protocols. These amendments reflect the maturation of the ecosystem and address earlier concerns about identity fraud and unauthorized data sharing.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 4</div>
-        </footer>
+  <!-- § 4 Core Features -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <h2 class="section-heading">Core Features &amp; Capabilities</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p><strong>New Aadhaar App Integration (February 2026):</strong> The newly launched Aadhaar App enables residents to securely manage their Aadhaar credentials and share them offline through QR codes and direct app-to-app transfers. Key capabilities include QR code generation for selective data sharing, face verification with liveness detection, biometric lock/unlock mechanisms, and the ability to manage up to five Aadhaar profiles simultaneously.</p>
 
-    <!-- MARKET OVERVIEW -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 5</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>3. Market Overview & Statistics (2026)</h1>
-
-        <div class="section">
-            <p>The OVSE ecosystem has reached a critical inflection point in 2026 with significant maturation in both technological capabilities and market adoption. The following statistics reflect the current state of the market as of February 2026:</p>
-
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="stat-number">17</div>
-                    <div class="stat-label">Certified OVSE Companies in India (Feb 2026)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">1.4B+</div>
-                    <div class="stat-label">Eligible Aadhaar Holders Worldwide</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">99.8%</div>
-                    <div class="stat-label">Offline Verification Success Rate</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number">5+</div>
-                    <div class="stat-label">Active Sectors Using OVSE</div>
-                </div>
-            </div>
-
-            <h2>Adoption Trajectory</h2>
-            <p>From 2021 to 2026, OVSE adoption followed a careful, regulated path. Initial certifications were limited to government departments and large financial institutions. By 2023-2024, the first wave of fintech companies and hospitality operators received certification. The 2025 regulatory amendments opened the pathway for educational institutions and healthcare providers, leading to the current diverse ecosystem of 17 certified entities spanning multiple sectors.</p>
-
-            <h2>Geographic Distribution</h2>
-            <p>While exact geographic data varies, OVSE certifications are concentrated among companies with national presence and technical infrastructure to support offline verification workflows. The regulatory framework does not restrict geographic location of OVSEs, enabling both metropolitan and tier-2/tier-3 city companies to obtain certification if they meet technical and compliance requirements.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 5</div>
-        </footer>
+    <div class="card-grid">
+      <div class="card"><span class="card-icon">📱</span><div class="card-title">QR Code Scanning</div><p>Users scan organization-provided QR codes to initiate offline verification and selective credential sharing.</p></div>
+      <div class="card"><span class="card-icon">👤</span><div class="card-title">Face Verification</div><p>Advanced facial recognition ensures proof of presence, confirming the legitimate individual is conducting the transaction.</p></div>
+      <div class="card"><span class="card-icon">🎯</span><div class="card-title">Selective Sharing</div><p>Customized QR codes allow users to share only specific fields (name, DOB, photo) as required by the OVSE.</p></div>
+      <div class="card"><span class="card-icon">🔒</span><div class="card-title">Cryptographic Signing</div><p>All transmitted credentials contain digital signatures, ensuring authenticity and preventing tampering.</p></div>
+      <div class="card"><span class="card-icon">⚡</span><div class="card-title">Instant Verification</div><p>Real-time verification without OTP delays or internet connectivity requirements to central servers.</p></div>
+      <div class="card"><span class="card-icon">🛡️</span><div class="card-title">Data Privacy</div><p>Full compliance with DPDP Act through consent-based sharing and minimal data collection principles.</p></div>
     </div>
 
-    <div class="page-break"></div>
+    <div class="highlight-box">
+      <h3>Aadhaar Verifiable Credentials (AVC)</h3>
+      <p>A new addition to the OVSE toolkit as of December 2025, Aadhaar Verifiable Credentials are digitally signed documents containing demographic data, photographs, and Aadhaar numbers. These credentials can be stored on user devices and transmitted without internet connectivity, providing organizations with authentic, verifiable proof of identity that meets regulatory requirements across multiple jurisdictions and use cases.</p>
+    </div>
+  </div>
 
-    <!-- FEATURES -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 6</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>4. Core Features & Capabilities</h1>
-
-        <div class="section">
-            <h2>New Aadhaar App Integration (February 2026)</h2>
-            <p>The newly launched Aadhaar App represents the next generation of digital identity management. This application enables residents to securely manage their Aadhaar credentials and share them offline through QR codes and direct app-to-app transfers. Key capabilities include QR code generation for selective data sharing, face verification with liveness detection, biometric lock/unlock mechanisms, and the ability to manage up to five Aadhaar profiles simultaneously.</p>
-
-            <div class="feature-grid">
-                <div class="feature-box">
-                    <h4>📱 QR Code Scanning</h4>
-                    <p>Users scan organization-provided QR codes to initiate offline verification and selective credential sharing.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>👤 Face Verification</h4>
-                    <p>Advanced facial recognition ensures proof of presence, confirming the legitimate individual is conducting the transaction.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>🎯 Selective Sharing</h4>
-                    <p>Customized QR codes allow users to share only specific fields (name, DOB, photo) as required by the OVSE.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>🔒 Cryptographic Signing</h4>
-                    <p>All transmitted credentials contain digital signatures, ensuring authenticity and preventing tampering.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>⚡ Instant Verification</h4>
-                    <p>Real-time verification without OTP delays or internet connectivity requirements to central servers.</p>
-                </div>
-                <div class="feature-box">
-                    <h4>🛡️ Data Privacy</h4>
-                    <p>Full compliance with DPDP Act through consent-based sharing and minimal data collection principles.</p>
-                </div>
-            </div>
-
-            <h2>Aadhaar Verifiable Credentials (AVC)</h2>
-            <p>A new addition to the OVSE toolkit as of December 2025, Aadhaar Verifiable Credentials are digitally signed documents containing demographic data, photographs, and Aadhaar numbers. These credentials can be stored on user devices and transmitted without internet connectivity, providing organizations with authentic, verifiable proof of identity that meets regulatory requirements across multiple jurisdictions and use cases.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 6</div>
-        </footer>
+  <!-- § 5 Technical Process Flow -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <h2 class="section-heading">Technical Process Flow</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>The offline verification process follows a clearly defined workflow that ensures security while maintaining user convenience.</p>
 
-    <!-- TECHNICAL PROCESS -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 7</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>5. Technical Process Flow</h1>
-
-        <div class="section">
-            <p>The offline verification process follows a clearly defined workflow that ensures security while maintaining user convenience. The following steps describe a typical OVSE verification scenario:</p>
-
-            <h2>Step-by-Step Verification Process</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="15%">Step</th>
-                        <th width="25%">Action</th>
-                        <th width="60%">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1</strong></td>
-                        <td>User Opens App</td>
-                        <td>Aadhaar holder accesses the new Aadhaar App on their mobile device with internet or offline capability</td>
-                    </tr>
-                    <tr>
-                        <td><strong>2</strong></td>
-                        <td>Scans QR Code</td>
-                        <td>User scans QR code generated by OVSE specifying which credentials are being requested</td>
-                    </tr>
-                    <tr>
-                        <td><strong>3</strong></td>
-                        <td>Face Verification</td>
-                        <td>Optional face capture and matching against Aadhaar photo ensures proof of presence (can be skipped based on OVSE settings)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>4</strong></td>
-                        <td>Shares Credentials</td>
-                        <td>Digitally signed verifiable credentials containing requested data transmitted securely to OVSE system</td>
-                    </tr>
-                    <tr>
-                        <td><strong>5</strong></td>
-                        <td>Verification Complete</td>
-                        <td>OVSE validates cryptographic signatures and stores verification record without connecting to UIDAI CIDR</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>Infrastructure Requirements</h2>
-            <p>OVSEs require basic technical infrastructure including secure callback URL endpoints, valid SSL/TLS certificates (minimum 2 years validity), and systems capable of receiving and validating digitally signed credentials. The framework does not require constant internet connectivity to UIDAI servers, though initial QR code generation and periodic synchronization benefits from connectivity. Organizations can operate completely offline in remote locations with pre-generated QR codes and cached verification lists.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>User Opens App</h4>
+          <p>Aadhaar holder accesses the new Aadhaar App on their mobile device with internet or offline capability.</p>
         </div>
-
-        <footer>
-            <div class="page-number">Page 7</div>
-        </footer>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Scans QR Code</h4>
+          <p>User scans QR code generated by OVSE specifying which credentials are being requested.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Face Verification</h4>
+          <p>Optional face capture and matching against Aadhaar photo ensures proof of presence. Can be skipped based on OVSE settings.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Shares Credentials</h4>
+          <p>Digitally signed verifiable credentials containing requested data transmitted securely to OVSE system.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Verification Complete</h4>
+          <p>OVSE validates cryptographic signatures and stores verification record without connecting to UIDAI CIDR.</p>
+        </div>
+      </div>
     </div>
 
-    <div class="page-break"></div>
+    <p><strong>Infrastructure Requirements:</strong> OVSEs require secure callback URL endpoints, valid SSL/TLS certificates (minimum 2 years validity), and systems capable of receiving and validating digitally signed credentials. Organizations can operate completely offline in remote locations with pre-generated QR codes and cached verification lists.</p>
+  </div>
 
-    <!-- USE CASES -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 8</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>6. Use Cases Across Sectors</h1>
-
-        <div class="section">
-            <p>OVSE technology has found practical applications across diverse sectors of India's digital economy. The following use cases represent current implementations as of February 2026:</p>
-
-            <h2>Hospitality & Hotels</h2>
-            <p>Hotels utilize OVSE for guest check-in verification, eliminating the need for physical Aadhaar document collection. Front desk staff scan guest QR codes, verify face presence, and complete hotel registration within seconds. This approach reduces document storage liability, improves guest experience, and ensures compliance with government mandate requiring identity verification for lodging services. Early adopters report 40% reduction in check-in time.</p>
-
-            <h2>Fintech & Banking</h2>
-            <p>Fintech companies like Perfios leverage OVSE for instant, paperless KYC (Know Your Customer) in account opening and financial product onboarding. Consumers can open investment accounts, lending platforms, or payment wallets using only their Aadhaar App without submitting physical documents or requiring video verification calls. This dramatically reduces operational costs and accelerates customer acquisition.</p>
-
-            <h2>Education Sector</h2>
-            <p>Educational institutions use OVSE for student admission verification, attendance tracking, and identity confirmation for online examination proctoring. Face verification ensures the student physically present matches the registered individual, addressing concerns about proxy test taking in online learning environments. Some universities report 99% accuracy in preventing admission fraud through OVSE implementation.</p>
-
-            <h2>Healthcare & Hospitals</h2>
-            <p>Hospitals implement OVSE for patient admission, emergency room triage, and gig worker/service provider verification. This enables faster patient registration during critical situations while maintaining accurate identity records. Health insurance verification becomes instantaneous through offline credential validation.</p>
-
-            <h2>Government Services</h2>
-            <p>Government agencies use OVSE for licensing (driving licenses, business licenses), permit issuance, and citizen access to government benefits. The offline capability proves invaluable in rural administrative offices with unreliable internet connectivity, ensuring equal access to government services across all regions.</p>
-
-            <h2>Entertainment & Events</h2>
-            <p>Cinema ticket bookings now include age verification through OVSE face verification, reducing the need for physical ID checks. Exhibition participation and conference registration are streamlined through offline verification of participant identity and credentials.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 8</div>
-        </footer>
+  <!-- § 6 Use Cases -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <h2 class="section-heading">Use Cases Across Sectors</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>OVSE technology has found practical applications across diverse sectors of India's digital economy. The following use cases represent current implementations as of February 2026.</p>
 
-    <!-- REGULATORY FRAMEWORK -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 9</p>
-                </div>
-            </div>
-        </header>
+    <div class="card-grid">
+      <div class="card"><span class="card-icon">🏨</span><div class="card-title">Hospitality &amp; Hotels</div><p>Hotels utilize OVSE for guest check-in verification, eliminating physical Aadhaar document collection. Early adopters report <strong>40% reduction in check-in time.</strong></p></div>
+      <div class="card"><span class="card-icon">💳</span><div class="card-title">Fintech &amp; Banking</div><p>Fintech companies leverage OVSE for instant, paperless KYC in account opening and financial product onboarding without submitting physical documents.</p></div>
+      <div class="card"><span class="card-icon">🎓</span><div class="card-title">Education Sector</div><p>Educational institutions use OVSE for student admission verification and online examination proctoring. Some universities report <strong>99% accuracy in preventing admission fraud.</strong></p></div>
+      <div class="card"><span class="card-icon">🏥</span><div class="card-title">Healthcare &amp; Hospitals</div><p>Hospitals implement OVSE for patient admission, emergency room triage, and service provider verification, enabling faster registration during critical situations.</p></div>
+      <div class="card"><span class="card-icon">🏛️</span><div class="card-title">Government Services</div><p>Government agencies use OVSE for licensing, permit issuance, and citizen access to benefits — invaluable in rural administrative offices with unreliable connectivity.</p></div>
+      <div class="card"><span class="card-icon">🎭</span><div class="card-title">Entertainment &amp; Events</div><p>Cinema ticket bookings now include age verification through OVSE face verification. Exhibition and conference registration streamlined through offline identity verification.</p></div>
+    </div>
+  </div>
 
-        <h1>7. Regulatory Framework & Requirements</h1>
-
-        <div class="section">
-            <h2>Eligible Entities for OVSE Certification</h2>
-            <p>The UIDAI permits a wide range of organizations to apply for OVSE certification, including government departments, private companies, banks, NBFCs (Non-Banking Financial Companies), educational institutions, healthcare providers, telecommunications companies, and fintech platforms. Each entity must demonstrate a legitimate business purpose for offline identity verification aligned with DPDP Act requirements.</p>
-
-            <h2>Technical Requirements for Registration</h2>
-            <p>Prospective OVSEs must submit specific technical documentation as part of the registration process. This includes organization logo in SVG format, callback URL where UIDAI will send verification responses, public certificate with minimum 2 years validity for secure communication, and Android/iOS App IDs with domain names. Additionally, organizations must demonstrate system infrastructure capable of receiving and validating digitally signed credentials and maintaining audit logs of all verification transactions.</p>
-
-            <h2>Registration Process Timeline</h2>
-            <ol>
-                <li>Download OVSE registration form from UIDAI official portal or request through collaborate@uidai.net.in</li>
-                <li>Complete entity details including organization name, GST number, registered address, and authorized representatives</li>
-                <li>Attach all required technical documents (logo, certificate, callback URL, app details)</li>
-                <li>Submit application to UIDAI at collaborate@uidai.net.in with subject line "OVSE Registration Request"</li>
-                <li>UIDAI conducts domain verification and technical security assessment (typically 2-4 weeks)</li>
-                <li>Upon approval, UIDAI provides integration support and technical documentation</li>
-            </ol>
-
-            <h2>Compliance & Audit Requirements</h2>
-            <p>Certified OVSEs must maintain comprehensive audit trails of all verification transactions, comply with data retention policies, and undergo periodic security audits. The DPDP Act requires organizations to implement privacy impact assessments and ensure users provide explicit consent for each verification scenario. Failure to comply can result in suspension or revocation of OVSE certification.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 9</div>
-        </footer>
+  <!-- § 7 Regulatory Framework -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <h2 class="section-heading">Regulatory Framework &amp; Requirements</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p><strong>Eligible Entities:</strong> The UIDAI permits a wide range of organizations to apply for OVSE certification, including government departments, private companies, banks, NBFCs, educational institutions, healthcare providers, telecommunications companies, and fintech platforms.</p>
 
-    <!-- COMPARATIVE ANALYSIS -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 10</p>
-                </div>
-            </div>
-        </header>
+    <p><strong>Technical Requirements:</strong> Prospective OVSEs must submit organization logo in SVG format, callback URL where UIDAI will send verification responses, public certificate with minimum 2 years validity, and Android/iOS App IDs with domain names.</p>
 
-        <h1>8. Comparative Analysis</h1>
-
-        <div class="section">
-            <p>Understanding how OVSE compares to alternative identity verification methods is critical for organizations evaluating implementation strategies. The following table presents a comprehensive comparison across multiple dimensions:</p>
-
-            <table style="font-size: 9px;">
-                <thead>
-                    <tr>
-                        <th width="18%">Aspect</th>
-                        <th width="27%">Physical Aadhaar</th>
-                        <th width="27%">Online Auth</th>
-                        <th width="28%">OVSE Offline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Internet Required</strong></td>
-                        <td>No</td>
-                        <td>Yes</td>
-                        <td>No</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Real-time Verification</strong></td>
-                        <td>Manual/Not Verified</td>
-                        <td>Yes (Server-based)</td>
-                        <td>Yes (Cryptographic)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Data Privacy</strong></td>
-                        <td>High Risk</td>
-                        <td>Medium</td>
-                        <td>High (Selective)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Document Storage</strong></td>
-                        <td>Physical Copies</td>
-                        <td>Server Storage</td>
-                        <td>Minimal/None</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Fraud Prevention</strong></td>
-                        <td>Low</td>
-                        <td>High</td>
-                        <td>Very High</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Verification Speed</strong></td>
-                        <td>Slow (Manual)</td>
-                        <td>Fast (Seconds)</td>
-                        <td>Instant (Offline)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Proof of Presence</strong></td>
-                        <td>Visual Check</td>
-                        <td>Limited</td>
-                        <td>Face Verification</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Regulatory Compliance</strong></td>
-                        <td>Low</td>
-                        <td>High</td>
-                        <td>Very High</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Setup Complexity</strong></td>
-                        <td>None</td>
-                        <td>High</td>
-                        <td>Medium</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Cost per Transaction</strong></td>
-                        <td>Very Low</td>
-                        <td>Low</td>
-                        <td>Low</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>Analysis Summary</h2>
-            <p>OVSE emerges as the optimal solution for organizations prioritizing fraud prevention, privacy compliance, and operational efficiency. While physical Aadhaar requires minimal setup, it offers inadequate verification and high privacy risks. Online authentication provides real-time verification but depends on constant internet connectivity and server infrastructure. OVSE uniquely combines offline capability, cryptographic security, and user data control, making it the preferred choice for regulated sectors and organizations operating in connectivity-challenged regions.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 10</div>
-        </footer>
+    <div class="steps" style="margin-top: 28px;">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Download Registration Form</h4><p>Download OVSE registration form from UIDAI official portal or request through <code>collaborate@uidai.net.in</code></p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Complete Entity Details</h4><p>Fill in organization name, GST number, registered address, and authorized representatives.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Attach Technical Documents</h4><p>Include logo (SVG), SSL certificate, callback URL, and app store IDs.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Submit to UIDAI</h4><p>Email application to <code>collaborate@uidai.net.in</code> with subject line <code>OVSE Registration Request</code></p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Security Assessment</h4><p>UIDAI conducts domain verification and technical security assessment (typically 2–4 weeks).</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Integration Support</h4><p>Upon approval, UIDAI provides integration support and technical documentation.</p></div></div>
     </div>
 
-    <div class="page-break"></div>
+    <p style="margin-top: 24px;"><strong>Compliance &amp; Audit:</strong> Certified OVSEs must maintain comprehensive audit trails, comply with data retention policies, and undergo periodic security audits. The DPDP Act requires organizations to implement privacy impact assessments and ensure users provide explicit consent for each verification scenario.</p>
+  </div>
 
-    <!-- CHALLENGES & SOLUTIONS -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 11</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>9. Challenges & Solutions</h1>
-
-        <div class="section">
-            <p>Implementing OVSE technology presents both challenges and opportunities. The framework has evolved to address earlier concerns through regulatory amendments and technical improvements. The following analysis examines key challenges and corresponding solutions:</p>
-
-            <div class="challenge-solution">
-                <div class="challenge-box">
-                    <h4>Challenge: Document Fraud & Forgery</h4>
-                    <p>Traditional physical Aadhaar copies were prone to falsification and unauthorized duplication, creating identity theft risks and enabling fraudulent access to services.</p>
-                </div>
-                <div class="solution-box">
-                    <h4>Solution: Cryptographic Verification</h4>
-                    <p>OVSE digitally signs all credentials with UIDAI-provided cryptographic keys, making forgery mathematically impossible and enabling real-time authenticity validation.</p>
-                </div>
-            </div>
-
-            <div class="challenge-solution">
-                <div class="challenge-box">
-                    <h4>Challenge: Internet Dependency</h4>
-                    <p>Rural and remote locations lack consistent broadband connectivity, preventing residents from accessing identity verification services and modern financial services.</p>
-                </div>
-                <div class="solution-box">
-                    <h4>Solution: Complete Offline Capability</h4>
-                    <p>Both users and OVSEs can function completely offline after initial QR code generation. Pre-generated codes enable verification in areas without any connectivity.</p>
-                </div>
-            </div>
-
-            <div class="challenge-solution">
-                <div class="challenge-box">
-                    <h4>Challenge: Unauthorized Data Sharing</h4>
-                    <p>Users had limited control over which personal information was shared, raising privacy concerns and regulatory compliance issues under the DPDP Act.</p>
-                </div>
-                <div class="solution-box">
-                    <h4>Solution: Selective Credential Sharing</h4>
-                    <p>Users now generate customized QR codes sharing only specific fields (name, DOB, photo) as required. Organizations cannot access data not explicitly shared through the selective sharing mechanism.</p>
-                </div>
-            </div>
-
-            <div class="challenge-solution">
-                <div class="challenge-box">
-                    <h4>Challenge: Proof of Presence</h4>
-                    <p>Without physical presence verification, proxy users could conduct transactions on behalf of actual residents, enabling fraud and impersonation.</p>
-                </div>
-                <div class="solution-box">
-                    <h4>Solution: Face Verification</h4>
-                    <p>New Aadhaar App includes advanced face recognition matching stored Aadhaar photograph with real-time capture, ensuring the legitimate individual is conducting the transaction.</p>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 11</div>
-        </footer>
+  <!-- § 8 Comparative Analysis -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <h2 class="section-heading">Comparative Analysis</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>Understanding how OVSE compares to alternative identity verification methods is critical for organizations evaluating implementation strategies.</p>
 
-    <!-- CASE STUDY: PERFIOS -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 12</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>10. Case Study: Perfios.ai OVSE Certification (February 2026)</h1>
-
-        <div class="section">
-            <h2>Company Overview</h2>
-            <p>Perfios.ai is India's leading B2B SaaS TechFin company with global presence and operations across Asia, Europe, and North America. The company provides financial intelligence, credit underwriting, and identity verification solutions to over 75 enterprise clients spanning banks, fintech companies, insurance providers, and government agencies. In February 2026, Perfios achieved OVSE certification from UIDAI, becoming one of the 17 certified entities and among the first fintech companies to implement offline identity verification at scale.</p>
-
-            <h2>Motivation & Strategic Importance</h2>
-            <p>Perfios's decision to pursue OVSE certification reflected a strategic commitment to the Digital India initiative and recognition that offline verification would become essential for fintech operations. The certification enables the company to offer instant, paperless KYC solutions to its enterprise clients, eliminating traditional documentation requirements and accelerating customer acquisition. For end users, this means opening investment accounts, accessing loans, or creating digital wallets using only the Aadhaar App without physical documents.</p>
-
-            <h2>Implementation Approach</h2>
-            <p>Perfios integrated OVSE capabilities into its existing B2B SaaS platform through a modular approach. The implementation includes QR code generation customized per client organization, secure callback URL endpoints for receiving digitally signed credentials, and validation modules that authenticate UIDAI signatures without connecting to central servers. The company conducted extensive testing across 5+ sectors (fintech, hospitality, education) to ensure compatibility with existing client workflows.</p>
-
-            <h2>Key Achievements</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="35%">Metric</th>
-                        <th width="65%">Achievement</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Certification Status</td>
-                        <td>Achieved OVSE certification February 2026; among first 17 certified entities</td>
-                    </tr>
-                    <tr>
-                        <td>Sector Coverage</td>
-                        <td>Enabled offline KYC across hospitality, fintech, education, and healthcare sectors</td>
-                    </tr>
-                    <tr>
-                        <td>Verification Speed</td>
-                        <td>Reduced KYC completion from 10+ minutes to under 30 seconds</td>
-                    </tr>
-                    <tr>
-                        <td>Client Adoption</td>
-                        <td>Multiple enterprise clients integrated OVSE solutions within first 30 days</td>
-                    </tr>
-                    <tr>
-                        <td>Success Metrics</td>
-                        <td>99.8%+ verification success rate with <0.2% fraud detection rate</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h2>Industry Impact</h2>
-            <p>Perfios's OVSE implementation catalyzed broader fintech adoption of offline verification. Competitors and clients observed that paperless KYC dramatically improved user experience while maintaining or improving security. The company's success demonstrated that OVSE certification provides genuine competitive advantage in the digital identity space, positioning certified organizations as leaders in regulatory compliance and user privacy protection.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 12</div>
-        </footer>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Physical Aadhaar</th>
+            <th>Online Authentication</th>
+            <th>OVSE Offline</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Internet Required</td><td>No</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Real-time Verification</td><td>Manual / Not Verified</td><td>Yes (Server-based)</td><td>Yes (Cryptographic)</td></tr>
+          <tr><td>Data Privacy</td><td><span class="cross">●</span> High Risk</td><td><span class="mid">●</span> Medium</td><td><span class="check">●</span> High (Selective)</td></tr>
+          <tr><td>Document Storage</td><td>Physical Copies</td><td>Server Storage</td><td>Minimal / None</td></tr>
+          <tr><td>Fraud Prevention</td><td><span class="cross">●</span> Low</td><td><span class="mid">●</span> High</td><td><span class="check">●</span> Very High</td></tr>
+          <tr><td>Verification Speed</td><td>Slow (Manual)</td><td>Fast (Seconds)</td><td>Instant (Offline)</td></tr>
+          <tr><td>Proof of Presence</td><td>Visual Check</td><td>Limited</td><td><span class="check">●</span> Face Verification</td></tr>
+          <tr><td>Regulatory Compliance</td><td><span class="cross">●</span> Low</td><td><span class="mid">●</span> High</td><td><span class="check">●</span> Very High</td></tr>
+          <tr><td>Setup Complexity</td><td>None</td><td>High</td><td>Medium</td></tr>
+          <tr><td>Cost per Transaction</td><td>Very Low</td><td>Low</td><td>Low</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="page-break"></div>
+    <p><strong>Analysis Summary:</strong> OVSE emerges as the optimal solution for organizations prioritizing fraud prevention, privacy compliance, and operational efficiency. It uniquely combines offline capability, cryptographic security, and user data control, making it the preferred choice for regulated sectors and organizations operating in connectivity-challenged regions.</p>
+  </div>
 
-    <!-- BENEFITS & FUTURE -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 13</p>
-                </div>
-            </div>
-        </header>
-
-        <h1>11. Benefits & Future Outlook</h1>
-
-        <div class="section">
-            <h2>Benefits for OVSE-Certified Organizations</h2>
-            <ul>
-                <li><strong>Faster Customer Onboarding:</strong> Complete offline Aadhaar verification in under one minute without documentation or OTP delays accelerates customer acquisition and improves conversion rates.</li>
-                <li><strong>Reduced Document Fraud:</strong> Cryptographic verification prevents fake, edited, or forged Aadhaar documents, eliminating a major source of identity fraud in financial services and hospitality.</li>
-                <li><strong>Paperless Operations:</strong> Organizations eliminate need for collecting, storing, and managing physical Aadhaar copies, reducing liability and operational complexity.</li>
-                <li><strong>Enhanced Security:</strong> Digital signatures and face verification provide multiple layers of security exceeding traditional verification methods.</li>
-                <li><strong>Regulatory Advantage:</strong> OVSE certification demonstrates DPDP Act compliance and proactive privacy protection, providing legal protection and customer trust.</li>
-                <li><strong>Operational Efficiency:</strong> Offline capability enables service delivery in remote areas without infrastructure investment or internet connectivity requirements.</li>
-                <li><strong>Market Differentiation:</strong> With only 17 certified entities in India, OVSE certification provides significant competitive advantage and brand positioning.</li>
-                <li><strong>Cost Optimization:</strong> Reduced documentation handling, manual verification, and fraud losses improve unit economics and profitability.</li>
-            </ul>
-
-            <h2>Future Evolution (2026-2028 Outlook)</h2>
-            <p><strong>Expanded Sector Adoption:</strong> Beyond current sectors, OVSE is expected to expand into manufacturing, logistics, remote work verification, and gig economy platforms. Manufacturing facilities may use OVSE for worker identity and attendance verification. Logistics companies could implement offline credential sharing for vendor and delivery partner authentication.</p>
-
-            <p><strong>Enhanced Biometric Capabilities:</strong> Future versions may incorporate iris scanning, fingerprint verification, and voice recognition alongside existing face verification, providing additional authentication factors in high-security scenarios.</p>
-
-            <p><strong>Ecosystem Integration:</strong> Seamless integration with DigiLocker, e-sign platforms, and other Digital India initiatives will create end-to-end digital workflows. Citizens may be able to initiate document signing based on OVSE-verified identity without additional authentication.</p>
-
-            <p><strong>Cross-Border Potential:</strong> International bilateral agreements may enable OVSE-verified credentials to be recognized in other countries' systems, supporting Indian diaspora's access to home country services and international business operations.</p>
-
-            <p><strong>AI-Powered Fraud Detection:</strong> Machine learning models analyzing verification patterns may identify sophisticated fraud attempts, providing real-time alerts to OVSE operators and government agencies.</p>
-
-            <p><strong>Increased Certification Wave:</strong> As awareness spreads and technical barriers lower, the number of certified OVSEs is expected to grow from current 17 to 50+ by 2028, covering all major sectors and many mid-market companies.</p>
-
-            <h2>Conclusion</h2>
-            <p>Aadhaar OVSE represents a mature, production-ready framework that has evolved from experimental pilot to critical digital infrastructure. With regulatory clarity, proven real-world implementations, and tangible benefits for organizations and citizens, OVSE adoption is accelerating across India's digital economy. Organizations seeking competitive advantage, regulatory compliance, and customer trust should consider OVSE certification as a strategic priority for 2026 and beyond.</p>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 13</div>
-        </footer>
+  <!-- § 9 Challenges & Solutions -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <h2 class="section-heading">Challenges &amp; Solutions</h2>
     </div>
 
-    <div class="page-break"></div>
+    <p>Implementing OVSE technology presents both challenges and opportunities. The framework has evolved to address earlier concerns through regulatory amendments and technical improvements.</p>
 
-    <!-- CONTACT & RESOURCES -->
-    <div class="page">
-        <header>
-            <div class="logo-section">
-                <div class="logo">AADHAAR OVSE</div>
-                <div class="document-info">
-                    <p>Case Study 2026</p>
-                    <p>Page 14</p>
-                </div>
-            </div>
-        </header>
+    <div class="chal-grid">
+      <div class="chal-card">
+        <div class="chal-head problem">⚠ Challenge: Document Fraud &amp; Forgery</div>
+        <div class="chal-body">Traditional physical Aadhaar copies were prone to falsification and unauthorized duplication, creating identity theft risks and enabling fraudulent access to services.</div>
+      </div>
+      <div class="chal-card">
+        <div class="chal-head solution">✓ Solution: Cryptographic Verification</div>
+        <div class="chal-body">OVSE digitally signs all credentials with UIDAI-provided cryptographic keys, making forgery mathematically impossible and enabling real-time authenticity validation.</div>
+      </div>
 
-        <h1>Appendix: Resources & Contact Information</h1>
+      <div class="chal-card">
+        <div class="chal-head problem">⚠ Challenge: Internet Dependency</div>
+        <div class="chal-body">Rural and remote locations lack consistent broadband connectivity, preventing residents from accessing identity verification services and modern financial services.</div>
+      </div>
+      <div class="chal-card">
+        <div class="chal-head solution">✓ Solution: Complete Offline Capability</div>
+        <div class="chal-body">Both users and OVSEs can function completely offline after initial QR code generation. Pre-generated codes enable verification in areas without any connectivity.</div>
+      </div>
 
-        <div class="section">
-            <h2>Official UIDAI Resources</h2>
-            <ul>
-                <li><strong>UIDAI Main Portal:</strong> www.uidai.gov.in - Official source for all Aadhaar-related information and services</li>
-                <li><strong>OVSE Handbook:</strong> Available on UIDAI portal with comprehensive technical guidelines and compliance requirements</li>
-                <li><strong>Support Email:</strong> collaborate@uidai.net.in for OVSE registration inquiries and technical support</li>
-                <li><strong>General Helpline:</strong> 1947 (toll-free) for questions about Aadhaar services and OVSE process</li>
-            </ul>
+      <div class="chal-card">
+        <div class="chal-head problem">⚠ Challenge: Unauthorized Data Sharing</div>
+        <div class="chal-body">Users had limited control over which personal information was shared, raising privacy concerns and regulatory compliance issues under the DPDP Act.</div>
+      </div>
+      <div class="chal-card">
+        <div class="chal-head solution">✓ Solution: Selective Credential Sharing</div>
+        <div class="chal-body">Users now generate customized QR codes sharing only specific fields (name, DOB, photo) as required. Organizations cannot access data not explicitly shared.</div>
+      </div>
 
-            <h2>Technical Implementation Support</h2>
-            <ul>
-                <li>UIDAI provides detailed API documentation and integration guidelines for certified OVSEs</li>
-                <li>Technical support team available for troubleshooting and integration assistance post-certification</li>
-                <li>Regular webinars and training sessions conducted for OVSE operators</li>
-                <li>Security patches and regulatory updates distributed through official UIDAI channels</li>
-            </ul>
-
-            <h2>Regulatory & Compliance References</h2>
-            <ul>
-                <li>Digital Personal Data Protection (DPDP) Act, 2023 - Framework for privacy compliance</li>
-                <li>Aadhaar and Targeted Delivery of Financial and Subsidised Services and Subsidised Goods Act, 2016</li>
-                <li>UIDAI Authentication and Offline Verification Regulations - Core OVSE framework</li>
-                <li>December 2025 Amendment to OVSE Regulations - Latest regulatory updates</li>
-            </ul>
-
-            <h2>Document Metadata</h2>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><strong>Document Title</strong></td>
-                        <td>Aadhaar OVSE Offline Verification - Comprehensive Case Study 2026</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Version</strong></td>
-                        <td>2.0 (2026 Update)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Publication Date</strong></td>
-                        <td>February 2026</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Total Pages</strong></td>
-                        <td>14</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Author</strong></td>
-                        <td>Digital India Documentation Team</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Data Source</strong></td>
-                        <td>UIDAI Official Framework, February 2026 Announcements, Regulatory Guidelines</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <footer>
-            <div class="page-number">Page 14</div>
-        </footer>
+      <div class="chal-card">
+        <div class="chal-head problem">⚠ Challenge: Proof of Presence</div>
+        <div class="chal-body">Without physical presence verification, proxy users could conduct transactions on behalf of actual residents, enabling fraud and impersonation.</div>
+      </div>
+      <div class="chal-card">
+        <div class="chal-head solution">✓ Solution: Face Verification</div>
+        <div class="chal-body">New Aadhaar App includes advanced face recognition matching stored Aadhaar photograph with real-time capture, ensuring the legitimate individual is conducting the transaction.</div>
+      </div>
     </div>
+  </div>
+
+  <!-- § 10 Case Study -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <h2 class="section-heading">Case Study: Perfios.ai OVSE Certification</h2>
+    </div>
+
+    <p><strong>Company Overview:</strong> Perfios.ai is India's leading B2B SaaS TechFin company with global presence and operations across Asia, Europe, and North America. In February 2026, Perfios achieved OVSE certification from UIDAI, becoming one of the 17 certified entities and among the first fintech companies to implement offline identity verification at scale.</p>
+
+    <p><strong>Strategic Motivation:</strong> Perfios's decision to pursue OVSE certification reflected a strategic commitment to the Digital India initiative and recognition that offline verification would become essential for fintech operations. The certification enables the company to offer instant, paperless KYC solutions to its enterprise clients, eliminating traditional documentation requirements.</p>
+
+    <p><strong>Implementation Approach:</strong> Perfios integrated OVSE capabilities into its existing B2B SaaS platform through a modular approach, including QR code generation customized per client organization, secure callback URL endpoints, and validation modules that authenticate UIDAI signatures without connecting to central servers. Testing was conducted across 5+ sectors.</p>
+
+    <div class="ach-table">
+      <div class="ach-row" style="border-top: 1px solid var(--border);">
+        <div class="ach-metric">Certification Status</div>
+        <div class="ach-value">Achieved OVSE certification February 2026; among first 17 certified entities</div>
+      </div>
+      <div class="ach-row">
+        <div class="ach-metric">Sector Coverage</div>
+        <div class="ach-value">Enabled offline KYC across hospitality, fintech, education, and healthcare sectors</div>
+      </div>
+      <div class="ach-row">
+        <div class="ach-metric">Verification Speed</div>
+        <div class="ach-value">Reduced KYC completion from 10+ minutes to <strong>under 30 seconds</strong></div>
+      </div>
+      <div class="ach-row">
+        <div class="ach-metric">Client Adoption</div>
+        <div class="ach-value">Multiple enterprise clients integrated OVSE solutions within first 30 days</div>
+      </div>
+      <div class="ach-row">
+        <div class="ach-metric">Success Metrics</div>
+        <div class="ach-value"><strong>99.8%+</strong> verification success rate with &lt;0.2% fraud detection rate</div>
+      </div>
+    </div>
+
+    <p style="margin-top: 24px;"><strong>Industry Impact:</strong> Perfios's OVSE implementation catalyzed broader fintech adoption of offline verification. The company's success demonstrated that OVSE certification provides genuine competitive advantage in the digital identity space, positioning certified organizations as leaders in regulatory compliance and user privacy protection.</p>
+  </div>
+
+  <!-- § 11 Benefits & Future -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <span class="section-number">11</span>
+      <h2 class="section-heading">Benefits &amp; Future Outlook</h2>
+    </div>
+
+    <p><strong>Benefits for OVSE-Certified Organizations:</strong></p>
+
+    <div class="benefit-list">
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Faster Customer Onboarding</strong>Complete offline Aadhaar verification in under one minute without documentation or OTP delays, improving conversion rates.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Reduced Document Fraud</strong>Cryptographic verification prevents fake, edited, or forged Aadhaar documents, eliminating a major source of identity fraud.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Paperless Operations</strong>Organizations eliminate need for collecting, storing, and managing physical Aadhaar copies, reducing liability and complexity.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Enhanced Security</strong>Digital signatures and face verification provide multiple layers of security exceeding traditional verification methods.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Regulatory Advantage</strong>OVSE certification demonstrates DPDP Act compliance and proactive privacy protection, providing legal protection and customer trust.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Market Differentiation</strong>With only 17 certified entities in India, OVSE certification provides significant competitive advantage and brand positioning.</div></div>
+    </div>
+
+    <p><strong>Future Evolution (2026–2028 Outlook):</strong></p>
+
+    <div class="future-grid">
+      <div class="future-card"><h4>📦 Expanded Sector Adoption</h4><p>OVSE expected to expand into manufacturing, logistics, remote work verification, and gig economy platforms for worker identity and attendance verification.</p></div>
+      <div class="future-card"><h4>🔬 Enhanced Biometrics</h4><p>Future versions may incorporate iris scanning, fingerprint verification, and voice recognition alongside existing face verification for high-security scenarios.</p></div>
+      <div class="future-card"><h4>🔗 Ecosystem Integration</h4><p>Seamless integration with DigiLocker, e-sign platforms, and other Digital India initiatives will create end-to-end digital workflows for citizens.</p></div>
+      <div class="future-card"><h4>🌐 Cross-Border Potential</h4><p>International bilateral agreements may enable OVSE-verified credentials to be recognized in other countries, supporting the Indian diaspora.</p></div>
+      <div class="future-card"><h4>🤖 AI-Powered Detection</h4><p>Machine learning models analyzing verification patterns may identify sophisticated fraud attempts in real time, providing alerts to OVSE operators and government agencies.</p></div>
+      <div class="future-card"><h4>📈 Increased Certifications</h4><p>The number of certified OVSEs is expected to grow from current 17 to <strong>50+ by 2028</strong>, covering all major sectors and many mid-market companies.</p></div>
+    </div>
+
+    <div class="highlight-box" style="margin-top: 32px;">
+      <h3>Conclusion</h3>
+      <p>Aadhaar OVSE represents a mature, production-ready framework that has evolved from experimental pilot to critical digital infrastructure. With regulatory clarity, proven real-world implementations, and tangible benefits for organizations and citizens, OVSE adoption is accelerating across India's digital economy. Organizations seeking competitive advantage, regulatory compliance, and customer trust should consider OVSE certification as a strategic priority for 2026 and beyond.</p>
+    </div>
+  </div>
+
+</div><!-- /content-wrap -->
+
+<!-- ════════════════════════════════════ APPENDIX ════════════════════════════════ -->
+<div class="appendix" id="appendix">
+  <div class="section-label">Appendix</div>
+  <h2 class="toc-title">Resources &amp; Contact Information</h2>
+
+  <div class="resource-grid">
+    <div class="resource-group">
+      <h3>Official UIDAI Resources</h3>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>UIDAI Main Portal</strong><p>www.uidai.gov.in — Official source for all Aadhaar-related information and services</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>OVSE Handbook</strong><p>Available on UIDAI portal with comprehensive technical guidelines and compliance requirements</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Support Email</strong><p>collaborate@uidai.net.in — for OVSE registration inquiries and technical support</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>General Helpline</strong><p>1947 (toll-free) for questions about Aadhaar services and the OVSE process</p></div>
+      </div>
+    </div>
+
+    <div class="resource-group">
+      <h3>Regulatory &amp; Compliance References</h3>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>DPDP Act, 2023</strong><p>Digital Personal Data Protection Act — Framework for privacy compliance</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Aadhaar Act, 2016</strong><p>Aadhaar and Targeted Delivery of Financial and Subsidised Services Act</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>UIDAI OVSE Regulations</strong><p>Authentication and Offline Verification Regulations — Core OVSE framework</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>December 2025 Amendment</strong><p>Latest regulatory updates to the OVSE framework including AVC and face verification</p></div>
+      </div>
+    </div>
+
+    <div class="resource-group">
+      <h3>Technical Implementation</h3>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>API Documentation</strong><p>UIDAI provides detailed API documentation and integration guidelines for certified OVSEs</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Technical Support</strong><p>Technical support team available for troubleshooting and integration assistance post-certification</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Training &amp; Webinars</strong><p>Regular webinars and training sessions conducted for OVSE operators</p></div>
+      </div>
+    </div>
+
+    <div class="resource-group">
+      <h3>Document Metadata</h3>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Title</strong><p>Aadhaar OVSE Offline Verification — Comprehensive Case Study 2026</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Version &amp; Date</strong><p>Version 2.0 · Published February 2026 · 14 pages</p></div>
+      </div>
+      <div class="resource-item">
+        <span class="resource-bullet">→</span>
+        <div><strong>Data Source</strong><p>UIDAI Official Framework, February 2026 Announcements, Regulatory Guidelines</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Aadhaar OVSE Case Study 2026 · Version 2.0 · Based on UIDAI Official Framework · Digital India Documentation Team
+</div>
 
 </body>
 </html>
