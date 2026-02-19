@@ -4,589 +4,551 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System Engineering Playbook</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-:root {
-  --bg: #080810;
-  --surface: #0d0d1a;
-  --surface2: #11112a;
-  --border: rgba(255,255,255,0.06);
-  --border-lit: rgba(255,255,255,0.12);
-  --text: #e8e8f0;
-  --muted: #5a5a7a;
-  --accent1: #6c63ff;
-  --accent2: #00d4aa;
-}
-
-html { scroll-behavior: smooth; }
 body {
-  font-family: 'DM Mono', monospace;
-  background: var(--bg); color: var(--text);
-  min-height: 100vh; overflow-x: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  background: #0d1117;
+  color: #c9d1d9;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 48px 24px 80px;
 }
 
-.bg-mesh {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(108,99,255,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 80%, rgba(0,212,170,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,107,107,0.03) 0%, transparent 60%);
-}
-.grid-overlay {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 60px 60px;
+.page {
+  max-width: 860px;
+  margin: 0 auto;
 }
 
-.wrapper {
-  position: relative; z-index: 1;
-  max-width: 1200px; margin: 0 auto; padding: 0 2rem 5rem;
+/* ── Top title ── */
+.title-block {
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 24px;
+  margin-bottom: 32px;
 }
+.title-block h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #e6edf3;
+  margin-bottom: 8px;
+}
+.title-block p {
+  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.meta-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #8b949e;
+}
+.meta-row span strong { color: #c9d1d9; }
 
-/* Header */
-header {
-  padding: 3rem 0 2.5rem;
-  display: grid; grid-template-columns: 1fr auto;
-  align-items: start; gap: 2rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 3.5rem;
-  animation: fadeDown 0.8s ease both;
+/* ── Stats table ── */
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 32px;
+  font-size: 13px;
 }
-.brand { display: flex; flex-direction: column; gap: 0.6rem; }
-.brand-badge {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--accent2); font-weight: 500;
+.stats-table th {
+  text-align: left;
+  padding: 6px 12px;
+  border: 1px solid #21262d;
+  background: #161b22;
+  color: #8b949e;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-.brand-badge::before {
-  content: ''; width: 6px; height: 6px;
-  background: var(--accent2); border-radius: 50%;
-  animation: pulse 2s infinite;
+.stats-table td {
+  padding: 6px 12px;
+  border: 1px solid #21262d;
+  color: #c9d1d9;
 }
-@keyframes pulse {
-  0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}
-}
-h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
-  line-height: 1.05; letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,.6) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-h1 span {
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.brand-sub { font-size: 0.8rem; color: var(--muted); letter-spacing: .5px; margin-top: .25rem; }
-.header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: .75rem; }
-.stat-pill {
-  display: flex; align-items: center; gap: .5rem;
-  background: var(--surface); border: 1px solid var(--border-lit);
-  border-radius: 2rem; padding: .4rem 1rem;
-  font-size: .72rem; color: var(--muted); white-space: nowrap;
-}
-.stat-pill strong { color: var(--text); font-weight: 500; }
+.stats-table tr:hover td { background: #161b22; }
+.stats-table .done { color: #3fb950; }
+.stats-table .tot  { color: #e6edf3; font-weight: 500; }
 
-/* Section groups */
-.section-group { margin-bottom: 2.5rem; animation: fadeUp .6s ease both; }
-.section-label {
-  display: flex; align-items: center; gap: .75rem;
-  margin-bottom: 1rem; font-size: .62rem; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted);
+/* ── Group heading ── */
+.group-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 40px 0 16px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #21262d;
 }
-.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
-.section-label span {
-  background: var(--surface2); border: 1px solid var(--border);
-  padding: .18rem .6rem; border-radius: 99px; font-size: .58rem; color: var(--muted);
-}
+.group-heading span { color: #c9d1d9; }
 
-/* Card grid */
-.categories {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5px; background: var(--border);
-  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
-}
-.category {
-  background: var(--bg); padding: 1.5rem;
-  transition: background .25s;
-}
-.category:hover { background: var(--surface); }
+/* ── Category ── */
+.cat-block { margin-bottom: 28px; }
 
-.cat-header { display: flex; align-items: center; gap: .65rem; margin-bottom: 1rem; }
-.cat-icon {
-  width: 30px; height: 30px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: .82rem; flex-shrink: 0;
-}
 .cat-title {
-  font-family: 'Syne', sans-serif; font-size: .72rem;
-  font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6edf3;
+  margin-bottom: 2px;
 }
-.cat-count {
-  margin-left: auto; font-size: .6rem; color: var(--muted);
-  background: var(--surface2); padding: .1rem .4rem;
-  border-radius: 99px; border: 1px solid var(--border); white-space: nowrap;
+.cat-title .icon { margin-right: 6px; }
+.cat-meta {
+  font-size: 11px;
+  color: #8b949e;
+  margin-bottom: 8px;
 }
 
-.item-list { list-style: none; display: flex; flex-direction: column; gap: .18rem; }
-.item-list li { font-size: .75rem; line-height: 1.4; transition: all .2s; }
-.item-list li.pending { color: var(--muted); padding: .28rem .4rem; border-radius: 4px; }
+/* ── Item list ── */
+.item-list { list-style: none; padding-left: 0; }
+.item-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 13px;
+  color: #8b949e;
+}
+.item-list li .n {
+  font-size: 11px;
+  color: #484f58;
+  min-width: 28px;
+  flex-shrink: 0;
+}
+.item-list li.done { color: #c9d1d9; }
 .item-list li.done a {
-  color: var(--text); text-decoration: none;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: .5rem; padding: .28rem .4rem; border-radius: 5px; transition: all .2s;
+  color: #c9d1d9;
+  text-decoration: none;
 }
-.item-list li.done a:hover {
-  background: rgba(255,255,255,.05); color: #fff; transform: translateX(3px);
+.item-list li.done a:hover { color: #58a6ff; text-decoration: underline; }
+.item-list li .tick {
+  font-size: 11px;
+  color: #3fb950;
+  flex-shrink: 0;
 }
-.check-badge {
-  font-size: .58rem; color: var(--accent2);
-  background: rgba(0,212,170,.1); border: 1px solid rgba(0,212,170,.25);
-  border-radius: 99px; padding: .08rem .38rem;
-  letter-spacing: .5px; white-space: nowrap; flex-shrink: 0;
+.item-list li .dot {
+  font-size: 11px;
+  color: #484f58;
+  flex-shrink: 0;
 }
 
-/* ── Colour themes ── */
-.c1  .cat-icon{background:rgba(108, 99,255,.15);color:#6c63ff;} .c1  .cat-title{color:#6c63ff;}
-.c2  .cat-icon{background:rgba(  0,212,170,.12);color:#00d4aa;} .c2  .cat-title{color:#00d4aa;}
-.c3  .cat-icon{background:rgba(245,200, 66,.10);color:#f5c842;} .c3  .cat-title{color:#f5c842;}
-.c4  .cat-icon{background:rgba(255,107,107,.10);color:#ff6b6b;} .c4  .cat-title{color:#ff6b6b;}
-.c5  .cat-icon{background:rgba(255,140, 70,.12);color:#ff8c46;} .c5  .cat-title{color:#ff8c46;}
-.c6  .cat-icon{background:rgba(180,130,255,.12);color:#b482ff;} .c6  .cat-title{color:#b482ff;}
-.c7  .cat-icon{background:rgba(255, 60, 60,.10);color:#ff5555;} .c7  .cat-title{color:#ff5555;}
-.c8  .cat-icon{background:rgba( 80,220,100,.10);color:#50dc64;} .c8  .cat-title{color:#50dc64;}
-.c9  .cat-icon{background:rgba(255, 80,120,.10);color:#ff5078;} .c9  .cat-title{color:#ff5078;}
-.c10 .cat-icon{background:rgba(255,165,  0,.10);color:#ffa500;} .c10 .cat-title{color:#ffa500;}
-.c11 .cat-icon{background:rgba(100,200,255,.10);color:#64c8ff;} .c11 .cat-title{color:#64c8ff;}
-.c12 .cat-icon{background:rgba(255,140,  0,.12);color:#ff8c00;} .c12 .cat-title{color:#ff8c00;}
-.c13 .cat-icon{background:rgba(255,100,160,.10);color:#ff64a0;} .c13 .cat-title{color:#ff64a0;}
-.c14 .cat-icon{background:rgba(140,100,255,.12);color:#8c64ff;} .c14 .cat-title{color:#8c64ff;}
-.c15 .cat-icon{background:rgba(  0,180,255,.10);color:#00b4ff;} .c15 .cat-title{color:#00b4ff;}
-.c16 .cat-icon{background:rgba( 50,220,180,.10);color:#32dcb4;} .c16 .cat-title{color:#32dcb4;}
-.c17 .cat-icon{background:rgba(255,100,200,.10);color:#ff64c8;} .c17 .cat-title{color:#ff64c8;}
-.c18 .cat-icon{background:rgba(100,180,255,.10);color:#64b4ff;} .c18 .cat-title{color:#64b4ff;}
-.c19 .cat-icon{background:rgba(180,255,120,.10);color:#b4ff78;} .c19 .cat-title{color:#b4ff78;}
-.c20 .cat-icon{background:rgba(255,200, 80,.10);color:#ffc850;} .c20 .cat-title{color:#ffc850;}
-
-/* Footer */
-footer {
-  margin-top: 3rem; border-top: 1px solid var(--border);
-  padding-top: 2rem; display: flex; justify-content: space-between;
-  align-items: center; gap: 1.5rem; flex-wrap: wrap;
-  font-size: .72rem; color: var(--muted);
-  animation: fadeUp .6s ease .5s both;
+/* ── Summary at bottom ── */
+.summary-block { margin-top: 48px; border-top: 1px solid #21262d; padding-top: 24px; }
+.summary-block h2 { font-size: 14px; color: #e6edf3; margin-bottom: 16px; font-weight: 600; }
+.summary-table2 {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
 }
-.footer-left { display: flex; flex-direction: column; gap: .3rem; }
-.footer-left strong { color: var(--text); font-size: .78rem; }
-.footer-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
-.footer-stat { display: flex; flex-direction: column; align-items: center; }
-.footer-stat .num {
-  font-family: 'Syne', sans-serif; font-size: 1.4rem;
-  font-weight: 800; color: var(--text); line-height: 1;
+.summary-table2 th {
+  text-align: left;
+  padding: 6px 10px;
+  border: 1px solid #21262d;
+  background: #161b22;
+  color: #8b949e;
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
 }
-.footer-stat .label { font-size: .58rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: .2rem; }
+.summary-table2 td {
+  padding: 5px 10px;
+  border: 1px solid #21262d;
+  color: #c9d1d9;
+}
+.summary-table2 tr:hover td { background: #161b22; }
+.summary-table2 .grp-cell { color: #8b949e; font-size: 11px; }
+.summary-table2 .done-cell { color: #3fb950; }
+.summary-table2 .total-row td { background: #161b22; font-weight: 600; color: #e6edf3; border-top: 1px solid #30363d; }
 
-@keyframes fadeDown { from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:translateY(0);} }
-@keyframes fadeUp   { from{opacity:0;transform:translateY( 16px);}to{opacity:1;transform:translateY(0);} }
-.section-group:nth-child(1){animation-delay:.05s;}
-.section-group:nth-child(2){animation-delay:.10s;}
-.section-group:nth-child(3){animation-delay:.15s;}
-.section-group:nth-child(4){animation-delay:.20s;}
-.section-group:nth-child(5){animation-delay:.25s;}
-.section-group:nth-child(6){animation-delay:.30s;}
+/* ── Trajectory ── */
+.traj-block { margin-top: 32px; }
+.traj-block h2 { font-size: 14px; color: #e6edf3; margin-bottom: 12px; font-weight: 600; }
+.traj-list { list-style: none; }
+.traj-list li { font-size: 13px; color: #8b949e; padding: 3px 0; }
+.traj-list li strong { color: #c9d1d9; }
 
-@media(max-width:640px){
-  .wrapper{padding:0 1rem 3rem;}
-  header{grid-template-columns:1fr;}
-  .header-meta{align-items:flex-start;}
-  .categories{grid-template-columns:1fr;}
-  .footer-stats{gap:1.2rem;}
+/* ── Footer ── */
+.footer { margin-top: 48px; border-top: 1px solid #21262d; padding-top: 16px; font-size: 12px; color: #484f58; }
+
+@media(max-width: 600px) {
+  body { padding: 24px 16px 48px; }
+  .meta-row { gap: 12px; }
 }
 </style>
 </head>
 <body>
-<div class="bg-mesh"></div>
-<div class="grid-overlay"></div>
-<div class="wrapper">
+<div class="page">
 
-<!-- HEADER -->
-<header>
-  <div class="brand">
-    <div class="brand-badge">Active · Feb 2026</div>
-    <h1>System<br><span>Engineering</span></h1>
-    <p class="brand-sub">Playbook · Architectural deep-dives &amp; case studies</p>
-  </div>
-  <div class="header-meta">
-    <div class="stat-pill"><strong>85+</strong> Topics</div>
-    <div class="stat-pill"><strong>20</strong> Categories</div>
-    <div class="stat-pill"><strong>16</strong> Published</div>
-  </div>
-</header>
-
-
-<!-- ═══ GROUP 1 — FRONTEND, AI & CLOUD ═══ -->
-<div class="section-group">
-  <div class="section-label">Frontend, AI &amp; Cloud <span>3 categories · 19 topics</span></div>
-  <div class="categories">
-
-    <div class="category c1">
-      <div class="cat-header">
-        <div class="cat-icon">📱</div>
-        <div class="cat-title">Mobile &amp; UI/UX Design</div>
-        <div class="cat-count">7</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Mobile-First vs Desktop-First — Revolut / Cash App</li>
-        <li class="pending">Figma Plugin Architecture &amp; Real-Time Collaboration</li>
-        <li class="done"><a href="./case-studies/checkout-flow-ecommerce/">Checkout Flow E-Commerce <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/paypay/">PayPay System <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/zoho-web-interface-design/">Zoho Web Interface <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/apple-liquid-glass/">Apple Liquid Glass <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/canvas-drag-drop-workflow/">Canvas &amp; Drag-Drop Workflows <span class="check-badge">done</span></a></li>
-      </ul>
-    </div>
-
-    <div class="category c2">
-      <div class="cat-header">
-        <div class="cat-icon">🤖</div>
-        <div class="cat-title">AI &amp; Search Systems</div>
-        <div class="cat-count">4</div>
-      </div>
-      <ul class="item-list">
-        <li class="done"><a href="./case-studies/perplexity-answer-engine/">Perplexity Answer Engine <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/zoho-zia/">Zoho ZIA AI Assistant <span class="check-badge">done</span></a></li>
-        <li class="pending">OpenAI Model Deployment at Scale</li>
-        <li class="pending">ByteDance TikTok Recommendation Engine</li>
-      </ul>
-    </div>
-
-    <div class="category c3">
-      <div class="cat-header">
-        <div class="cat-icon">☁️</div>
-        <div class="cat-title">Cloud &amp; Platform Engineering</div>
-        <div class="cat-count">8</div>
-      </div>
-      <ul class="item-list">
-        <li class="done"><a href="./case-studies/cloudflare-go/">Cloudflare GO <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/systems-engineering-general/">Systems Engineering General <span class="check-badge">done</span></a></li>
-        <li class="pending">Neocloud Performance Benchmark</li>
-        <li class="pending">Sovereign AI Cloud — NIS2 &amp; GDPR</li>
-        <li class="pending">Vercel Microfrontend Migration</li>
-        <li class="pending">Coolify — Open-Source PaaS</li>
-        <li class="pending">Ataccama — Docker-Driven AI Platform</li>
-        <li class="pending">Warehouse Group VM to Container Migration</li>
-      </ul>
-    </div>
-
+<!-- TITLE -->
+<div class="title-block">
+  <h1>🧠 System Engineering Playbook</h1>
+  <p>Deep technical case studies analyzing modern system architecture, distributed systems, cloud infrastructure, AI platforms, fintech systems, automotive engineering, critical infrastructure, and real-time platforms.</p>
+  <div class="meta-row">
+    <span><strong>Version:</strong> 2.2</span>
+    <span><strong>Status:</strong> Active Development</span>
+    <span><strong>Updated:</strong> Feb 19, 2026</span>
+    <span><strong>Total:</strong> 94 topics</span>
+    <span><strong>Published:</strong> 12 confirmed</span>
+    <span><strong>Upcoming:</strong> 82</span>
   </div>
 </div>
 
+<!-- QUICK STATS -->
+<table class="stats-table">
+  <tr><th>Metric</th><th>Value</th></tr>
+  <tr><td>Total Topics</td><td class="tot">94</td></tr>
+  <tr><td>Published (confirmed folders)</td><td class="done">12</td></tr>
+  <tr><td>Upcoming</td><td>82</td></tr>
+  <tr><td>Groups</td><td>7</td></tr>
+  <tr><td>Categories</td><td>22</td></tr>
+  <tr><td>Version</td><td>2.2</td></tr>
+</table>
 
-<!-- ═══ GROUP 2 — SECURITY, SPACE & AUTOMOTIVE ═══ -->
-<div class="section-group">
-  <div class="section-label">Security, Space &amp; Automotive <span>3 categories · 10 topics</span></div>
-  <div class="categories">
 
-    <div class="category c5">
-      <div class="cat-header">
-        <div class="cat-icon">🔐</div>
-        <div class="cat-title">Security &amp; Zero-Trust</div>
-        <div class="cat-count">4</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">AI Agent Identity &amp; Security</li>
-        <li class="pending">Cloudflare Zero Trust Architecture</li>
-        <li class="pending">Signal End-to-End Encryption Protocol</li>
-        <li class="pending">Interpol Biometric Border Control</li>
-      </ul>
-    </div>
+<!-- ═══════════════════════════════════
+     GROUP 1 — FRONTEND, AI & CLOUD
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 1</span> — Frontend, AI &amp; Cloud · 3 categories · 13 topics</div>
 
-    <div class="category c6">
-      <div class="cat-header">
-        <div class="cat-icon">🛰️</div>
-        <div class="cat-title">Satellite &amp; Space Systems</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Starlink Space Infrastructure</li>
-        <li class="pending">LEO Capacity Modeling</li>
-        <li class="pending">NASA Deep Space Network</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">📱</span>Mobile &amp; UI/UX</div>
+  <div class="cat-meta">5 published · 2 upcoming · 7 total</div>
+  <ul class="item-list">
+    <li><span class="n">#1</span><span class="dot">○</span> Mobile-First vs Desktop-First — Revolut / Cash App Architecture</li>
+    <li><span class="n">#2</span><span class="dot">○</span> Figma Plugin Architecture &amp; Real-Time Collaboration</li>
+    <li class="done"><span class="n">#3</span><span class="tick">✓</span><a href="./case-studies/checkout-flow-ecommerce/">Checkout Flow E-Commerce Case Study</a></li>
+    <li class="done"><span class="n">#4</span><span class="tick">✓</span><a href="./case-studies/paypay/">PayPay Case Study</a></li>
+    <li class="done"><span class="n">#5</span><span class="tick">✓</span><a href="./case-studies/zoho-web-interface-design/">Zoho Web Interface Design Analysis</a></li>
+    <li class="done"><span class="n">#6</span><span class="tick">✓</span><a href="./case-studies/apple-liquid-glass/">Apple Liquid Glass Case Study</a></li>
+    <li class="done"><span class="n">#7</span><span class="tick">✓</span><a href="./case-studies/canvas-drag-drop-workflow/">Canvas, Drag-and-Drop &amp; Visual Workflow Engines</a></li>
+  </ul>
+</div>
 
-    <div class="category c7">
-      <div class="cat-header">
-        <div class="cat-icon">⚡</div>
-        <div class="cat-title">Tesla &amp; Aerospace Engineering</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="done"><a href="./case-studies/tesla-unified-vehicle-command/">Tesla Unified Vehicle Command <span class="check-badge">done</span></a></li>
-        <li class="done"><a href="./case-studies/tesla-battery-systems/">Tesla Battery Systems <span class="check-badge">done</span></a></li>
-        <li class="pending">SpaceX Falcon 9 Autonomous Landing</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🤖</span>AI &amp; Search Systems</div>
+  <div class="cat-meta">2 published · 0 upcoming · 2 total</div>
+  <ul class="item-list">
+    <li class="done"><span class="n">#8</span><span class="tick">✓</span><a href="./case-studies/perplexity-answer-engine/">Perplexity Answer Engine Case Study</a></li>
+    <li class="done"><span class="n">#9</span><span class="tick">✓</span><a href="./case-studies/zoho-zia/">Zoho ZIA Case Study</a></li>
+  </ul>
+</div>
 
-  </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">☁️</span>Cloud &amp; Infrastructure</div>
+  <div class="cat-meta">1 published · 3 upcoming · 4 total</div>
+  <ul class="item-list">
+    <li><span class="n">#10</span><span class="dot">○</span> Neocloud Performance Benchmark — CoreWeave vs Together AI vs Fireworks AI vs AWS/Azure</li>
+    <li><span class="n">#11</span><span class="dot">○</span> AI Agent Identity &amp; Security — OAuth + MCP Patterns</li>
+    <li><span class="n">#12</span><span class="dot">○</span> Sovereign AI Cloud — NIS2, GDPR, EU Data Act Mapping</li>
+    <li class="done"><span class="n">#13</span><span class="tick">✓</span><a href="./case-studies/cloudflare-go/">Cloudflare GO Case Study</a></li>
+  </ul>
 </div>
 
 
-<!-- ═══ GROUP 3 — FINTECH, STREAMING & DISTRIBUTED ═══ -->
-<div class="section-group">
-  <div class="section-label">Fintech, Platforms &amp; Distributed Systems <span>4 categories · 19 topics</span></div>
-  <div class="categories">
+<!-- ═══════════════════════════════════
+     GROUP 2 — PLATFORM, SPACE & AUTOMOTIVE
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 2</span> — Platform, Space &amp; Automotive · 3 categories · 9 topics</div>
 
-    <div class="category c8">
-      <div class="cat-header">
-        <div class="cat-icon">💳</div>
-        <div class="cat-title">Payments &amp; Fintech</div>
-        <div class="cat-count">5</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Stripe Payment Reliability Engineering</li>
-        <li class="pending">Visa Global Transaction Processing</li>
-        <li class="pending">SWIFT Global Financial Messaging</li>
-        <li class="pending">Bloomberg Terminal Infrastructure</li>
-        <li class="pending">Chicago Board of Trade Open-Outcry Systems</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🚀</span>Platform Engineering</div>
+  <div class="cat-meta">1 published · 4 upcoming · 5 total</div>
+  <ul class="item-list">
+    <li><span class="n">#14</span><span class="dot">○</span> Vercel Microfrontend Migration</li>
+    <li><span class="n">#15</span><span class="dot">○</span> Coolify — Open-Source PaaS Alternative</li>
+    <li><span class="n">#16</span><span class="dot">○</span> Ataccama — Docker-Driven AI Transformation</li>
+    <li><span class="n">#17</span><span class="dot">○</span> The Warehouse Group — VM to Container Migration</li>
+    <li class="done"><span class="n">#18</span><span class="tick">✓</span><a href="./case-studies/systems-engineering-general/">Systems Engineering General Case Study</a></li>
+  </ul>
+</div>
 
-    <div class="category c9">
-      <div class="cat-header">
-        <div class="cat-icon">📡</div>
-        <div class="cat-title">Streaming, Content &amp; Commerce</div>
-        <div class="cat-count">4</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Netflix Chaos Engineering</li>
-        <li class="pending">YouTube View Validation &amp; Anti-Bot</li>
-        <li class="pending">Uber Real-Time Dispatch</li>
-        <li class="pending">Amazon Fulfillment Robotics</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🛰️</span>Satellite &amp; Space Engineering</div>
+  <div class="cat-meta">0 published · 2 upcoming · 2 total</div>
+  <ul class="item-list">
+    <li><span class="n">#19</span><span class="dot">○</span> Starlink as Space Infrastructure</li>
+    <li><span class="n">#20</span><span class="dot">○</span> LEO Capacity Modeling</li>
+  </ul>
+</div>
 
-    <div class="category c16">
-      <div class="cat-header">
-        <div class="cat-icon">🔗</div>
-        <div class="cat-title">Distributed Systems &amp; Protocols</div>
-        <div class="cat-count">5</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Kubernetes Control Plane Architecture</li>
-        <li class="pending">Ethereum Layer 2 Scaling</li>
-        <li class="pending">ICANN DNS Root Server System</li>
-        <li class="pending">Linux Foundation Open-Source Governance</li>
-        <li class="pending">World Bank Digital Infrastructure</li>
-      </ul>
-    </div>
-
-    <div class="category c4">
-      <div class="cat-header">
-        <div class="cat-icon">🌍</div>
-        <div class="cat-title">Global Public Data Systems</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">WHO Global Pandemic Data Systems</li>
-        <li class="pending">Interpol Criminal Database</li>
-        <li class="pending">YouTube View Validation &amp; Anti-Bot</li>
-      </ul>
-    </div>
-
-  </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">⚡</span>Tesla Engineering</div>
+  <div class="cat-meta">2 published · 0 upcoming · 2 total</div>
+  <ul class="item-list">
+    <li class="done"><span class="n">#21</span><span class="tick">✓</span><a href="./case-studies/tesla-unified-vehicle-command/">Tesla Unified Vehicle Command System</a></li>
+    <li class="done"><span class="n">#22</span><span class="tick">✓</span><a href="./case-studies/tesla-battery-systems/">Tesla Battery Systems Case Study</a></li>
+  </ul>
 </div>
 
 
-<!-- ═══ GROUP 4 — CRITICAL INFRASTRUCTURE ═══ -->
-<div class="section-group">
-  <div class="section-label">Critical Infrastructure &amp; Hidden Systems <span>3 categories · 13 topics</span></div>
-  <div class="categories">
+<!-- ═══════════════════════════════════
+     GROUP 3 — FINTECH & DISTRIBUTED
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 3</span> — Fintech, Platforms &amp; Distributed Systems · 4 categories · 20 topics</div>
 
-    <div class="category c10">
-      <div class="cat-header">
-        <div class="cat-icon">🛡️</div>
-        <div class="cat-title">Defense &amp; Physical Infrastructure</div>
-        <div class="cat-count">5</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Cheyenne Mountain Defense Systems</li>
-        <li class="pending">North Atlantic Air Traffic Control</li>
-        <li class="pending">Submarine Fiber Cable Infrastructure</li>
-        <li class="pending">Power Grid Black Start Systems</li>
-        <li class="pending">GPS Ground Segment &amp; Time Correction</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">💳</span>Payments &amp; Fintech</div>
+  <div class="cat-meta">0 published · 5 upcoming · 5 total</div>
+  <ul class="item-list">
+    <li><span class="n">#23</span><span class="dot">○</span> SWIFT Global Financial Messaging Architecture</li>
+    <li><span class="n">#31</span><span class="dot">○</span> Chicago Board of Trade Open-Outcry System</li>
+    <li><span class="n">#56</span><span class="dot">○</span> Stripe Payment Reliability Engineering</li>
+    <li><span class="n">#65</span><span class="dot">○</span> Bloomberg Terminal Infrastructure</li>
+    <li><span class="n">#66</span><span class="dot">○</span> Visa Global Transaction Processing Network</li>
+  </ul>
+</div>
 
-    <div class="category c11">
-      <div class="cat-header">
-        <div class="cat-icon">🔬</div>
-        <div class="cat-title">Science, Research &amp; Archives</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">CERN LHC Real-Time Trigger Systems</li>
-        <li class="pending">Svalbard Global Seed Vault Systems</li>
-        <li class="pending">Library of Congress Digital Preservation</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">📡</span>Streaming, Content &amp; Commerce</div>
+  <div class="cat-meta">0 published · 4 upcoming · 4 total</div>
+  <ul class="item-list">
+    <li><span class="n">#57</span><span class="dot">○</span> Netflix Chaos Engineering Platform</li>
+    <li><span class="n">#58</span><span class="dot">○</span> Uber Real-Time Dispatch &amp; Surge Algorithms</li>
+    <li><span class="n">#59</span><span class="dot">○</span> Amazon Fulfillment Robotics &amp; Optimization</li>
+    <li><span class="n">#68</span><span class="dot">○</span> ByteDance TikTok Recommendation System</li>
+  </ul>
+</div>
 
-    <div class="category c4">
-      <div class="cat-header">
-        <div class="cat-icon">🚨</div>
-        <div class="cat-title">Emergency &amp; Disaster Response</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">911 Emergency Response Network</li>
-        <li class="pending">National Disaster Early Warning Systems</li>
-        <li class="pending">Disaster Recovery &amp; Geo-Redundant Identity Systems</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🔗</span>Distributed Systems &amp; Protocols</div>
+  <div class="cat-meta">0 published · 6 upcoming · 6 total</div>
+  <ul class="item-list">
+    <li><span class="n">#60</span><span class="dot">○</span> Ethereum Layer 2 Scaling Architecture</li>
+    <li><span class="n">#63</span><span class="dot">○</span> Kubernetes Control Plane Architecture</li>
+    <li><span class="n">#69</span><span class="dot">○</span> ICANN DNS Root Server Infrastructure</li>
+    <li><span class="n">#71</span><span class="dot">○</span> Linux Foundation Open Source Governance</li>
+    <li><span class="n">#73</span><span class="dot">○</span> World Bank Digital Public Infrastructure</li>
+    <li><span class="n">#74</span><span class="dot">○</span> WHO Global Pandemic Data Infrastructure</li>
+  </ul>
+</div>
 
-  </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🌍</span>Global Tech &amp; AI Platforms</div>
+  <div class="cat-meta">0 published · 5 upcoming · 5 total</div>
+  <ul class="item-list">
+    <li><span class="n">#55</span><span class="dot">○</span> Cloudflare Zero Trust Architecture</li>
+    <li><span class="n">#61</span><span class="dot">○</span> OpenAI Model Deployment &amp; Inference Infrastructure</li>
+    <li><span class="n">#64</span><span class="dot">○</span> Signal End-to-End Encryption Protocol</li>
+    <li><span class="n">#67</span><span class="dot">○</span> Interpol Secure Criminal Database Systems</li>
+    <li><span class="n">#72</span><span class="dot">○</span> Interpol Biometric Border Control Systems</li>
+  </ul>
 </div>
 
 
-<!-- ═══ GROUP 5 — INDIA DIGITAL & AADHAAR ═══ -->
-<div class="section-group">
-  <div class="section-label">India Digital Public Infrastructure &amp; Aadhaar <span>3 categories · 16 topics</span></div>
-  <div class="categories">
+<!-- ═══════════════════════════════════
+     GROUP 4 — CRITICAL INFRASTRUCTURE
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 4</span> — Critical Infrastructure &amp; Hidden Systems · 3 categories · 14 topics</div>
 
-    <div class="category c12">
-      <div class="cat-header">
-        <div class="cat-icon">🇮🇳</div>
-        <div class="cat-title">India Digital Public Infrastructure</div>
-        <div class="cat-count">4</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">India GST Digital Tax Infrastructure</li>
-        <li class="pending">Aadhaar Biometric Identity System — Overview</li>
-        <li class="pending">UIDAI Digital Signature Validation</li>
-        <li class="pending">Aadhaar Consent Framework (Section 8A)</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🛡️</span>Defense &amp; Physical Infrastructure</div>
+  <div class="cat-meta">0 published · 6 upcoming · 6 total</div>
+  <ul class="item-list">
+    <li><span class="n">#25</span><span class="dot">○</span> North Atlantic Procedural Air Traffic Control</li>
+    <li><span class="n">#26</span><span class="dot">○</span> Global Submarine Fiber Cable Infrastructure</li>
+    <li><span class="n">#27</span><span class="dot">○</span> Cheyenne Mountain Hardened Defense Architecture</li>
+    <li><span class="n">#28</span><span class="dot">○</span> Power Grid Black Start &amp; Islanding Systems</li>
+    <li><span class="n">#62</span><span class="dot">○</span> SpaceX Falcon 9 Autonomous Landing System</li>
+    <li><span class="n">#70</span><span class="dot">○</span> NASA Deep Space Network Architecture</li>
+  </ul>
+</div>
 
-    <div class="category c13">
-      <div class="cat-header">
-        <div class="cat-icon">🪪</div>
-        <div class="cat-title">Aadhaar Auth, Biometrics &amp; API</div>
-        <div class="cat-count">6</div>
-      </div>
-      <ul class="item-list">
-        <li class="done"><a href="./case-studies/aadhaar-ovse-offline-verification/">Aadhaar OVSE Offline Verification <span class="check-badge">done</span></a></li>
-        <li class="pending">Distributed Biometric Deduplication — ABIS Architecture</li>
-        <li class="pending">Secure API Gateway &amp; Auth Flow (KYC, eKYC, OTP, Tokenization)</li>
-        <li class="pending">Zero-Trust Identity Verification for Gov Integrations</li>
-        <li class="pending">National-Scale Identity Throughput — Peak Auth TPS</li>
-        <li class="pending">Data Minimization — Virtual ID &amp; UID Tokenization</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🔬</span>Science, Research &amp; Archives</div>
+  <div class="cat-meta">0 published · 4 upcoming · 4 total</div>
+  <ul class="item-list">
+    <li><span class="n">#24</span><span class="dot">○</span> Svalbard Global Seed Vault Engineering Systems</li>
+    <li><span class="n">#29</span><span class="dot">○</span> Library of Congress Long-Term Digital Preservation</li>
+    <li><span class="n">#30</span><span class="dot">○</span> GPS Ground Segment &amp; Relativistic Time Correction</li>
+    <li><span class="n">#32</span><span class="dot">○</span> CERN LHC Real-Time Trigger &amp; Data Filtering</li>
+  </ul>
+</div>
 
-    <div class="category c14">
-      <div class="cat-header">
-        <div class="cat-icon">🔑</div>
-        <div class="cat-title">Aadhaar Crypto, Arch &amp; Compliance</div>
-        <div class="cat-count">4</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Cryptographic Key Management &amp; HSM Infrastructure</li>
-        <li class="pending">High-Availability UIDAI CIDR Data Center Architecture</li>
-        <li class="pending">Audit Logging, Traceability &amp; Compliance (DPDP)</li>
-        <li class="pending">Geo-Redundant UIDAI Disaster Recovery Architecture</li>
-      </ul>
-    </div>
-
-  </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🕵️</span>Law Enforcement &amp; Intelligence</div>
+  <div class="cat-meta">0 published · 2 upcoming · 2 total</div>
+  <ul class="item-list">
+    <li><span class="n">#67</span><span class="dot">○</span> Interpol Secure Criminal Database Systems</li>
+    <li><span class="n">#72</span><span class="dot">○</span> Interpol Biometric Border Control Systems</li>
+  </ul>
 </div>
 
 
-<!-- ═══ GROUP 6 — GAME & REAL-TIME SYSTEMS ═══ -->
-<div class="section-group">
-  <div class="section-label">Game &amp; Real-Time Systems <span>4 categories · 20 topics</span></div>
-  <div class="categories">
+<!-- ═══════════════════════════════════
+     GROUP 5 — PUBLIC & NATIONAL PLATFORMS
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 5</span> — Public Systems &amp; National Platforms · 2 categories · 5 topics</div>
 
-    <div class="category c17">
-      <div class="cat-header">
-        <div class="cat-icon">🎮</div>
-        <div class="cat-title">Game Engines &amp; Architecture</div>
-        <div class="cat-count">7</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Unity DOTS &amp; ECS Architecture</li>
-        <li class="pending">Unity Addressables System</li>
-        <li class="pending">Unity Shader Graph &amp; Rendering Pipeline</li>
-        <li class="pending">Unity ScriptableObject Patterns</li>
-        <li class="pending">Unreal Engine Blueprint vs C++</li>
-        <li class="pending">Godot Scene Tree &amp; Node System</li>
-        <li class="pending">Godot Multiplayer API</li>
-      </ul>
-    </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🚨</span>Emergency &amp; Government Systems</div>
+  <div class="cat-meta">0 published · 3 upcoming · 3 total</div>
+  <ul class="item-list">
+    <li><span class="n">#33</span><span class="dot">○</span> 911 Emergency Response Network Architecture</li>
+    <li><span class="n">#34</span><span class="dot">○</span> India GST Digital Tax Infrastructure</li>
+    <li><span class="n">#37</span><span class="dot">○</span> National Disaster Early Warning Sensor Networks</li>
+  </ul>
+</div>
 
-    <div class="category c18">
-      <div class="cat-header">
-        <div class="cat-icon">🕹️</div>
-        <div class="cat-title">Multiplayer &amp; Networking</div>
-        <div class="cat-count">5</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Unity Netcode for GameObjects</li>
-        <li class="pending">Photon Engine Multiplayer</li>
-        <li class="pending">Mirror Networking Layer</li>
-        <li class="pending">Epic Online Services Matchmaking</li>
-        <li class="pending">Open Match Scalable Matchmaking</li>
-      </ul>
-    </div>
-
-    <div class="category c19">
-      <div class="cat-header">
-        <div class="cat-icon">🖥️</div>
-        <div class="cat-title">Game Backend &amp; Services</div>
-        <div class="cat-count">5</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">PlayFab Backend Architecture</li>
-        <li class="pending">Firebase Realtime Database</li>
-        <li class="pending">Steamworks Leaderboard Systems</li>
-        <li class="pending">Redis Real-Time Leaderboard</li>
-        <li class="pending">Unity Analytics Telemetry</li>
-      </ul>
-    </div>
-
-    <div class="category c20">
-      <div class="cat-header">
-        <div class="cat-icon">🐳</div>
-        <div class="cat-title">DevOps &amp; Game Infrastructure</div>
-        <div class="cat-count">3</div>
-      </div>
-      <ul class="item-list">
-        <li class="pending">Unity Cloud Build CI/CD Pipeline</li>
-        <li class="pending">Docker Game Server Containerization</li>
-        <li class="pending">Kubernetes Auto-Scaling for Game Servers</li>
-      </ul>
-    </div>
-
-  </div>
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🌐</span>Consumer-Scale National Platforms</div>
+  <div class="cat-meta">0 published · 2 upcoming · 2 total</div>
+  <ul class="item-list">
+    <li><span class="n">#35</span><span class="dot">○</span> Aadhaar Biometric Identity Authentication System</li>
+    <li><span class="n">#36</span><span class="dot">○</span> YouTube View Validation &amp; Anti-Bot Detection</li>
+  </ul>
 </div>
 
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-left">
-    <strong>System Engineering Playbook</strong>
-    <span>Engineering Excellence · India &amp; Asia Clients · Since 2023</span>
-    <span>Last updated: Feb 19, 2026</span>
-  </div>
-  <div class="footer-stats">
-    <div class="footer-stat"><div class="num">85+</div><div class="label">Topics</div></div>
-    <div class="footer-stat"><div class="num">20</div><div class="label">Categories</div></div>
-    <div class="footer-stat"><div class="num">6</div><div class="label">Groups</div></div>
-    <div class="footer-stat"><div class="num">16</div><div class="label">Published</div></div>
-  </div>
-</footer>
+<!-- ═══════════════════════════════════
+     GROUP 6 — AADHAAR & NATIONAL IDENTITY
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 6</span> — Aadhaar &amp; National Identity Systems · 3 categories · 17 topics</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🇮🇳</span>Legal, Consent &amp; Privacy</div>
+  <div class="cat-meta">0 published · 6 upcoming · 6 total</div>
+  <ul class="item-list">
+    <li><span class="n">#40</span><span class="dot">○</span> Aadhaar Consent Framework (Section 8A)</li>
+    <li><span class="n">#41</span><span class="dot">○</span> Aadhaar Act 2019 &amp; DPDP Compliance Mapping</li>
+    <li><span class="n">#43</span><span class="dot">○</span> Privacy-Preserving Aadhaar Storage (Last 4 Digits Strategy)</li>
+    <li><span class="n">#45</span><span class="dot">○</span> Aadhaar Breach Reporting &amp; 72-Hour Incident Response</li>
+    <li><span class="n">#51</span><span class="dot">○</span> Data Minimization Architecture (Virtual ID, UID Tokenization)</li>
+    <li><span class="n">#53</span><span class="dot">○</span> Audit Logging, Traceability &amp; Compliance Engineering (DPDP)</li>
+  </ul>
+</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🪪</span>Auth, Biometrics &amp; API</div>
+  <div class="cat-meta">1 published · 7 upcoming · 8 total</div>
+  <ul class="item-list">
+    <li class="done"><span class="n">#38</span><span class="tick">✓</span><a href="./case-studies/aadhaar-ovse-offline-verification/">Aadhaar OVSE Offline Verification Framework</a></li>
+    <li><span class="n">#39</span><span class="dot">○</span> UIDAI Digital Signature Validation &amp; Cryptography</li>
+    <li><span class="n">#42</span><span class="dot">○</span> UIDAI Sandbox API Architecture &amp; Webhooks</li>
+    <li><span class="n">#44</span><span class="dot">○</span> National Biometric Database at 140+ Crore Scale</li>
+    <li><span class="n">#46</span><span class="dot">○</span> Distributed Biometric Deduplication at 140+ Crore Scale (ABIS Architecture)</li>
+    <li><span class="n">#48</span><span class="dot">○</span> Secure API Gateway &amp; Auth Flow (KYC, eKYC, OTP, Tokenization)</li>
+    <li><span class="n">#49</span><span class="dot">○</span> Zero-Trust Identity Verification for Government Integrations</li>
+    <li><span class="n">#54</span><span class="dot">○</span> National-Scale Identity Throughput Engineering (Peak Auth TPS)</li>
+  </ul>
+</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🔑</span>Cryptography, Architecture &amp; DR</div>
+  <div class="cat-meta">0 published · 3 upcoming · 3 total</div>
+  <ul class="item-list">
+    <li><span class="n">#47</span><span class="dot">○</span> High-Availability UIDAI CIDR Data Center Architecture</li>
+    <li><span class="n">#50</span><span class="dot">○</span> Cryptographic Key Management &amp; HSM Infrastructure</li>
+    <li><span class="n">#52</span><span class="dot">○</span> Disaster Recovery &amp; Geo-Redundant Identity Systems</li>
+  </ul>
+</div>
+
+
+<!-- ═══════════════════════════════════
+     GROUP 7 — GAME & REAL-TIME SYSTEMS
+═══════════════════════════════════ -->
+<div class="group-heading"><span>Group 7</span> — Game &amp; Real-Time Systems · 4 categories · 20 topics</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🎮</span>Game Engines &amp; Architecture</div>
+  <div class="cat-meta">0 published · 7 upcoming · 7 total</div>
+  <ul class="item-list">
+    <li><span class="n">#75</span><span class="dot">○</span> Unity DOTS &amp; ECS Architecture</li>
+    <li><span class="n">#76</span><span class="dot">○</span> Unity Addressables System</li>
+    <li><span class="n">#87</span><span class="dot">○</span> Unity Shader Graph &amp; Rendering Pipelines</li>
+    <li><span class="n">#91</span><span class="dot">○</span> Unity ScriptableObject Architecture Patterns</li>
+    <li><span class="n">#78</span><span class="dot">○</span> Unreal Engine Blueprint vs C++ Architecture</li>
+    <li><span class="n">#79</span><span class="dot">○</span> Godot Scene Tree &amp; Node System</li>
+    <li><span class="n">#88</span><span class="dot">○</span> Godot Multiplayer API</li>
+  </ul>
+</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🕹️</span>Multiplayer &amp; Networking</div>
+  <div class="cat-meta">0 published · 5 upcoming · 5 total</div>
+  <ul class="item-list">
+    <li><span class="n">#77</span><span class="dot">○</span> Unity Netcode for GameObjects</li>
+    <li><span class="n">#80</span><span class="dot">○</span> Photon Engine Multiplayer Infrastructure</li>
+    <li><span class="n">#81</span><span class="dot">○</span> Mirror Networking Layer</li>
+    <li><span class="n">#89</span><span class="dot">○</span> Epic Online Services Identity &amp; Matchmaking</li>
+    <li><span class="n">#94</span><span class="dot">○</span> Open Match Scalable Matchmaking System</li>
+  </ul>
+</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🖥️</span>Game Backend &amp; Services</div>
+  <div class="cat-meta">0 published · 5 upcoming · 5 total</div>
+  <ul class="item-list">
+    <li><span class="n">#82</span><span class="dot">○</span> PlayFab Backend Architecture</li>
+    <li><span class="n">#83</span><span class="dot">○</span> Firebase Realtime Database for Games</li>
+    <li><span class="n">#84</span><span class="dot">○</span> Steamworks Leaderboard Systems</li>
+    <li><span class="n">#86</span><span class="dot">○</span> Unity Analytics Telemetry Systems</li>
+    <li><span class="n">#90</span><span class="dot">○</span> Redis Real-Time Leaderboard Design</li>
+  </ul>
+</div>
+
+<div class="cat-block">
+  <div class="cat-title"><span class="icon">🐳</span>DevOps &amp; Game Infrastructure</div>
+  <div class="cat-meta">0 published · 3 upcoming · 3 total</div>
+  <ul class="item-list">
+    <li><span class="n">#85</span><span class="dot">○</span> Unity Cloud Build CI/CD</li>
+    <li><span class="n">#92</span><span class="dot">○</span> Docker Game Server Containerization</li>
+    <li><span class="n">#93</span><span class="dot">○</span> Kubernetes Auto-Scaling Game Servers</li>
+  </ul>
+</div>
+
+
+<!-- SUMMARY TABLE -->
+<div class="summary-block">
+  <h2>📊 Summary Statistics</h2>
+  <table class="summary-table2">
+    <tr><th>Group</th><th>Category</th><th>✓ Done</th><th>○ Upcoming</th><th>Total</th></tr>
+    <tr><td class="grp-cell" rowspan="3">1 — Frontend, AI &amp; Cloud</td><td>📱 Mobile &amp; UI/UX</td><td class="done-cell">5</td><td>2</td><td>7</td></tr>
+    <tr><td>🤖 AI &amp; Search Systems</td><td class="done-cell">2</td><td>0</td><td>2</td></tr>
+    <tr><td>☁️ Cloud &amp; Infrastructure</td><td class="done-cell">1</td><td>3</td><td>4</td></tr>
+    <tr><td class="grp-cell" rowspan="3">2 — Platform, Space &amp; Auto</td><td>🚀 Platform Engineering</td><td class="done-cell">1</td><td>4</td><td>5</td></tr>
+    <tr><td>🛰️ Satellite &amp; Space</td><td class="done-cell">0</td><td>2</td><td>2</td></tr>
+    <tr><td>⚡ Tesla Engineering</td><td class="done-cell">2</td><td>0</td><td>2</td></tr>
+    <tr><td class="grp-cell" rowspan="4">3 — Fintech &amp; Distributed</td><td>💳 Payments &amp; Fintech</td><td class="done-cell">0</td><td>5</td><td>5</td></tr>
+    <tr><td>📡 Streaming, Content &amp; Commerce</td><td class="done-cell">0</td><td>4</td><td>4</td></tr>
+    <tr><td>🔗 Distributed Systems &amp; Protocols</td><td class="done-cell">0</td><td>6</td><td>6</td></tr>
+    <tr><td>🌍 Global Tech &amp; AI Platforms</td><td class="done-cell">0</td><td>5</td><td>5</td></tr>
+    <tr><td class="grp-cell" rowspan="3">4 — Critical Infrastructure</td><td>🛡️ Defense &amp; Physical Infra</td><td class="done-cell">0</td><td>6</td><td>6</td></tr>
+    <tr><td>🔬 Science, Research &amp; Archives</td><td class="done-cell">0</td><td>4</td><td>4</td></tr>
+    <tr><td>🕵️ Law Enforcement &amp; Intelligence</td><td class="done-cell">0</td><td>2</td><td>2</td></tr>
+    <tr><td class="grp-cell" rowspan="2">5 — Public &amp; National</td><td>🚨 Emergency &amp; Government</td><td class="done-cell">0</td><td>3</td><td>3</td></tr>
+    <tr><td>🌐 Consumer-Scale Platforms</td><td class="done-cell">0</td><td>2</td><td>2</td></tr>
+    <tr><td class="grp-cell" rowspan="3">6 — Aadhaar &amp; Identity</td><td>🇮🇳 Legal, Consent &amp; Privacy</td><td class="done-cell">0</td><td>6</td><td>6</td></tr>
+    <tr><td>🪪 Auth, Biometrics &amp; API</td><td class="done-cell">1</td><td>7</td><td>8</td></tr>
+    <tr><td>🔑 Crypto, Architecture &amp; DR</td><td class="done-cell">0</td><td>3</td><td>3</td></tr>
+    <tr><td class="grp-cell" rowspan="4">7 — Game &amp; Real-Time</td><td>🎮 Game Engines &amp; Architecture</td><td class="done-cell">0</td><td>7</td><td>7</td></tr>
+    <tr><td>🕹️ Multiplayer &amp; Networking</td><td class="done-cell">0</td><td>5</td><td>5</td></tr>
+    <tr><td>🖥️ Game Backend &amp; Services</td><td class="done-cell">0</td><td>5</td><td>5</td></tr>
+    <tr><td>🐳 DevOps &amp; Game Infrastructure</td><td class="done-cell">0</td><td>3</td><td>3</td></tr>
+    <tr class="total-row"><td colspan="2">TOTAL — 22 categories · 7 groups</td><td class="done-cell">12</td><td>82</td><td>94</td></tr>
+  </table>
+</div>
+
+<!-- TRAJECTORY -->
+<div class="traj-block">
+  <h2>📈 Growth Trajectory</h2>
+  <ul class="traj-list">
+    <li><strong>v1.0</strong> — 77 case studies across 9 categories</li>
+    <li><strong>v2.0</strong> — 85 case studies, added Aadhaar &amp; National Identity Systems category</li>
+    <li><strong>v2.1</strong> — Added 5 Aadhaar-specific case studies</li>
+    <li><strong>v2.2</strong> — Expanded Aadhaar roadmap (ABIS, CIDR, HSM, Zero-Trust, DR). Restructured into 7 groups, 22 categories</li>
+    <li><strong>Goal</strong> — Comprehensive coverage of Indian government systems architecture, global scale infrastructure, and real-time engineering systems</li>
+  </ul>
+</div>
+
+<div class="footer">
+  Last Updated: February 19, 2026 · Version: 2.2 · 94 topics · 12 confirmed published · India &amp; Asia focus
+</div>
 
 </div>
 </body>
