@@ -4,23 +4,73 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System Engineering Playbook</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:          #050508;
+      --bg-card:     #0d0d12;
+      --bg-hover:    #13131a;
+      --border:      #1c1c26;
+      --border-soft: #16161e;
+      --text:        #f0f0f5;
+      --text-muted:  #6b6b80;
+      --text-dim:    #3a3a50;
+      --accent:      #4f6ef7;
+      --accent-glow: rgba(79,110,247,0.15);
+      --green:       #22c55e;
+      --font:        'Geist', system-ui, sans-serif;
+      --mono:        'Geist Mono', 'JetBrains Mono', monospace;
+      --radius:      8px;
+    }
 
-body {
-  font-family: 'JetBrains Mono', monospace;
-  background: #0d1117;
-  color: #c9d1d9;
-  font-size: 14px;
-  line-height: 1.6;
-  padding: 48px 24px 80px;
-}
+    /* Reset & Base */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.page {
-  max-width: 860px;
-  margin: 0 auto;
-}
+    /* Grid texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,110,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,110,247,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Hero glow effects */
+    .hero-glow {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    .glow-orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(120px);
+      animation: pulse-orb 4s ease-in-out infinite alternate;
+    }
+    .glow-orb.indigo { top: 15%; left: 10%; width: 400px; height: 400px; background: rgba(79, 70, 229, 0.12); }
+    .glow-orb.purple { top: 40%; right: 10%; width: 450px; height: 450px; background: rgba(147, 51, 234, 0.12); animation-delay: 1.5s; }
+    .glow-orb.third { bottom: 10%; right: 5%; width: 350px; height: 350px; background: rgba(147, 51, 234, 0.08); filter: blur(100px); animation: pulse-orb 5s ease-in-out infinite alternate-reverse; }
+
+    @keyframes pulse-orb {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.1); opacity: 0.9; }
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 5rem 2rem 7rem;
+    }
 
 /* ── Top title ── */
 .title-block {
@@ -29,14 +79,14 @@ body {
   margin-bottom: 32px;
 }
 .title-block h1 {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 600;
   color: #e6edf3;
   margin-bottom: 8px;
 }
 .title-block p {
   color: #8b949e;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.6;
 }
 .meta-row {
@@ -44,7 +94,7 @@ body {
   gap: 24px;
   flex-wrap: wrap;
   margin-top: 12px;
-  font-size: 12px;
+  font-size: 14px;
   color: #8b949e;
 }
 .meta-row span strong { color: #c9d1d9; }
@@ -54,16 +104,16 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 32px;
-  font-size: 13px;
+  font-size: 15px;
 }
 .stats-table th {
   text-align: left;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border: 1px solid #21262d;
   background: #161b22;
   color: #8b949e;
   font-weight: 500;
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -78,13 +128,13 @@ body {
 
 /* ── Group heading ── */
 .group-heading {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: #8b949e;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin: 40px 0 16px;
-  padding-bottom: 6px;
+  margin: 48px 0 20px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #21262d;
 }
 .group-heading span { color: #c9d1d9; }
@@ -93,16 +143,16 @@ body {
 .cat-block { margin-bottom: 28px; }
 
 .cat-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: #e6edf3;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
-.cat-title .icon { margin-right: 6px; }
+.cat-title .icon { margin-right: 8px; }
 .cat-meta {
-  font-size: 11px;
+  font-size: 13px;
   color: #8b949e;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 /* ── Item list ── */
@@ -111,14 +161,14 @@ body {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  padding: 2px 0;
-  font-size: 13px;
+  padding: 4px 0;
+  font-size: 15px;
   color: #8b949e;
 }
 .item-list li .n {
-  font-size: 11px;
+  font-size: 13px;
   color: #484f58;
-  min-width: 28px;
+  min-width: 32px;
   flex-shrink: 0;
 }
 .item-list li.done { color: #c9d1d9; }
@@ -128,53 +178,53 @@ body {
 }
 .item-list li.done a:hover { color: #58a6ff; text-decoration: underline; }
 .item-list li .tick {
-  font-size: 11px;
+  font-size: 13px;
   color: #3fb950;
   flex-shrink: 0;
 }
 .item-list li .dot {
-  font-size: 11px;
+  font-size: 13px;
   color: #484f58;
   flex-shrink: 0;
 }
 
 /* ── Summary at bottom ── */
 .summary-block { margin-top: 48px; border-top: 1px solid #21262d; padding-top: 24px; }
-.summary-block h2 { font-size: 14px; color: #e6edf3; margin-bottom: 16px; font-weight: 600; }
+.summary-block h2 { font-size: 18px; color: #e6edf3; margin-bottom: 20px; font-weight: 600; }
 .summary-table2 {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 14.5px;
 }
 .summary-table2 th {
   text-align: left;
-  padding: 6px 10px;
+  padding: 8px 10px;
   border: 1px solid #21262d;
   background: #161b22;
   color: #8b949e;
   font-weight: 500;
-  font-size: 11px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 .summary-table2 td {
-  padding: 5px 10px;
+  padding: 8px 10px;
   border: 1px solid #21262d;
   color: #c9d1d9;
 }
 .summary-table2 tr:hover td { background: #161b22; }
-.summary-table2 .grp-cell { color: #8b949e; font-size: 11px; }
+.summary-table2 .grp-cell { color: #8b949e; font-size: 13px; }
 .summary-table2 .done-cell { color: #3fb950; }
 .summary-table2 .total-row td { background: #161b22; font-weight: 600; color: #e6edf3; border-top: 1px solid #30363d; }
 
 /* ── Trajectory ── */
 .traj-block { margin-top: 32px; }
-.traj-block h2 { font-size: 14px; color: #e6edf3; margin-bottom: 12px; font-weight: 600; }
+.traj-block h2 { font-size: 18px; color: #e6edf3; margin-bottom: 16px; font-weight: 600; }
 .traj-list { list-style: none; }
-.traj-list li { font-size: 13px; color: #8b949e; padding: 3px 0; }
+.traj-list li { font-size: 15px; color: #8b949e; padding: 4px 0; }
 .traj-list li strong { color: #c9d1d9; }
 
 /* ── Footer ── */
-.footer { margin-top: 48px; border-top: 1px solid #21262d; padding-top: 16px; font-size: 12px; color: #484f58; }
+.footer { margin-top: 48px; border-top: 1px solid #21262d; padding-top: 16px; font-size: 14px; color: #484f58; }
 
 @media(max-width: 600px) {
   body { padding: 24px 16px 48px; }
@@ -183,6 +233,11 @@ body {
 </style>
 </head>
 <body>
+  <div class="hero-glow">
+    <div class="glow-orb indigo"></div>
+    <div class="glow-orb purple"></div>
+    <div class="glow-orb third"></div>
+  </div>
 <div class="page">
 
 <!-- TITLE -->
